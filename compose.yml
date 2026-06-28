@@ -1,0 +1,14 @@
+services:
+  nextjs-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_PATH=/app/database/nuzlocke.db
+    restart: unless-stopped
+    volumes:
+      - ./database:/app/database
+      - ./app.log:/app/app.log
