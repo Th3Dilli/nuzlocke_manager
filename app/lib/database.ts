@@ -45,6 +45,14 @@ database.exec(`
         created_at TEXT NOT NULL,
         expires_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS team_editors
+    (
+        owner      TEXT NOT NULL,
+        editor     TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        PRIMARY KEY (owner, editor)
+    );
 `)
 
 
@@ -107,5 +115,25 @@ export const upsertStmt = database.prepare(`
 export const selectStmt = database.prepare(`SELECT *
                                             FROM stats
                                             WHERE user = ?`);
+
+export const insertTeamEditor = database.prepare<{ owner: string; editor: string; created_at: string }>(`
+    INSERT INTO team_editors (owner, editor, created_at)
+    VALUES (@owner, @editor, @created_at)
+    ON CONFLICT(owner, editor) DO NOTHING
+`);
+
+export const deleteTeamEditor = database.prepare<{ owner: string; editor: string }>(`
+    DELETE FROM team_editors WHERE owner = @owner AND editor = @editor
+`);
+
+export const selectTeamEditors = database.prepare<[string]>(`SELECT editor
+                                                            FROM team_editors
+                                                            WHERE owner = ?
+                                                            ORDER BY editor`);
+
+export const selectTeamEditor = database.prepare<[string, string]>(`SELECT 1
+                                                                   FROM team_editors
+                                                                   WHERE owner = ?
+                                                                     AND editor = ?`);
 
 export default database

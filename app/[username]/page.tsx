@@ -4,6 +4,7 @@ import {use} from "react";
 import {Stat} from "@/app/lib/types/Stat";
 import {Suspense, useEffect, useState} from "react";
 import TeamEditor from "@/app/components/TeamEditor";
+import EditorManager from "@/app/components/EditorManager";
 
 
 function HomeInner({username}: { username: string }) {
@@ -11,13 +12,17 @@ function HomeInner({username}: { username: string }) {
 
     const [notFound, setNotFound] = useState(false);
     const [isOwner, setIsOwner] = useState(false);
+    const [canEdit, setCanEdit] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
-        fetch("/api/me")
+        fetch(`/api/stats/${username}/permissions`)
             .then(res => res.json())
-            .then((data: { username: string | null }) => {
-                if (!cancelled) setIsOwner(data.username === username);
+            .then((data: { isOwner: boolean; canEdit: boolean }) => {
+                if (!cancelled) {
+                    setIsOwner(data.isOwner);
+                    setCanEdit(data.canEdit);
+                }
             })
             .catch(() => {/* not logged in / offline: stay read-only */});
         return () => {
@@ -102,7 +107,8 @@ function HomeInner({username}: { username: string }) {
                 <img className="w-16 h-16" src={`/showdown/${stats.team5}.gif`}/>
                 <img className="w-16 h-16" src={`/showdown/${stats.team6}.gif`}/>
 
-                {isOwner && <TeamEditor username={username} stats={stats}/>}
+                {canEdit && <TeamEditor username={username} stats={stats}/>}
+                {isOwner && <EditorManager username={username}/>}
             </main>
         </div>
     );
