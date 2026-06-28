@@ -3,12 +3,27 @@
 import {use} from "react";
 import {Stat} from "@/app/lib/types/Stat";
 import {Suspense, useEffect, useState} from "react";
+import TeamEditor from "@/app/components/TeamEditor";
 
 
 function HomeInner({username}: { username: string }) {
     const [stats, setStats] = useState<Stat|undefined>();
 
     const [notFound, setNotFound] = useState(false);
+    const [isOwner, setIsOwner] = useState(false);
+
+    useEffect(() => {
+        let cancelled = false;
+        fetch("/api/me")
+            .then(res => res.json())
+            .then((data: { username: string | null }) => {
+                if (!cancelled) setIsOwner(data.username === username);
+            })
+            .catch(() => {/* not logged in / offline: stay read-only */});
+        return () => {
+            cancelled = true;
+        };
+    }, [username]);
 
     useEffect(() => {
         let es: EventSource | null = null;
@@ -86,6 +101,8 @@ function HomeInner({username}: { username: string }) {
                 <img className="w-16 h-16" src={`/showdown/${stats.team4}.gif`}/>
                 <img className="w-16 h-16" src={`/showdown/${stats.team5}.gif`}/>
                 <img className="w-16 h-16" src={`/showdown/${stats.team6}.gif`}/>
+
+                {isOwner && <TeamEditor username={username} stats={stats}/>}
             </main>
         </div>
     );

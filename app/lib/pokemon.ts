@@ -1,4 +1,6 @@
-const POKEMON = [
+export type Pokemon = { name: string; url: string; id: number };
+
+export const POKEMON: Pokemon[] = [
     {
         "name": "bulbasaur",
         "url": "https://pokeapi.co/api/v2/pokemon/1/",

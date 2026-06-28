@@ -1,0 +1,165 @@
+"use client";
+
+import {useMemo, useState} from "react";
+import {POKEMON} from "@/app/lib/pokemon";
+import {Stat} from "@/app/lib/types/Stat";
+import {Check, Search, X} from "lucide-react";
+
+const TEAM_KEYS = ["team1", "team2", "team3", "team4", "team5", "team6"] as const;
+
+const MAX_SUGGESTIONS = 8;
+
+export default function TeamEditor({username, stats}: { username: string; stats: Stat }) {
+    // Draft team, seeded once from the current stats. The 6 entries are
+    // Pokémon ids (as strings) or "" for an empty slot.
+    const [team, setTeam] = useState<string[]>(() => TEAM_KEYS.map(k => stats[k] ?? ""));
+    const [saving, setSaving] = useState(false);
+    const [saved, setSaved] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const dirty = useMemo(
+        () => TEAM_KEYS.some((k, i) => (stats[k] ?? "") !== team[i]),
+        [stats, team]
+    );
+
+    function setSlot(index: number, id: string) {
+        setTeam(prev => prev.map((v, i) => (i === index ? id : v)));
+        setSaved(false);
+        setError(null);
+    }
+
+    async function handleSave() {
+        setSaving(true);
+        setError(null);
+        try {
+            const body = Object.fromEntries(TEAM_KEYS.map((k, i) => [k, team[i]]));
+            const res = await fetch(`/api/stats/${username}`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(body),
+            });
+            if (res.ok) {
+                setSaved(true);
+                setTimeout(() => setSaved(false), 2000);
+            } else {
+                setError(await res.text() || "Failed to save");
+            }
+        } catch {
+            setError("Failed to save");
+        } finally {
+            setSaving(false);
+        }
+    }
+
+    return (
+        <div className="mt-6 rounded-xl border border-yellow-600 bg-neutral-900 p-4">
+            <div className="mb-4 flex items-center justify-between">
+                <h2 className="cinzel text-xl font-bold text-yellow-300">Edit Team</h2>
+                <div className="flex items-center gap-3">
+                    {error && <span className="text-sm text-red-400">{error}</span>}
+                    <button
+                        onClick={handleSave}
+                        disabled={saving || !dirty}
+                        className="inline-flex cursor-pointer items-center gap-1.5 rounded bg-yellow-600 px-4 py-2 text-sm font-bold text-black shadow transition-colors hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                        {saved ? <><Check className="h-4 w-4"/> Saved</> : saving ? "Saving…" : "Save Team"}
+                    </button>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {team.map((id, i) => (
+                    <PokemonSlot key={i} index={i} id={id} onSelect={selected => setSlot(i, selected)}/>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function PokemonSlot({index, id, onSelect}: { index: number; id: string; onSelect: (id: string) => void }) {
+    const [query, setQuery] = useState("");
+    const [open, setOpen] = useState(false);
+
+    const selected = useMemo(() => POKEMON.find(p => String(p.id) === id), [id]);
+
+    const suggestions = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        if (!q) return [];
+        return POKEMON.filter(p => p.name.includes(q)).slice(0, MAX_SUGGESTIONS);
+    }, [query]);
+
+    function choose(pokemonId: number) {
+        onSelect(String(pokemonId));
+        setQuery("");
+        setOpen(false);
+    }
+
+    return (
+        <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">
+            <div className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500">
+                Slot {index + 1}
+            </div>
+
+            {/* Current selection preview */}
+            <div className="mb-3 flex items-center gap-3">
+                <div className="flex h-16 w-16 items-center justify-center rounded bg-neutral-900">
+                    {id ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img className="h-16 w-16" src={`/showdown/${id}.gif`} alt={selected?.name ?? id}/>
+                    ) : (
+                        <span className="text-xs text-gray-600">empty</span>
+                    )}
+                </div>
+                <div className="flex-1">
+                    <div className="capitalize text-gray-200">{selected?.name ?? "—"}</div>
+                    {id && (
+                        <button
+                            onClick={() => onSelect("")}
+                            className="mt-1 inline-flex cursor-pointer items-center gap-1 text-xs text-gray-400 hover:text-red-400"
+                        >
+                            <X className="h-3 w-3"/> Clear
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {/* Search field */}
+            <div className="relative">
+                <div className="flex items-center rounded-md border border-yellow-600 bg-neutral-900 px-2 focus-within:border-yellow-500">
+                    <Search className="h-4 w-4 text-gray-500"/>
+                    <input
+                        type="text"
+                        value={query}
+                        placeholder="Search Pokémon…"
+                        onChange={e => {
+                            setQuery(e.target.value);
+                            setOpen(true);
+                        }}
+                        onFocus={() => setOpen(true)}
+                        onBlur={() => setTimeout(() => setOpen(false), 150)}
+                        className="w-full bg-transparent px-2 py-2 text-sm text-gray-200 outline-none"
+                    />
+                </div>
+
+                {open && suggestions.length > 0 && (
+                    <ul className="absolute z-10 mt-1 max-h-72 w-full overflow-y-auto rounded-md border border-yellow-700 bg-neutral-900 shadow-lg">
+                        {suggestions.map(p => (
+                            <li key={p.id}>
+                                <button
+                                    // onMouseDown fires before the input's blur, so the click registers.
+                                    onMouseDown={e => e.preventDefault()}
+                                    onClick={() => choose(p.id)}
+                                    className="flex w-full cursor-pointer items-center gap-3 px-2 py-1.5 text-left hover:bg-neutral-800"
+                                >
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img className="h-10 w-10" src={`/showdown/${p.id}.gif`} alt={p.name}/>
+                                    <span className="capitalize text-sm text-gray-200">{p.name}</span>
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+        </div>
+    );
+}
