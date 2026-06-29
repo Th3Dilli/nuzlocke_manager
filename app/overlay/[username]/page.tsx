@@ -2,7 +2,7 @@
 
 import {Stat} from "@/app/lib/types/Stat";
 import {Component, ReactNode, Suspense, use, useEffect, useState} from "react";
-import TeamBox, {Graveyard, Pokeball, TitleTab} from "@/app/components/TeamBox";
+import TeamBox, {Graveyard, TitleTab} from "@/app/components/TeamBox";
 
 function OverlayInner({username}: { username: string }) {
 
@@ -47,7 +47,7 @@ function OverlayInner({username}: { username: string }) {
 
 // Change this value to adjust the layout.
 // The math will automatically handle everything else.
-    const MAIN_SCREEN_WIDTH = 1250;
+    const MAIN_SCREEN_WIDTH = 1280;
 
     return (
         <div
@@ -63,25 +63,24 @@ function OverlayInner({username}: { username: string }) {
         >
 
             {/* Left Column Container */}
-            <div className="flex flex-col gap-4 shrink-0 aspect-4/3] min-h-[var(--main-h)] min-w-[var(--main-W)]">
-                <Frame label="Nuzlocke" className="aspect-4/3 min-h-[var(--main-h)] min-w-[var(--main-W)] shrink-0" />
+            <div className="flex flex-col gap-4">
+                <Frame label="Nuzlocke" className="aspect-4/3 min-h-[var(--main-h)] min-w-[var(--main-W)]" />
 
                 <Graveyard label="Graveyard" className="w-full flex-1 min-h-0">
-                    <div className="flex flex-row gap-2">
-                        {stats.team.map((id, i) => (
-                            <div key={i} className="flex flex-1 items-center justify-center">
-                                {id ? (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img
-                                        src={`/showdown/${id}.gif`}
-                                        alt=""
-                                        className=" [image-rendering:pixelated]"
-                                    />
-                                ) : (
-                                    <Pokeball className="h-3/4 w-3/4 opacity-30"/>
-                                )}
-                            </div>
-                        ))}
+                    <div className="flex h-full flex-row flex-wrap content-start ">
+                        {stats.graveyard.length === 0 ? (
+                            <span className="m-auto text-lg opacity-40">No fallen Pokémon yet</span>
+                        ) : (
+                            stats.graveyard.map((id, i) => (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                    key={`${id}-${i}`}
+                                    src={`/showdown/${id}.gif`}
+                                    alt=""
+                                    className="h-16 w-16 object-contain opacity-80 grayscale [image-rendering:pixelated]"
+                                />
+                            ))
+                        )}
                     </div>
                 </Graveyard>
             </div>

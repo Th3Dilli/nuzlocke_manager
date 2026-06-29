@@ -17,8 +17,9 @@ log("INFO", `Database: ${dbPath}`);
 database.exec(`
     CREATE TABLE IF NOT EXISTS stats
     (
-        user TEXT PRIMARY KEY,
-        team TEXT NOT NULL DEFAULT '[]'
+        user      TEXT PRIMARY KEY,
+        team      TEXT NOT NULL DEFAULT '[]',
+        graveyard TEXT NOT NULL DEFAULT '[]'
     );
 
     CREATE TABLE IF NOT EXISTS users
@@ -49,6 +50,14 @@ database.exec(`
         PRIMARY KEY (owner, editor)
     );
 `)
+
+// Migration: add the graveyard column to pre-existing stats tables (CREATE TABLE
+// IF NOT EXISTS above only covers fresh installs). Must run before any statement
+// referencing the column is prepared below.
+const statsColumns = database.prepare(`PRAGMA table_info(stats)`).all() as Array<{ name: string }>;
+if (!statsColumns.some(c => c.name === "graveyard")) {
+    database.exec(`ALTER TABLE stats ADD COLUMN graveyard TEXT NOT NULL DEFAULT '[]'`);
+}
 
 
 export const upsertUser = database.prepare<{ twitch_id: string; username: string; profile_image_url: string; now: string }>(`
@@ -101,10 +110,11 @@ export const deleteExpiredSessions = database.prepare<[string]>(`DELETE
                                                                 FROM sessions
                                                                 WHERE expires_at < ?`)
 
-export const upsertStmt = database.prepare<{ user: string; team: string }>(`
-    INSERT INTO stats (user, team)
-    VALUES (@user, @team)
-    ON CONFLICT(user) DO UPDATE SET team = excluded.team
+export const upsertStmt = database.prepare<{ user: string; team: string; graveyard: string }>(`
+    INSERT INTO stats (user, team, graveyard)
+    VALUES (@user, @team, @graveyard)
+    ON CONFLICT(user) DO UPDATE SET team      = excluded.team,
+                                    graveyard = excluded.graveyard
 `);
 
 export const selectStmt = database.prepare(`SELECT *

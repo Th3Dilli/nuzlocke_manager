@@ -1,4 +1,4 @@
-import {emptyTeam, normalizeTeam, Stat} from "@/app/lib/types/Stat";
+import {emptyTeam, normalizeGraveyard, normalizeTeam, Stat} from "@/app/lib/types/Stat";
 import {getUserToken, selectStmt, upsertStmt} from "@/app/lib/database";
 import {User} from "@/app/lib/users";
 
@@ -31,18 +31,25 @@ export function updatePageEnabled(user: User) {
 const subscribers = new Map<string, Set<(stat: Stat) => void>>();
 
 
-function loadStat(user: string): Stat {
-    const row = selectStmt.get(user) as { user: string; team: string } | undefined;
-    if (row) {
-        let parsed: unknown = [];
-        try {
-            parsed = JSON.parse(row.team);
-        } catch {
-            // Corrupt/legacy value: fall back to an empty team.
-        }
-        return {user: row.user, team: normalizeTeam(parsed)};
+function safeParse(value: string): unknown {
+    try {
+        return JSON.parse(value);
+    } catch {
+        // Corrupt/legacy value: caller falls back to an empty list.
+        return [];
     }
-    return {user: user, team: emptyTeam()};
+}
+
+function loadStat(user: string): Stat {
+    const row = selectStmt.get(user) as { user: string; team: string; graveyard: string } | undefined;
+    if (row) {
+        return {
+            user: row.user,
+            team: normalizeTeam(safeParse(row.team)),
+            graveyard: normalizeGraveyard(safeParse(row.graveyard)),
+        };
+    }
+    return {user: user, team: emptyTeam(), graveyard: []};
 }
 
 export function updateUserToken(username: string, api_token: string) {
@@ -65,8 +72,13 @@ export function setStats(user: string, s: Stat) {
     if (userStat) {
         userStat.user = s.user;
         userStat.team = normalizeTeam(s.team);
+        userStat.graveyard = normalizeGraveyard(s.graveyard);
 
-        upsertStmt.run({user, team: JSON.stringify(userStat.team)});
+        upsertStmt.run({
+            user,
+            team: JSON.stringify(userStat.team),
+            graveyard: JSON.stringify(userStat.graveyard),
+        });
 
         subscribers.get(user)?.forEach(cb => cb(userStat));
     }

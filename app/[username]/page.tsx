@@ -4,8 +4,9 @@ import {use} from "react";
 import {Stat} from "@/app/lib/types/Stat";
 import {Suspense, useEffect, useState} from "react";
 import TeamEditor from "@/app/components/TeamEditor";
+import GraveyardEditor from "@/app/components/GraveyardEditor";
 import EditorManager from "@/app/components/EditorManager";
-import TeamBox from "@/app/components/TeamBox";
+import TeamBox, {Graveyard} from "@/app/components/TeamBox";
 
 
 function HomeInner({username}: { username: string }) {
@@ -109,11 +110,29 @@ function HomeInner({username}: { username: string }) {
                         <p>{username}</p>
                     </a>
                 </div>
-                <div className="flex justify-center w-200">
+                <div className="flex justify-center items-center gap-2">
                     <TeamBox team={stats.team}/>
+                    <Graveyard label="Graveyard" className="w-full flex-1 h-20">
+                        <div className="flex h-16 flex-row flex-wrap content-start ">
+                            {stats.graveyard.length === 0 ? (
+                                <span className="m-auto text-lg opacity-40">No fallen Pokémon yet</span>
+                            ) : (
+                                stats.graveyard.map((id, i) => (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img
+                                        key={`${id}-${i}`}
+                                        src={`/showdown/${id}.gif`}
+                                        alt=""
+                                        className="h-16 w-16 object-contain opacity-80 grayscale [image-rendering:pixelated]"
+                                    />
+                                ))
+                            )}
+                        </div>
+                    </Graveyard>
                 </div>
 
                 {canEdit && <TeamEditor username={username} stats={stats}/>}
+                {canEdit && <GraveyardEditor username={username} stats={stats}/>}
                 {isOwner && <EditorManager username={username}/>}
             </main>
         </div>
