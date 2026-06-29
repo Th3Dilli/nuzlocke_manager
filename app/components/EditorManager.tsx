@@ -70,7 +70,7 @@ export default function EditorManager({username}: { username: string }) {
     }
 
     return (
-        <div className="mt-6 rounded-xl border border-yellow-600 bg-neutral-900 p-4">
+        <div className="mt-6 rounded-xl border border-yellow-600 bgdark p-4">
             <div className="mb-1 flex items-center gap-2">
                 <UserPlus className="h-5 w-5 text-yellow-300"/>
                 <h2 className="text-xl font-bold text-yellow-300">Team Editors</h2>

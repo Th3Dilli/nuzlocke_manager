@@ -34,7 +34,7 @@ body:has(.overlay) {
     background-color: transparent;
 }
 
-.overlay-bar {
+.bgdark {
     font-family: Arial, Helvetica, sans-serif;
     background-color: rgba(30,30,30,0.8);
     background-size: cover;

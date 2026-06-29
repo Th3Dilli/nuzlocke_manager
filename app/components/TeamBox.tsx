@@ -2,7 +2,7 @@ import {ReactNode} from "react";
 
 export default function TeamBox({team}: { team: number[] }) {
     return (
-        <div className="overlay-bar relative shrink-0 rounded-2xl border-[5px] border-yellow-500 p-3 pt-5">
+        <div className="bgdark relative shrink-0 rounded-2xl border-[5px] border-yellow-500 p-3 pt-5">
             <TitleTab label="Team" borderColor="border-yellow-500"/>
             <div className="flex flex-row gap-2">
                 {team.map((id, i) => (
@@ -53,7 +53,7 @@ export function Pokeball({className}: { className?: string }) {
 
 export function Graveyard({label, className, children}: { label?: string; className?: string; children?: ReactNode }) {
     return (
-        <div className={`relative rounded-2xl border-6 border-yellow-500 ${className ?? ""}`}>
+        <div className={`relative rounded-2xl border-6 border-yellow-500 bgdark ${className ?? ""}`}>
             {label ? <TitleTab label={label} borderColor="border-yellow-500"/> : <></>}
             {children}
         </div>

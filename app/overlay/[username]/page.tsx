@@ -51,7 +51,7 @@ function OverlayInner({username}: { username: string }) {
 
     return (
         <div
-            className="overlay relative flex h-[1080px] w-[1920px] gap-4 overflow-hidden p-4 text-yellow-300 bg-transparent"
+            className="overlay relative flex h-[1080px] w-[1920px] gap-4 overflow-hidden p-4 text-yellow-300 bg-transparent page-bg"
             style={{
                 // Pass the width to CSS variables so Tailwind calc can read it
                 "--main-w": `${MAIN_SCREEN_WIDTH}px`,

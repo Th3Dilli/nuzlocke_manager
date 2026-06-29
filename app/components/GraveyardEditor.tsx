@@ -86,7 +86,7 @@ export default function GraveyardEditor({username, stats}: { username: string; s
     }
 
     return (
-        <div className="mt-6 rounded-xl border border-yellow-600 bg-neutral-900 p-4">
+        <div className="mt-6 rounded-xl border border-yellow-600 bgdark p-4">
             <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <Skull className="h-5 w-5 text-yellow-300"/>
