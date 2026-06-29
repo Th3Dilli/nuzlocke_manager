@@ -38,6 +38,12 @@ export default async function Home() {
                         <div className="p-2 gap-2 rounded-xl border border-yellow-600 bg-neutral-900">
                             {user.page_enabled === 1 ? (
                                 <div>
+                                    <a href={`${baseUrl}/${user.username}`} className="text-yellow-600 hover:underline">
+                                        Go to Page
+                                    </a><br/>
+                                    <a href={`${baseUrl}/overlay/${user.username}`} className="text-yellow-600 hover:underline">
+                                        Go to Overlay
+                                    </a>
                                     <CopyKeyField name="Overlay OBS Browser Source:" url={`${baseUrl}/overlay/${user.username}`}></CopyKeyField>
 
                                 </div>

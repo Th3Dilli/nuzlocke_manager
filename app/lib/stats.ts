@@ -1,4 +1,4 @@
-import {Stat} from "@/app/lib/types/Stat";
+import {emptyTeam, normalizeTeam, Stat} from "@/app/lib/types/Stat";
 import {getUserToken, selectStmt, upsertStmt} from "@/app/lib/database";
 import {User} from "@/app/lib/users";
 
@@ -32,21 +32,17 @@ const subscribers = new Map<string, Set<(stat: Stat) => void>>();
 
 
 function loadStat(user: string): Stat {
-    const row = selectStmt.get(user) as {
-        user: string; team1: string; team2: string; team3: string; team4: string; team5: string; team6: string;
-    } | undefined;
+    const row = selectStmt.get(user) as { user: string; team: string } | undefined;
     if (row) {
-        return {
-            user: row.user,
-            team1: row.team1,
-            team2: row.team2,
-            team3: row.team3,
-            team4: row.team4,
-            team5: row.team5,
-            team6: row.team6,
-        };
+        let parsed: unknown = [];
+        try {
+            parsed = JSON.parse(row.team);
+        } catch {
+            // Corrupt/legacy value: fall back to an empty team.
+        }
+        return {user: row.user, team: normalizeTeam(parsed)};
     }
-    return {user: user, team1: "", team2: "", team3: "", team4: "", team5: "", team6: ""};
+    return {user: user, team: emptyTeam()};
 }
 
 export function updateUserToken(username: string, api_token: string) {
@@ -68,22 +64,9 @@ export function setStats(user: string, s: Stat) {
     const userStat = statsCache.get(user);
     if (userStat) {
         userStat.user = s.user;
-        userStat.team1 = s.team1;
-        userStat.team2 = s.team2;
-        userStat.team3 = s.team3;
-        userStat.team4 = s.team4;
-        userStat.team5 = s.team5;
-        userStat.team6 = s.team6;
+        userStat.team = normalizeTeam(s.team);
 
-        upsertStmt.run({
-            user,
-            team1: userStat.team1,
-            team2: userStat.team2,
-            team3: userStat.team3,
-            team4: userStat.team4,
-            team5: userStat.team5,
-            team6: userStat.team6,
-        });
+        upsertStmt.run({user, team: JSON.stringify(userStat.team)});
 
         subscribers.get(user)?.forEach(cb => cb(userStat));
     }

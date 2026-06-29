@@ -17,13 +17,8 @@ log("INFO", `Database: ${dbPath}`);
 database.exec(`
     CREATE TABLE IF NOT EXISTS stats
     (
-        user  TEXT PRIMARY KEY,
-        team1 TEXT,
-        team2 TEXT,
-        team3 TEXT,
-        team4 TEXT,
-        team5 TEXT,
-        team6 TEXT
+        user TEXT PRIMARY KEY,
+        team TEXT NOT NULL DEFAULT '[]'
     );
 
     CREATE TABLE IF NOT EXISTS users
@@ -106,10 +101,10 @@ export const deleteExpiredSessions = database.prepare<[string]>(`DELETE
                                                                 FROM sessions
                                                                 WHERE expires_at < ?`)
 
-export const upsertStmt = database.prepare(`
-    INSERT INTO stats (user, team1, team2, team3, team4, team5, team6)
-    VALUES (@user, @team1, @team2, @team3, @team4, @team5, @team6)
-    ON CONFLICT(user) DO UPDATE SET user=excluded.user,team1=excluded.team1,team2=excluded.team2,team3=excluded.team3,team4=excluded.team4,team5=excluded.team5,team6=excluded.team6
+export const upsertStmt = database.prepare<{ user: string; team: string }>(`
+    INSERT INTO stats (user, team)
+    VALUES (@user, @team)
+    ON CONFLICT(user) DO UPDATE SET team = excluded.team
 `);
 
 export const selectStmt = database.prepare(`SELECT *

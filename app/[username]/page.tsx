@@ -5,10 +5,11 @@ import {Stat} from "@/app/lib/types/Stat";
 import {Suspense, useEffect, useState} from "react";
 import TeamEditor from "@/app/components/TeamEditor";
 import EditorManager from "@/app/components/EditorManager";
+import TeamBox from "@/app/components/TeamBox";
 
 
 function HomeInner({username}: { username: string }) {
-    const [stats, setStats] = useState<Stat|undefined>();
+    const [stats, setStats] = useState<Stat | undefined>();
 
     const [notFound, setNotFound] = useState(false);
     const [isOwner, setIsOwner] = useState(false);
@@ -24,7 +25,8 @@ function HomeInner({username}: { username: string }) {
                     setCanEdit(data.canEdit);
                 }
             })
-            .catch(() => {/* not logged in / offline: stay read-only */});
+            .catch(() => {/* not logged in / offline: stay read-only */
+            });
         return () => {
             cancelled = true;
         };
@@ -83,7 +85,7 @@ function HomeInner({username}: { username: string }) {
             <div className="text-yellow-500 p-4">
                 <main className="max-w-7xl mx-auto flex flex-col gap-4">
                     <div className="flex flex-row items-center gap-4">
-                        <h1 className="cinzel font-bold text-2xl text-yellow-300">
+                        <h1 className="font-bold text-2xl text-yellow-300">
                             User not found or Stats not enabled
                         </h1>
                     </div>
@@ -99,13 +101,17 @@ function HomeInner({username}: { username: string }) {
     return (
         <div className="text-yellow-500 p-4">
             <main className="max-w-7xl mx-auto flex flex-col gap-4">
-                {stats.user}
-                <img className="w-16 h-16" src={`/showdown/${stats.team1}.gif`}/>
-                <img className="w-16 h-16" src={`/showdown/${stats.team2}.gif`}/>
-                <img className="w-16 h-16" src={`/showdown/${stats.team3}.gif`}/>
-                <img className="w-16 h-16" src={`/showdown/${stats.team4}.gif`}/>
-                <img className="w-16 h-16" src={`/showdown/${stats.team5}.gif`}/>
-                <img className="w-16 h-16" src={`/showdown/${stats.team6}.gif`}/>
+                <div className="flex justify-center">
+                    <a href={`https://twitch.tv/${username}`}
+                       className="flex flex-row items-center gap-2 bg-[#9146ff] hover:bg-[#7d2ff7] text-white text-sm font-bold pl-2 pr-3 py-1.5 rounded-lg transition-colors">
+                        <img src="glitch_white.svg" className="w-4 h-4">
+                        </img>
+                        <p>{username}</p>
+                    </a>
+                </div>
+                <div className="flex justify-center w-200">
+                    <TeamBox team={stats.team}/>
+                </div>
 
                 {canEdit && <TeamEditor username={username} stats={stats}/>}
                 {isOwner && <EditorManager username={username}/>}

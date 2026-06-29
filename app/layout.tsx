@@ -1,5 +1,5 @@
 import type {Metadata} from "next";
-import {Cinzel, Geist, Geist_Mono} from "next/font/google";
+import { Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,11 +17,6 @@ export const metadata: Metadata = {
     description: "Nuzlocke",
 };
 
-const cinzel = Cinzel({
-    variable: "--font-cinzel",
-    subsets: ["latin"],
-});
-
 export default function RootLayout({
                                        children,
                                    }: Readonly<{
@@ -30,7 +25,7 @@ export default function RootLayout({
     return (
         <html
             lang="en"
-            className={`${cinzel.variable} ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+            className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
         >
         <body className="min-h-full flex flex-col">{children}</body>
         </html>

@@ -2,28 +2,59 @@
 
 import {useMemo, useState} from "react";
 import {POKEMON} from "@/app/lib/pokemon";
-import {Stat} from "@/app/lib/types/Stat";
-import {Check, Search, X} from "lucide-react";
-
-const TEAM_KEYS = ["team1", "team2", "team3", "team4", "team5", "team6"] as const;
+import {Stat, TEAM_SIZE} from "@/app/lib/types/Stat";
+import {AlertTriangle, Check, Search, X} from "lucide-react";
 
 const MAX_SUGGESTIONS = 8;
 
+function teamsEqual(a: number[], b: number[]): boolean {
+    return a.length === b.length && a.every((v, i) => v === b[i]);
+}
+
 export default function TeamEditor({username, stats}: { username: string; stats: Stat }) {
-    // Draft team, seeded once from the current stats. The 6 entries are
-    // Pokémon ids (as strings) or "" for an empty slot.
-    const [team, setTeam] = useState<string[]>(() => TEAM_KEYS.map(k => stats[k] ?? ""));
+    // Draft team, seeded once from the current stats. Length TEAM_SIZE; each
+    // entry is a Pokémon id or 0 for an empty slot.
+    const [team, setTeam] = useState<number[]>(() =>
+        Array.from({length: TEAM_SIZE}, (_, i) => stats.team[i] ?? 0)
+    );
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    // Set when another editor changed the team while we had unsaved edits.
+    const [remoteChanged, setRemoteChanged] = useState(false);
+    // The last team we saw from the server, kept in state so we can detect a new
+    // SSE update during render (React's "adjust state on a prop change" pattern).
+    const [prevRemote, setPrevRemote] = useState<number[]>(stats.team);
 
-    const dirty = useMemo(
-        () => TEAM_KEYS.some((k, i) => (stats[k] ?? "") !== team[i]),
-        [stats, team]
-    );
+    const dirty = useMemo(() => !teamsEqual(team, stats.team), [stats.team, team]);
 
-    function setSlot(index: number, id: string) {
+    // Reconcile the draft when a new team arrives over SSE (e.g. a co-editor
+    // saved). Adopt the incoming team silently when we have no pending edits;
+    // otherwise keep the draft and surface a notice so the user doesn't lose it.
+    if (!teamsEqual(prevRemote, stats.team)) {
+        setPrevRemote(stats.team);
+        if (teamsEqual(team, stats.team)) {
+            // Draft already matches the new remote (e.g. our own save echoed back).
+            setRemoteChanged(false);
+        } else if (teamsEqual(team, prevRemote)) {
+            // No local edits: adopt the incoming team.
+            setTeam([...stats.team]);
+            setRemoteChanged(false);
+        } else {
+            // Local edits conflict with the incoming team: let the user decide.
+            setRemoteChanged(true);
+        }
+    }
+
+    function setSlot(index: number, id: number) {
         setTeam(prev => prev.map((v, i) => (i === index ? id : v)));
+        setSaved(false);
+        setError(null);
+    }
+
+    function loadRemote() {
+        setTeam([...stats.team]);
+        setRemoteChanged(false);
         setSaved(false);
         setError(null);
     }
@@ -32,11 +63,10 @@ export default function TeamEditor({username, stats}: { username: string; stats:
         setSaving(true);
         setError(null);
         try {
-            const body = Object.fromEntries(TEAM_KEYS.map((k, i) => [k, team[i]]));
             const res = await fetch(`/api/stats/${username}`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(body),
+                body: JSON.stringify({team}),
             });
             if (res.ok) {
                 setSaved(true);
@@ -54,7 +84,7 @@ export default function TeamEditor({username, stats}: { username: string; stats:
     return (
         <div className="mt-6 rounded-xl border border-yellow-600 bg-neutral-900 p-4">
             <div className="mb-4 flex items-center justify-between">
-                <h2 className="cinzel text-xl font-bold text-yellow-300">Edit Team</h2>
+                <h2 className="text-xl font-bold text-yellow-300">Edit Team</h2>
                 <div className="flex items-center gap-3">
                     {error && <span className="text-sm text-red-400">{error}</span>}
                     <button
@@ -67,6 +97,26 @@ export default function TeamEditor({username, stats}: { username: string; stats:
                 </div>
             </div>
 
+            {remoteChanged && (
+                <div className="mb-4 flex items-center justify-between gap-3 rounded-md border border-amber-500 bg-amber-500/10 px-3 py-2 text-sm text-amber-300">
+                    <span className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4"/>
+                        This team was changed by another editor.
+                    </span>
+                    <span className="flex items-center gap-2">
+                        <button
+                            onClick={loadRemote}
+                            className="cursor-pointer rounded border border-amber-500 px-2 py-1 text-xs font-medium hover:bg-amber-500/20"
+                        >
+                            Load latest
+                        </button>
+                        <button onClick={() => setRemoteChanged(false)} title="Keep my changes" className="cursor-pointer hover:text-amber-100">
+                            <X className="h-4 w-4"/>
+                        </button>
+                    </span>
+                </div>
+            )}
+
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {team.map((id, i) => (
                     <PokemonSlot key={i} index={i} id={id} onSelect={selected => setSlot(i, selected)}/>
@@ -76,11 +126,11 @@ export default function TeamEditor({username, stats}: { username: string; stats:
     );
 }
 
-function PokemonSlot({index, id, onSelect}: { index: number; id: string; onSelect: (id: string) => void }) {
+function PokemonSlot({index, id, onSelect}: { index: number; id: number; onSelect: (id: number) => void }) {
     const [query, setQuery] = useState("");
     const [open, setOpen] = useState(false);
 
-    const selected = useMemo(() => POKEMON.find(p => String(p.id) === id), [id]);
+    const selected = useMemo(() => POKEMON.find(p => p.id === id), [id]);
 
     const suggestions = useMemo(() => {
         const q = query.trim().toLowerCase();
@@ -89,7 +139,7 @@ function PokemonSlot({index, id, onSelect}: { index: number; id: string; onSelec
     }, [query]);
 
     function choose(pokemonId: number) {
-        onSelect(String(pokemonId));
+        onSelect(pokemonId);
         setQuery("");
         setOpen(false);
     }
@@ -105,16 +155,16 @@ function PokemonSlot({index, id, onSelect}: { index: number; id: string; onSelec
                 <div className="flex h-16 w-16 items-center justify-center rounded bg-neutral-900">
                     {id ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img className="h-16 w-16" src={`/showdown/${id}.gif`} alt={selected?.name ?? id}/>
+                        <img className="h-16 w-16" src={`/showdown/${id}.gif`} alt={selected?.name ?? String(id)}/>
                     ) : (
                         <span className="text-xs text-gray-600">empty</span>
                     )}
                 </div>
                 <div className="flex-1">
                     <div className="capitalize text-gray-200">{selected?.name ?? "—"}</div>
-                    {id && (
+                    {id !== 0 && (
                         <button
-                            onClick={() => onSelect("")}
+                            onClick={() => onSelect(0)}
                             className="mt-1 inline-flex cursor-pointer items-center gap-1 text-xs text-gray-400 hover:text-red-400"
                         >
                             <X className="h-3 w-3"/> Clear

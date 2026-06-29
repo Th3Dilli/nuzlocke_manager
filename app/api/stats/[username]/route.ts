@@ -2,15 +2,14 @@ import {getSessionUser} from "@/app/lib/session";
 import {getStats, setStats} from "@/app/lib/stats";
 import {canEditTeam} from "@/app/lib/editors";
 import {POKEMON} from "@/app/lib/pokemon";
-import {Stat} from "@/app/lib/types/Stat";
+import {TEAM_SIZE} from "@/app/lib/types/Stat";
 
-const TEAM_KEYS = ["team1", "team2", "team3", "team4", "team5", "team6"] as const;
-const validIds = new Set(POKEMON.map(p => String(p.id)));
+const validIds = new Set(POKEMON.map(p => p.id));
 
-// Update the team (slots 1-6) for a user's stats page. The page owner and any
-// editor the owner has granted may write to it; each slot is either empty or a
-// valid Pokémon id from the POKEMON list. setStats persists to the DB and
-// pushes the change to any live SSE subscribers (page + overlay).
+// Update the team for a user's stats page. The page owner and any editor the
+// owner has granted may write to it. The body is { team: number[] } where each
+// entry is a valid Pokémon id, or 0 for an empty slot. setStats persists to the
+// DB and pushes the change to any live SSE subscribers (page + overlay).
 export async function POST(
     request: Request,
     {params}: { params: Promise<{ username: string }> }
@@ -32,18 +31,22 @@ export async function POST(
         return new Response("Bad Request", {status: 400});
     }
 
-    const next: Record<string, string> = {};
-    for (const key of TEAM_KEYS) {
-        const value = body[key];
-        if (value === undefined || value === null || value === "") {
-            next[key] = "";
-            continue;
+    const rawTeam = body.team;
+    if (!Array.isArray(rawTeam) || rawTeam.length > TEAM_SIZE) {
+        return new Response("Invalid team", {status: 400});
+    }
+
+    const team: number[] = Array(TEAM_SIZE).fill(0);
+    for (let i = 0; i < rawTeam.length; i++) {
+        const value = rawTeam[i];
+        if (value === undefined || value === null || value === "" || value === 0) {
+            continue; // empty slot
         }
-        const id = String(value);
-        if (!validIds.has(id)) {
-            return new Response(`Invalid pokemon id for ${key}`, {status: 400});
+        const id = Number(value);
+        if (!Number.isInteger(id) || !validIds.has(id)) {
+            return new Response(`Invalid pokemon id in slot ${i + 1}`, {status: 400});
         }
-        next[key] = id;
+        team[i] = id;
     }
 
     // setStats only mutates an existing cache entry, which only exists while the
@@ -52,6 +55,6 @@ export async function POST(
         return new Response("Stats page not enabled", {status: 409});
     }
 
-    setStats(username, {user: username, ...next} as Stat);
+    setStats(username, {user: username, team});
     return Response.json({ok: true});
 }

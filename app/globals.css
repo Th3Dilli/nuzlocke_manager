@@ -30,18 +30,16 @@ body:has(.overlay) {
 }
 
 .overlay {
-    font-family: Cinzel, Arial, Helvetica, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     background-color: transparent;
 }
 
 .overlay-bar {
-    font-family: Cinzel, Arial, Helvetica, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     background-color: rgba(30,30,30,0.8);
     background-size: cover;
 }
-.cinzel {
-    font-family: Cinzel, Arial, Helvetica, sans-serif;
-}
+
 
 .page-bg {
     background-image:
