@@ -136,8 +136,7 @@ function HomeInner({username}: { username: string }) {
                 <div className="flex justify-center">
                     <a href={`https://twitch.tv/${username}`}
                        className="flex flex-row items-center gap-2 bg-[#9146ff] hover:bg-[#7d2ff7] text-white text-sm font-bold pl-2 pr-3 py-1.5 rounded-lg transition-colors">
-                        <img src="glitch_white.svg" className="w-4 h-4">
-                        </img>
+                        <img src="/glitch_white.svg" alt="" className="w-4 h-4"/>
                         <p>{username}</p>
                     </a>
                 </div>
