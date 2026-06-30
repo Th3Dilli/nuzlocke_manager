@@ -54,12 +54,19 @@ database.exec(`
 
     CREATE TABLE IF NOT EXISTS team_editors
     (
-        owner      TEXT NOT NULL,
-        editor     TEXT NOT NULL,
-        created_at TEXT NOT NULL,
+        owner      TEXT    NOT NULL,
+        editor     TEXT    NOT NULL,
+        can_manage INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT    NOT NULL,
         PRIMARY KEY (owner, editor)
     );
 `)
+
+// Migration: older databases were created before `can_manage` existed.
+const teamEditorColumns = database.prepare(`PRAGMA table_info(team_editors)`).all() as Array<{ name: string }>
+if (!teamEditorColumns.some(c => c.name === 'can_manage')) {
+    database.exec(`ALTER TABLE team_editors ADD COLUMN can_manage INTEGER NOT NULL DEFAULT 0`)
+}
 
 
 export const upsertUser = database.prepare<{ twitch_id: string; username: string; profile_image_url: string; now: string }>(`
@@ -145,9 +152,9 @@ export const selectSoullinkStmt = database.prepare(`SELECT *
                                                     FROM soullink
                                                     WHERE user = ?`);
 
-export const insertTeamEditor = database.prepare<{ owner: string; editor: string; created_at: string }>(`
-    INSERT INTO team_editors (owner, editor, created_at)
-    VALUES (@owner, @editor, @created_at)
+export const insertTeamEditor = database.prepare<{ owner: string; editor: string; can_manage: number; created_at: string }>(`
+    INSERT INTO team_editors (owner, editor, can_manage, created_at)
+    VALUES (@owner, @editor, @can_manage, @created_at)
     ON CONFLICT(owner, editor) DO NOTHING
 `);
 
@@ -155,12 +162,23 @@ export const deleteTeamEditor = database.prepare<{ owner: string; editor: string
     DELETE FROM team_editors WHERE owner = @owner AND editor = @editor
 `);
 
-export const selectTeamEditors = database.prepare<[string]>(`SELECT editor
+export const updateTeamEditorRole = database.prepare<{ owner: string; editor: string; can_manage: number }>(`
+    UPDATE team_editors
+    SET can_manage = @can_manage
+    WHERE owner = @owner AND editor = @editor
+`);
+
+export const selectTeamEditors = database.prepare<[string]>(`SELECT editor, can_manage
                                                             FROM team_editors
                                                             WHERE owner = ?
                                                             ORDER BY editor`);
 
 export const selectTeamEditor = database.prepare<[string, string]>(`SELECT 1
+                                                                   FROM team_editors
+                                                                   WHERE owner = ?
+                                                                     AND editor = ?`)
+
+export const selectTeamEditorRole = database.prepare<[string, string]>(`SELECT can_manage
                                                                    FROM team_editors
                                                                    WHERE owner = ?
                                                                      AND editor = ?`)

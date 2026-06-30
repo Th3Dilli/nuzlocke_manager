@@ -46,15 +46,17 @@ function HomeInner({username}: { username: string }) {
     const [notFound, setNotFound] = useState(false);
     const [isOwner, setIsOwner] = useState(false);
     const [canEdit, setCanEdit] = useState(false);
+    const [canManageEditors, setCanManageEditors] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
         fetch(`/api/${username}/permissions`)
             .then(res => res.json())
-            .then((data: { isOwner: boolean; canEdit: boolean }) => {
+            .then((data: { isOwner: boolean; canEdit: boolean; canManageEditors: boolean }) => {
                 if (!cancelled) {
                     setIsOwner(data.isOwner);
                     setCanEdit(data.canEdit);
+                    setCanManageEditors(data.canManageEditors);
                 }
             })
             .catch(() => {/* not logged in / offline: stay read-only */
@@ -158,7 +160,7 @@ function HomeInner({username}: { username: string }) {
                         </div>
                     </div>
                 )}
-                {isOwner && <EditorManager username={username}/>}
+                {(isOwner || canManageEditors) && <EditorManager username={username} isOwner={isOwner}/>}
             </main>
         </div>
     );
