@@ -1,16 +1,47 @@
 "use client";
 
 import {use} from "react";
-import {NuzlockeState} from "@/app/lib/types/NuzlockeState";
+import {SoullinkState} from "@/app/lib/types/SoullinkState";
 import {Suspense, useEffect, useState} from "react";
 import TeamEditor from "@/app/components/TeamEditor";
 import GraveyardEditor from "@/app/components/GraveyardEditor";
 import EditorManager from "@/app/components/EditorManager";
 import TeamBox, {Graveyard} from "@/app/components/TeamBox";
 
+function GraveyardEntries({graveyard}: { graveyard: number[] }) {
+    return (
+        <div className="flex min-h-16 flex-row flex-wrap content-start ">
+            {graveyard.length === 0 ? (
+                <span className="m-auto text-lg opacity-40">No fallen Pokémon yet</span>
+            ) : (
+                graveyard.map((id, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                        key={`${id}-${i}`}
+                        src={`/showdown/${id}.gif`}
+                        alt=""
+                        className="h-16 w-16 object-contain opacity-80 [image-rendering:pixelated]"
+                    />
+                ))
+            )}
+        </div>
+    );
+}
+
+function TeamColumn({label, team, graveyard}: { label: string; team: number[]; graveyard: number[] }) {
+    return (
+        <div className="flex flex-1 flex-col items-center gap-2">
+            <h2 className="text-lg font-bold text-yellow-300">{label}</h2>
+            <TeamBox team={team} className="w-full max-w-md"/>
+            <Graveyard label="Graveyard" className="w-full min-h-20">
+                <GraveyardEntries graveyard={graveyard}/>
+            </Graveyard>
+        </div>
+    );
+}
 
 function HomeInner({username}: { username: string }) {
-    const [stats, setStats] = useState<NuzlockeState | undefined>();
+    const [stats, setStats] = useState<SoullinkState | undefined>();
 
     const [notFound, setNotFound] = useState(false);
     const [isOwner, setIsOwner] = useState(false);
@@ -41,13 +72,12 @@ function HomeInner({username}: { username: string }) {
                 es.close();
             }
 
-            console.log(`Starting EventSource stream for: ${username}`);
-            es = new EventSource(`/api/${username}/stream`);
+            es = new EventSource(`/api/soullink/${username}/stream`);
 
             es.onmessage = (e) => {
                 if ('data' in e) {
                     try {
-                        const stat = JSON.parse(e.data) as NuzlockeState;
+                        const stat = JSON.parse(e.data) as SoullinkState;
                         setStats(stat);
                     } catch (err) {
                         console.error("Failed to parse SSE data", err);
@@ -58,7 +88,7 @@ function HomeInner({username}: { username: string }) {
                 }
             };
 
-            es.addEventListener("not_found", (e) => {
+            es.addEventListener("not_found", () => {
                 setNotFound(true);
                 es?.close();
             });
@@ -74,7 +104,6 @@ function HomeInner({username}: { username: string }) {
         startStream();
 
         return () => {
-            console.log(`Cleaning up stream for: ${username}`);
             if (es) {
                 es.close();
             }
@@ -99,6 +128,8 @@ function HomeInner({username}: { username: string }) {
         <div>Loading...</div>
     )
 
+    const apiUrl = `/api/soullink/${username}`;
+
     return (
         <div className="text-yellow-500 p-4">
             <main className="max-w-7xl mx-auto flex flex-col gap-4">
@@ -110,29 +141,24 @@ function HomeInner({username}: { username: string }) {
                         <p>{username}</p>
                     </a>
                 </div>
-                <div className="flex justify-center items-center gap-2">
-                    <TeamBox team={stats.team}/>
-                    <Graveyard label="Graveyard" className="w-full flex-1 h-20">
-                        <div className="flex h-16 flex-row flex-wrap content-start ">
-                            {stats.graveyard.length === 0 ? (
-                                <span className="m-auto text-lg opacity-40">No fallen Pokémon yet</span>
-                            ) : (
-                                stats.graveyard.map((id, i) => (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img
-                                        key={`${id}-${i}`}
-                                        src={`/showdown/${id}.gif`}
-                                        alt=""
-                                        className="h-16 w-16 object-contain opacity-80 [image-rendering:pixelated]"
-                                    />
-                                ))
-                            )}
-                        </div>
-                    </Graveyard>
+
+                <div className="flex flex-col items-stretch gap-4 md:flex-row md:justify-center">
+                    <TeamColumn label="Team 1" team={stats.team1} graveyard={stats.graveyard1}/>
+                    <TeamColumn label="Team 2" team={stats.team2} graveyard={stats.graveyard2}/>
                 </div>
 
-                {canEdit && <TeamEditor username={username} stats={stats}/>}
-                {canEdit && <GraveyardEditor username={username} stats={stats}/>}
+                {canEdit && (
+                    <div className="flex flex-col gap-4 md:flex-row">
+                        <div className="flex-1">
+                            <TeamEditor apiUrl={apiUrl} field="team1" team={stats.team1} label="Edit Team 1"/>
+                            <GraveyardEditor apiUrl={apiUrl} field="graveyard1" graveyard={stats.graveyard1} label="Edit Graveyard 1"/>
+                        </div>
+                        <div className="flex-1">
+                            <TeamEditor apiUrl={apiUrl} field="team2" team={stats.team2} label="Edit Team 2"/>
+                            <GraveyardEditor apiUrl={apiUrl} field="graveyard2" graveyard={stats.graveyard2} label="Edit Graveyard 2"/>
+                        </div>
+                    </div>
+                )}
                 {isOwner && <EditorManager username={username}/>}
             </main>
         </div>

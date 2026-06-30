@@ -2,7 +2,7 @@
 
 import {NuzlockeState} from "@/app/lib/types/NuzlockeState";
 import {Component, ReactNode, Suspense, use, useEffect, useState} from "react";
-import TeamBox, {Graveyard, TitleTab} from "@/app/components/TeamBox";
+import TeamBox, {Graveyard, Pokeball, TitleTab} from "@/app/components/TeamBox";
 
 function OverlayInner({username}: { username: string }) {
 
@@ -64,9 +64,9 @@ function OverlayInner({username}: { username: string }) {
 
             {/* Left Column Container */}
             <div className="flex flex-col gap-4">
-                <Frame label="Nuzlocke" className="aspect-4/3 min-h-[var(--main-h)] min-w-[var(--main-W)]" />
+                <Frame label="Nuzlocke" className="aspect-4/3 min-h-[var(--main-h)] min-w-[var(--main-w)]" />
 
-                <Graveyard label="Graveyard" className="w-full flex-1 min-h-0">
+                <Graveyard label="Graveyard" className="w-[var(--main-w)] flex-1 min-h-20 ">
                     <div className="flex h-full flex-row flex-wrap content-start ">
                         {stats.graveyard.length === 0 ? (
                             <span className="m-auto text-lg opacity-40">No fallen Pokémon yet</span>
@@ -77,7 +77,7 @@ function OverlayInner({username}: { username: string }) {
                                     key={`${id}-${i}`}
                                     src={`/showdown/${id}.gif`}
                                     alt=""
-                                    className="h-16 w-16 object-contain opacity-80 grayscale [image-rendering:pixelated]"
+                                    className="h-16 w-16 object-contain opacity-80  [image-rendering:pixelated]"
                                 />
                             ))
                         )}

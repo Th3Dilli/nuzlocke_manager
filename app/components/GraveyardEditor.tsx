@@ -2,8 +2,9 @@
 
 import {useMemo, useState} from "react";
 import {POKEMON} from "@/app/lib/pokemon";
-import {MAX_GRAVEYARD, NuzlockeState} from "@/app/lib/types/NuzlockeState";
-import {AlertTriangle, Check, Search, Skull, X} from "lucide-react";
+import {MAX_GRAVEYARD} from "@/app/lib/types/NuzlockeState";
+import {AlertTriangle, Check, Search, X} from "lucide-react";
+import {Pokeball} from "@/app/components/TeamBox";
 
 const MAX_SUGGESTIONS = 8;
 
@@ -11,10 +12,18 @@ function listsEqual(a: number[], b: number[]): boolean {
     return a.length === b.length && a.every((v, i) => v === b[i]);
 }
 
-export default function GraveyardEditor({username, stats}: { username: string; stats: NuzlockeState }) {
-    // Draft graveyard, seeded once from the current stats. Variable length; each
-    // entry is a Pokémon id (no empty slots).
-    const [graveyard, setGraveyard] = useState<number[]>(() => [...stats.graveyard]);
+// Generic graveyard editor: saves to `apiUrl` as `{ [field]: graveyard }`. Used
+// for both the single-graveyard nuzlocke page (field "graveyard") and the
+// two-graveyard soullink page (field "graveyard1"/"graveyard2").
+export default function GraveyardEditor({apiUrl, field, graveyard: remoteGraveyard, label = "Edit Graveyard"}: {
+    apiUrl: string;
+    field: string;
+    graveyard: number[];
+    label?: string;
+}) {
+    // Draft graveyard, seeded once from the current remote graveyard. Variable
+    // length; each entry is a Pokémon id (no empty slots).
+    const [graveyard, setGraveyard] = useState<number[]>(() => [...remoteGraveyard]);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -22,21 +31,21 @@ export default function GraveyardEditor({username, stats}: { username: string; s
     const [remoteChanged, setRemoteChanged] = useState(false);
     // The last graveyard we saw from the server, kept in state so we can detect a
     // new SSE update during render (React's "adjust state on a prop change").
-    const [prevRemote, setPrevRemote] = useState<number[]>(stats.graveyard);
+    const [prevRemote, setPrevRemote] = useState<number[]>(remoteGraveyard);
 
-    const dirty = useMemo(() => !listsEqual(graveyard, stats.graveyard), [stats.graveyard, graveyard]);
+    const dirty = useMemo(() => !listsEqual(graveyard, remoteGraveyard), [remoteGraveyard, graveyard]);
 
     // Reconcile the draft when a new graveyard arrives over SSE (e.g. a co-editor
     // saved). Adopt the incoming list silently when we have no pending edits;
     // otherwise keep the draft and surface a notice so the user doesn't lose it.
-    if (!listsEqual(prevRemote, stats.graveyard)) {
-        setPrevRemote(stats.graveyard);
-        if (listsEqual(graveyard, stats.graveyard)) {
+    if (!listsEqual(prevRemote, remoteGraveyard)) {
+        setPrevRemote(remoteGraveyard);
+        if (listsEqual(graveyard, remoteGraveyard)) {
             // Draft already matches the new remote (e.g. our own save echoed back).
             setRemoteChanged(false);
         } else if (listsEqual(graveyard, prevRemote)) {
             // No local edits: adopt the incoming graveyard.
-            setGraveyard([...stats.graveyard]);
+            setGraveyard([...remoteGraveyard]);
             setRemoteChanged(false);
         } else {
             // Local edits conflict with the incoming graveyard: let the user decide.
@@ -57,7 +66,7 @@ export default function GraveyardEditor({username, stats}: { username: string; s
     }
 
     function loadRemote() {
-        setGraveyard([...stats.graveyard]);
+        setGraveyard([...remoteGraveyard]);
         setRemoteChanged(false);
         setSaved(false);
         setError(null);
@@ -67,10 +76,10 @@ export default function GraveyardEditor({username, stats}: { username: string; s
         setSaving(true);
         setError(null);
         try {
-            const res = await fetch(`/api/${username}`, {
+            const res = await fetch(apiUrl, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({graveyard}),
+                body: JSON.stringify({[field]: graveyard}),
             });
             if (res.ok) {
                 setSaved(true);
@@ -89,8 +98,8 @@ export default function GraveyardEditor({username, stats}: { username: string; s
         <div className="mt-6 rounded-xl border border-yellow-600 bgdark p-4">
             <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <Skull className="h-5 w-5 text-yellow-300"/>
-                    <h2 className="text-xl font-bold text-yellow-300">Edit Graveyard</h2>
+                    <Pokeball className="h-5 w-5"/>
+                    <h2 className="text-xl font-bold text-yellow-300">{label}</h2>
                     <span className="text-sm text-gray-500">{graveyard.length}/{MAX_GRAVEYARD}</span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -130,7 +139,7 @@ export default function GraveyardEditor({username, stats}: { username: string; s
             {graveyard.length === 0 ? (
                 <p className="mt-4 text-sm text-gray-600">No Pokémon in the graveyard yet.</p>
             ) : (
-                <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                <ul className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-3">
                     {graveyard.map((id, i) => (
                         <GraveyardEntry key={`${id}-${i}`} index={i} id={id} onRemove={() => removeAt(i)}/>
                     ))}

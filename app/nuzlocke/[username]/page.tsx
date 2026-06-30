@@ -111,9 +111,9 @@ function HomeInner({username}: { username: string }) {
                     </a>
                 </div>
                 <div className="flex justify-center items-center gap-2">
-                    <TeamBox team={stats.team}/>
-                    <Graveyard label="Graveyard" className="w-full flex-1 h-20">
-                        <div className="flex h-16 flex-row flex-wrap content-start ">
+                    <TeamBox team={stats.team} className="w-full max-w-md"/>
+                    <Graveyard label="Graveyard" className="w-full flex-1 min-h-20">
+                        <div className="flex min-h-16 flex-row flex-wrap content-start ">
                             {stats.graveyard.length === 0 ? (
                                 <span className="m-auto text-lg opacity-40">No fallen Pokémon yet</span>
                             ) : (
@@ -131,8 +131,8 @@ function HomeInner({username}: { username: string }) {
                     </Graveyard>
                 </div>
 
-                {canEdit && <TeamEditor username={username} stats={stats}/>}
-                {canEdit && <GraveyardEditor username={username} stats={stats}/>}
+                {canEdit && <TeamEditor apiUrl={`/api/${username}`} field="team" team={stats.team} label="Edit Team"/>}
+                {canEdit && <GraveyardEditor apiUrl={`/api/${username}`} field="graveyard" graveyard={stats.graveyard} label="Edit Graveyard"/>}
                 {isOwner && <EditorManager username={username}/>}
             </main>
         </div>

@@ -2,7 +2,8 @@ import {changePageEnabled, getUsers, type User} from '@/app/lib/users'
 import {getSessionUser} from '@/app/lib/session'
 import Header from "@/app/components/Header";
 import CopyKeyField from "@/app/components/CopyField";
-import {updatePageEnabled} from "@/app/lib/stats";
+import {updatePageEnabled as updateNuzlockePageEnabled} from "@/app/lib/stats";
+import {updatePageEnabled as updateSoullinkPageEnabled} from "@/app/lib/soullinkStats";
 import {revalidatePath} from "next/cache";
 
 
@@ -24,8 +25,10 @@ export default async function Home() {
 
         if (sessionUser) {
             const user = changePageEnabled(sessionUser.twitch_id, isNuzlockeEnabled, isSoullinkEnabled)
-            if (user)
-                updatePageEnabled(user)
+            if (user) {
+                updateNuzlockePageEnabled(user)
+                updateSoullinkPageEnabled(user)
+            }
         }
         revalidatePath('/')
     }
@@ -38,13 +41,25 @@ export default async function Home() {
                         <div className="p-2 gap-2 rounded-xl border border-yellow-600 bg-neutral-900">
                             {user.nuzlocke_enabled === 1 ? (
                                 <div>
-                                    <a href={`${baseUrl}/${user.username}`} className="text-yellow-600 hover:underline">
-                                        Go to Page
+                                    <a href={`${baseUrl}/nuzlocke/${user.username}`} className="text-yellow-600 hover:underline">
+                                        Go to Nuzlocke Page
                                     </a><br/>
-                                    <a href={`${baseUrl}/overlay/${user.username}`} className="text-yellow-600 hover:underline">
-                                        Go to Overlay
+                                    <a href={`${baseUrl}/overlay/nuzlocke/${user.username}`} className="text-yellow-600 hover:underline">
+                                        Go to Nuzlocke Overlay
                                     </a>
-                                    <CopyKeyField name="Overlay OBS Browser Source:" url={`${baseUrl}/overlay/${user.username}`}></CopyKeyField>
+                                    <CopyKeyField name="Nuzlocke Overlay OBS Browser Source:" url={`${baseUrl}/overlay/nuzlocke/${user.username}`}></CopyKeyField>
+
+                                </div>
+                            ) : (<></>)}
+                            {user.soullink_enabled === 1 ? (
+                                <div>
+                                    <a href={`${baseUrl}/soullink/${user.username}`} className="text-yellow-600 hover:underline">
+                                        Go to Soullink Page
+                                    </a><br/>
+                                    <a href={`${baseUrl}/overlay/soullink/${user.username}`} className="text-yellow-600 hover:underline">
+                                        Go to Soullink Overlay
+                                    </a>
+                                    <CopyKeyField name="Soullink Overlay OBS Browser Source:" url={`${baseUrl}/overlay/soullink/${user.username}`}></CopyKeyField>
 
                                 </div>
                             ) : (<></>)}

@@ -96,6 +96,10 @@ export const selectUsers = database.prepare(`SELECT twitch_id, username, role, n
 export const getUserToken = database.prepare(`SELECT username, api_token
                                               FROM users WHERE nuzlocke_enabled == true OR soullink_enabled == true`)
 
+export const getSoullinkEnabledUsers = database.prepare(`SELECT username
+                                                         FROM users
+                                                         WHERE soullink_enabled == true`)
+
 export const insertSession = database.prepare<{ id: string; twitch_id: string; created_at: string; expires_at: string }>(`
     INSERT INTO sessions (id, twitch_id, created_at, expires_at)
     VALUES (@id, @twitch_id, @created_at, @expires_at)
@@ -123,6 +127,19 @@ export const upsertStmt = database.prepare<{ user: string; team: string; graveya
 export const selectStmt = database.prepare(`SELECT *
                                             FROM nuzlocke
                                             WHERE user = ?`);
+
+export const upsertSoullinkStmt = database.prepare<{ user: string; team1: string; team2: string; graveyard1: string; graveyard2: string }>(`
+    INSERT INTO soullink (user, team1, team2, graveyard1, graveyard2)
+    VALUES (@user, @team1, @team2, @graveyard1, @graveyard2)
+    ON CONFLICT(user) DO UPDATE SET team1      = excluded.team1,
+                                     team2      = excluded.team2,
+                                     graveyard1 = excluded.graveyard1,
+                                     graveyard2 = excluded.graveyard2
+`);
+
+export const selectSoullinkStmt = database.prepare(`SELECT *
+                                                    FROM soullink
+                                                    WHERE user = ?`);
 
 export const insertTeamEditor = database.prepare<{ owner: string; editor: string; created_at: string }>(`
     INSERT INTO team_editors (owner, editor, created_at)

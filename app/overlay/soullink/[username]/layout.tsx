@@ -1,7 +1,7 @@
 import {Metadata} from "next";
 
 export const metadata: Metadata = {
-    title: "Nuzlocke Overlay",
+    title: "Soullink Overlay",
 };
 
 export default function SiteLayout({children}: { children: React.ReactNode }) {

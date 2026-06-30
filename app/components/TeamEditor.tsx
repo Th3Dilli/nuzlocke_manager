@@ -2,8 +2,9 @@
 
 import {useMemo, useState} from "react";
 import {POKEMON} from "@/app/lib/pokemon";
-import {NuzlockeState, TEAM_SIZE} from "@/app/lib/types/NuzlockeState";
+import {TEAM_SIZE} from "@/app/lib/types/NuzlockeState";
 import {AlertTriangle, Check, Search, X} from "lucide-react";
+import {Pokeball} from "@/app/components/TeamBox";
 
 const MAX_SUGGESTIONS = 8;
 
@@ -11,11 +12,19 @@ function teamsEqual(a: number[], b: number[]): boolean {
     return a.length === b.length && a.every((v, i) => v === b[i]);
 }
 
-export default function TeamEditor({username, stats}: { username: string; stats: NuzlockeState }) {
-    // Draft team, seeded once from the current stats. Length TEAM_SIZE; each
-    // entry is a Pokémon id or 0 for an empty slot.
+// Generic team editor: saves to `apiUrl` as `{ [field]: team }`. Used for both
+// the single-team nuzlocke page (field "team") and the two-team soullink page
+// (field "team1"/"team2").
+export default function TeamEditor({apiUrl, field, team: remoteTeam, label = "Edit Team"}: {
+    apiUrl: string;
+    field: string;
+    team: number[];
+    label?: string;
+}) {
+    // Draft team, seeded once from the current remote team. Length TEAM_SIZE;
+    // each entry is a Pokémon id or 0 for an empty slot.
     const [team, setTeam] = useState<number[]>(() =>
-        Array.from({length: TEAM_SIZE}, (_, i) => stats.team[i] ?? 0)
+        Array.from({length: TEAM_SIZE}, (_, i) => remoteTeam[i] ?? 0)
     );
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -24,21 +33,21 @@ export default function TeamEditor({username, stats}: { username: string; stats:
     const [remoteChanged, setRemoteChanged] = useState(false);
     // The last team we saw from the server, kept in state so we can detect a new
     // SSE update during render (React's "adjust state on a prop change" pattern).
-    const [prevRemote, setPrevRemote] = useState<number[]>(stats.team);
+    const [prevRemote, setPrevRemote] = useState<number[]>(remoteTeam);
 
-    const dirty = useMemo(() => !teamsEqual(team, stats.team), [stats.team, team]);
+    const dirty = useMemo(() => !teamsEqual(team, remoteTeam), [remoteTeam, team]);
 
     // Reconcile the draft when a new team arrives over SSE (e.g. a co-editor
     // saved). Adopt the incoming team silently when we have no pending edits;
     // otherwise keep the draft and surface a notice so the user doesn't lose it.
-    if (!teamsEqual(prevRemote, stats.team)) {
-        setPrevRemote(stats.team);
-        if (teamsEqual(team, stats.team)) {
+    if (!teamsEqual(prevRemote, remoteTeam)) {
+        setPrevRemote(remoteTeam);
+        if (teamsEqual(team, remoteTeam)) {
             // Draft already matches the new remote (e.g. our own save echoed back).
             setRemoteChanged(false);
         } else if (teamsEqual(team, prevRemote)) {
             // No local edits: adopt the incoming team.
-            setTeam([...stats.team]);
+            setTeam([...remoteTeam]);
             setRemoteChanged(false);
         } else {
             // Local edits conflict with the incoming team: let the user decide.
@@ -53,7 +62,7 @@ export default function TeamEditor({username, stats}: { username: string; stats:
     }
 
     function loadRemote() {
-        setTeam([...stats.team]);
+        setTeam([...remoteTeam]);
         setRemoteChanged(false);
         setSaved(false);
         setError(null);
@@ -63,10 +72,10 @@ export default function TeamEditor({username, stats}: { username: string; stats:
         setSaving(true);
         setError(null);
         try {
-            const res = await fetch(`/api/${username}`, {
+            const res = await fetch(apiUrl, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({team}),
+                body: JSON.stringify({[field]: team}),
             });
             if (res.ok) {
                 setSaved(true);
@@ -84,7 +93,10 @@ export default function TeamEditor({username, stats}: { username: string; stats:
     return (
         <div className="mt-6 rounded-xl border border-yellow-600 bgdark p-4">
             <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-xl font-bold text-yellow-300">Edit Team</h2>
+                <div className="flex items-center gap-2">
+                    <Pokeball className="h-5 w-5"/>
+                    <h2 className="text-xl font-bold text-yellow-300">{label}</h2>
+                </div>
                 <div className="flex items-center gap-3">
                     {error && <span className="text-sm text-red-400">{error}</span>}
                     <button
