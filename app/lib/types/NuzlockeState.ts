@@ -4,7 +4,7 @@ export const TEAM_SIZE = 6;
 // is otherwise free-form: any number of fallen Pokémon, in order.
 export const MAX_GRAVEYARD = 100;
 
-export type Stat = {
+export type NuzlockeState = {
     user: string;
     // Always length TEAM_SIZE. Each entry is a Pokémon id, or 0 for an empty slot.
     team: number[];
@@ -49,7 +49,7 @@ function arraysEqual(a: number[], b: number[]): boolean {
     return a.length === b.length && a.every((v, i) => v === b[i]);
 }
 
-export function statsEqual(a: Stat, b: Stat): boolean {
+export function statsEqual(a: NuzlockeState, b: NuzlockeState): boolean {
     return a.user === b.user
         && arraysEqual(a.team, b.team)
         && arraysEqual(a.graveyard, b.graveyard);

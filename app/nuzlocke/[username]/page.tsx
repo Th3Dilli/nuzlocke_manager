@@ -1,7 +1,7 @@
 "use client";
 
 import {use} from "react";
-import {Stat} from "@/app/lib/types/Stat";
+import {NuzlockeState} from "@/app/lib/types/NuzlockeState";
 import {Suspense, useEffect, useState} from "react";
 import TeamEditor from "@/app/components/TeamEditor";
 import GraveyardEditor from "@/app/components/GraveyardEditor";
@@ -10,7 +10,7 @@ import TeamBox, {Graveyard} from "@/app/components/TeamBox";
 
 
 function HomeInner({username}: { username: string }) {
-    const [stats, setStats] = useState<Stat | undefined>();
+    const [stats, setStats] = useState<NuzlockeState | undefined>();
 
     const [notFound, setNotFound] = useState(false);
     const [isOwner, setIsOwner] = useState(false);
@@ -18,7 +18,7 @@ function HomeInner({username}: { username: string }) {
 
     useEffect(() => {
         let cancelled = false;
-        fetch(`/api/stats/${username}/permissions`)
+        fetch(`/api/${username}/permissions`)
             .then(res => res.json())
             .then((data: { isOwner: boolean; canEdit: boolean }) => {
                 if (!cancelled) {
@@ -42,12 +42,12 @@ function HomeInner({username}: { username: string }) {
             }
 
             console.log(`Starting EventSource stream for: ${username}`);
-            es = new EventSource(`/api/stats/${username}/stream`);
+            es = new EventSource(`/api/${username}/stream`);
 
             es.onmessage = (e) => {
                 if ('data' in e) {
                     try {
-                        const stat = JSON.parse(e.data) as Stat;
+                        const stat = JSON.parse(e.data) as NuzlockeState;
                         setStats(stat);
                     } catch (err) {
                         console.error("Failed to parse SSE data", err);
@@ -123,7 +123,7 @@ function HomeInner({username}: { username: string }) {
                                         key={`${id}-${i}`}
                                         src={`/showdown/${id}.gif`}
                                         alt=""
-                                        className="h-16 w-16 object-contain opacity-80 grayscale [image-rendering:pixelated]"
+                                        className="h-16 w-16 object-contain opacity-80 [image-rendering:pixelated]"
                                     />
                                 ))
                             )}

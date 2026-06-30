@@ -1,12 +1,10 @@
 import {changePageEnabled, getUsers, type User} from '@/app/lib/users'
 import {getSessionUser} from '@/app/lib/session'
 import Header from "@/app/components/Header";
-import ApiKeyField from "@/app/components/ApiKeyField";
 import CopyKeyField from "@/app/components/CopyField";
 import {updatePageEnabled} from "@/app/lib/stats";
 import {revalidatePath} from "next/cache";
-import {ConfigField} from "@/app/components/ConfigField";
-import {Download} from "lucide-react";
+
 
 export default async function Home() {
     const user: User | null = await getSessionUser()
@@ -21,9 +19,11 @@ export default async function Home() {
         'use server';
 
         const sessionUser = await getSessionUser()
-        const isChecked = formData.get('pageEnabled') === 'on';
+        const isNuzlockeEnabled = formData.get('nuzlockeEnabled') === 'on' ? 1 : 0;
+        const isSoullinkEnabled = formData.get('soullinkEnabled') === 'on' ? 1 : 0;
+
         if (sessionUser) {
-            const user = changePageEnabled(sessionUser.twitch_id, isChecked ? 1 : 0)
+            const user = changePageEnabled(sessionUser.twitch_id, isNuzlockeEnabled, isSoullinkEnabled)
             if (user)
                 updatePageEnabled(user)
         }
@@ -36,7 +36,7 @@ export default async function Home() {
                 <div className="flex flex-col items-center">
                     <div className="w-2/5">
                         <div className="p-2 gap-2 rounded-xl border border-yellow-600 bg-neutral-900">
-                            {user.page_enabled === 1 ? (
+                            {user.nuzlocke_enabled === 1 ? (
                                 <div>
                                     <a href={`${baseUrl}/${user.username}`} className="text-yellow-600 hover:underline">
                                         Go to Page
@@ -52,13 +52,38 @@ export default async function Home() {
                                 <form action={saveChanges} className="m-4 space-y-4 border border-yellow-700 rounded-lg">
                                     <div className=" flex flex-row items-center">
                                         <div className=" p-4 block text-lg font-medium text-gray-400 mb-2">
-                                            Enable Stats Page:
+                                            Enable Nuzlocke Page:
                                         </div>
                                         <label className=" relative inline-flex items-center cursor-pointer select-none">
                                             <input
                                                 type="checkbox"
-                                                name="pageEnabled"
-                                                defaultChecked={user.page_enabled === 1}
+                                                name="nuzlockeEnabled"
+                                                defaultChecked={user.nuzlocke_enabled === 1}
+                                                className="sr-only peer"
+                                            />
+
+                                            <div
+                                                className=" w-11 h-6 bg-gray-300 dark:bg-neutral-800 rounded-full peer peer-checked:bg-yellow-600
+                                         peer-focus:ring-2 peer-focus:ring-yellow-300 dark:peer-focus
+                                    :ring-yellow-800 duration-200 ease-in-out"
+                                            >
+                                            </div>
+
+                                            <div
+                                                className="absolute left-[2px] top-[2px] w-5 h-5 bg-white rounded-full shadow-sm peer-checked:translate-x-full transition-transform duration-200 ease-in-out"
+                                            ></div>
+                                        </label>
+
+                                    </div>
+                                    <div className=" flex flex-row items-center">
+                                        <div className=" p-4 block text-lg font-medium text-gray-400 mb-2">
+                                            Enable Soullink Page:
+                                        </div>
+                                        <label className=" relative inline-flex items-center cursor-pointer select-none">
+                                            <input
+                                                type="checkbox"
+                                                name="soullinkEnabled"
+                                                defaultChecked={user.soullink_enabled === 1}
                                                 className="sr-only peer"
                                             />
 
@@ -104,7 +129,7 @@ export default async function Home() {
                                         return (<div key={user.username} className="p-2 mb-4 gap-2 rounded-xl border border-yellow-600 bg-neutral-900">
                                             <p>{user.username} | {user.twitch_id}</p>
                                             <p>Role: {user.role}</p>
-                                            <p>Page Enabled: {user.page_enabled === 1 ? "Yes" : "No"}</p>
+                                            <p>Page Enabled: {user.nuzlocke_enabled === 1 ? "Yes" : "No"}</p>
                                             <p>Created At: {user.created_at} | Updated At: {user.updated_at}</p>
                                         </div>)
                                     })}

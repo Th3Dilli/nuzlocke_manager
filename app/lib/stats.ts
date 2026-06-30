@@ -1,10 +1,10 @@
-import {emptyTeam, normalizeGraveyard, normalizeTeam, Stat} from "@/app/lib/types/Stat";
+import {emptyTeam, normalizeGraveyard, normalizeTeam, NuzlockeState} from "@/app/lib/types/NuzlockeState";
 import {getUserToken, selectStmt, upsertStmt} from "@/app/lib/database";
 import {User} from "@/app/lib/users";
 
 declare global {
     var usersInst: Map<string, string> | undefined;
-    var statsCacheInst: Map<string, Stat> | undefined;
+    var statsCacheInst: Map<string, NuzlockeState> | undefined;
 }
 
 const users = globalThis.usersInst ??= new Map<string, string>();
@@ -12,13 +12,13 @@ const users = globalThis.usersInst ??= new Map<string, string>();
     users.set(user.username, user.api_token);
 })
 
-const statsCache = globalThis.statsCacheInst ??= new Map<string, Stat>();
+const statsCache = globalThis.statsCacheInst ??= new Map<string, NuzlockeState>();
 users.keys().forEach((user) => {
     statsCache.set(user, loadStat(user));
 });
 
 export function updatePageEnabled(user: User) {
-    if (user.page_enabled) {
+    if (user.nuzlocke_enabled) {
         statsCache.set(user.username, loadStat(user.username));
         users.set(user.username, user.api_token);
     } else {
@@ -28,7 +28,7 @@ export function updatePageEnabled(user: User) {
 }
 
 // --- SSE subscribers ---
-const subscribers = new Map<string, Set<(stat: Stat) => void>>();
+const subscribers = new Map<string, Set<(stat: NuzlockeState) => void>>();
 
 
 function safeParse(value: string): unknown {
@@ -40,7 +40,7 @@ function safeParse(value: string): unknown {
     }
 }
 
-function loadStat(user: string): Stat {
+function loadStat(user: string): NuzlockeState {
     const row = selectStmt.get(user) as { user: string; team: string; graveyard: string } | undefined;
     if (row) {
         return {
@@ -56,18 +56,18 @@ export function updateUserToken(username: string, api_token: string) {
     users.set(username, api_token);
 }
 
-export function subscribe(user: string, cb: (stat: Stat) => void) {
+export function subscribe(user: string, cb: (stat: NuzlockeState) => void) {
     if (!subscribers.has(user)) {
         subscribers.set(user, new Set());
     }
     subscribers.get(user)!.add(cb);
 }
 
-export function unsubscribe(user: string, cb: (stat: Stat) => void) {
+export function unsubscribe(user: string, cb: (stat: NuzlockeState) => void) {
     subscribers.get(user)?.delete(cb);
 }
 
-export function setStats(user: string, s: Stat) {
+export function setStats(user: string, s: NuzlockeState) {
     const userStat = statsCache.get(user);
     if (userStat) {
         userStat.user = s.user;
@@ -84,7 +84,7 @@ export function setStats(user: string, s: Stat) {
     }
 }
 
-export function getStats(user: string | null): Stat | null {
+export function getStats(user: string | null): NuzlockeState | null {
     if (!user) return null;
 
     return statsCache.get(user) ?? null;

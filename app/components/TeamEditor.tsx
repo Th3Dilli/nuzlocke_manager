@@ -2,7 +2,7 @@
 
 import {useMemo, useState} from "react";
 import {POKEMON} from "@/app/lib/pokemon";
-import {Stat, TEAM_SIZE} from "@/app/lib/types/Stat";
+import {NuzlockeState, TEAM_SIZE} from "@/app/lib/types/NuzlockeState";
 import {AlertTriangle, Check, Search, X} from "lucide-react";
 
 const MAX_SUGGESTIONS = 8;
@@ -11,7 +11,7 @@ function teamsEqual(a: number[], b: number[]): boolean {
     return a.length === b.length && a.every((v, i) => v === b[i]);
 }
 
-export default function TeamEditor({username, stats}: { username: string; stats: Stat }) {
+export default function TeamEditor({username, stats}: { username: string; stats: NuzlockeState }) {
     // Draft team, seeded once from the current stats. Length TEAM_SIZE; each
     // entry is a Pokémon id or 0 for an empty slot.
     const [team, setTeam] = useState<number[]>(() =>
@@ -63,7 +63,7 @@ export default function TeamEditor({username, stats}: { username: string; stats:
         setSaving(true);
         setError(null);
         try {
-            const res = await fetch(`/api/stats/${username}`, {
+            const res = await fetch(`/api/${username}`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({team}),

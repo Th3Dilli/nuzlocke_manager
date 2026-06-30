@@ -2,7 +2,7 @@ import {getSessionUser} from "@/app/lib/session";
 import {getStats, setStats} from "@/app/lib/stats";
 import {canEditTeam} from "@/app/lib/editors";
 import {POKEMON} from "@/app/lib/pokemon";
-import {MAX_GRAVEYARD, TEAM_SIZE} from "@/app/lib/types/Stat";
+import {MAX_GRAVEYARD, TEAM_SIZE} from "@/app/lib/types/NuzlockeState";
 
 const validIds = new Set(POKEMON.map(p => p.id));
 

@@ -1,18 +1,18 @@
 "use client";
 
-import {Stat} from "@/app/lib/types/Stat";
+import {NuzlockeState} from "@/app/lib/types/NuzlockeState";
 import {Component, ReactNode, Suspense, use, useEffect, useState} from "react";
 import TeamBox, {Graveyard, TitleTab} from "@/app/components/TeamBox";
 
 function OverlayInner({username}: { username: string }) {
 
-    const [stats, setStats] = useState<Stat>();
+    const [stats, setStats] = useState<NuzlockeState>();
     const [notFound, setNotFound] = useState(false);
     useEffect(() => {
-        const es = new EventSource(`/api/stats/${username}/stream`);
+        const es = new EventSource(`/api/${username}/stream`);
         es.onmessage = (e) => {
             if ('data' in e) {
-                const stat = JSON.parse(e.data) as Stat;
+                const stat = JSON.parse(e.data) as NuzlockeState;
                 setStats(stat);
             } else {
                 setNotFound(true);

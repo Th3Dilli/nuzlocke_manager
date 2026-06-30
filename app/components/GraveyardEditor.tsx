@@ -2,7 +2,7 @@
 
 import {useMemo, useState} from "react";
 import {POKEMON} from "@/app/lib/pokemon";
-import {MAX_GRAVEYARD, Stat} from "@/app/lib/types/Stat";
+import {MAX_GRAVEYARD, NuzlockeState} from "@/app/lib/types/NuzlockeState";
 import {AlertTriangle, Check, Search, Skull, X} from "lucide-react";
 
 const MAX_SUGGESTIONS = 8;
@@ -11,7 +11,7 @@ function listsEqual(a: number[], b: number[]): boolean {
     return a.length === b.length && a.every((v, i) => v === b[i]);
 }
 
-export default function GraveyardEditor({username, stats}: { username: string; stats: Stat }) {
+export default function GraveyardEditor({username, stats}: { username: string; stats: NuzlockeState }) {
     // Draft graveyard, seeded once from the current stats. Variable length; each
     // entry is a Pokémon id (no empty slots).
     const [graveyard, setGraveyard] = useState<number[]>(() => [...stats.graveyard]);
@@ -67,7 +67,7 @@ export default function GraveyardEditor({username, stats}: { username: string; s
         setSaving(true);
         setError(null);
         try {
-            const res = await fetch(`/api/stats/${username}`, {
+            const res = await fetch(`/api/${username}`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({graveyard}),

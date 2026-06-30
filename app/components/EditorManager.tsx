@@ -12,7 +12,7 @@ export default function EditorManager({username}: { username: string }) {
 
     useEffect(() => {
         let cancelled = false;
-        fetch(`/api/stats/${username}/editors`)
+        fetch(`/api/${username}/editors`)
             .then(res => (res.ok ? res.json() : {editors: []}))
             .then((data: { editors: string[] }) => {
                 if (!cancelled) setEditors(data.editors);
@@ -31,7 +31,7 @@ export default function EditorManager({username}: { username: string }) {
         setBusy(true);
         setError(null);
         try {
-            const res = await fetch(`/api/stats/${username}/editors`, {
+            const res = await fetch(`/api/${username}/editors`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({editor}),
@@ -53,7 +53,7 @@ export default function EditorManager({username}: { username: string }) {
     async function removeEditor(editor: string) {
         setError(null);
         try {
-            const res = await fetch(`/api/stats/${username}/editors`, {
+            const res = await fetch(`/api/${username}/editors`, {
                 method: "DELETE",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({editor}),

@@ -6,7 +6,8 @@ export type User = {
     twitch_id: string
     username: string
     role: number
-    page_enabled: number
+    nuzlocke_enabled: number
+    soullink_enabled: number
     api_token: string
     profile_image_url: string
     created_at: string
@@ -38,14 +39,15 @@ export function regenerateApiToken(twitch_id: string) {
     updateToken.run({ twitch_id, api_token: generateApiToken(), now })
 }
 
-export function changePageEnabled(twitch_id: string, enabled: number): User | null {
+export function changePageEnabled(twitch_id: string, isNuzlockeEnabled: number, isSoullinkEnabled: number): User | null {
     const now = new Date().toISOString()
     let user = getUser(twitch_id);
-    if (user?.page_enabled === 0) {
+    if (user?.nuzlocke_enabled === 0 && user?.soullink_enabled === 0) {
         if (user.api_token === null || user.api_token === "")
             regenerateApiToken(twitch_id)
     }
-    updatePageEnabled.run({twitch_id, page_enabled: enabled, now})
+
+    updatePageEnabled.run({twitch_id, nuzlocke_enabled: isNuzlockeEnabled,soullink_enabled:isSoullinkEnabled, now})
     user = getUser(twitch_id);
     return user;
 }
