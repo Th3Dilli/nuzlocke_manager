@@ -1,11 +1,12 @@
-import {changePageEnabled, getUsers, type User} from '@/app/lib/users'
+import {changePageEnabled, getUserByUsername, getUsers, type User} from '@/app/lib/users'
 import {getSessionUser} from '@/app/lib/session'
+import {getEditingFor} from '@/app/lib/editors'
 import Header from "@/app/components/Header";
 import CopyKeyField from "@/app/components/CopyField";
 import {updatePageEnabled as updateNuzlockePageEnabled} from "@/app/lib/stats";
 import {updatePageEnabled as updateSoullinkPageEnabled} from "@/app/lib/soullinkStats";
 import {revalidatePath} from "next/cache";
-import {Crown, ExternalLink, Gamepad2, ListChecks, Monitor, Settings, ShieldCheck, Swords} from "lucide-react";
+import {Crown, ExternalLink, Gamepad2, ListChecks, Monitor, Settings, ShieldCheck, Swords, UserPlus} from "lucide-react";
 
 function StatusBadge({enabled}: { enabled: boolean }) {
     return (
@@ -59,6 +60,13 @@ export default async function Home() {
     if (user && user.role >= 10) {
         const userResp = getUsers();
         if (userResp) users = userResp;
+    }
+
+    let editingFor: User[] = []
+    if (user) {
+        editingFor = getEditingFor(user.username)
+            .map(owner => getUserByUsername(owner))
+            .filter((owner): owner is User => owner !== null)
     }
 
     async function saveChanges(formData: FormData) {
@@ -193,6 +201,47 @@ export default async function Home() {
                             </div>
                         </div>
 
+                        {editingFor.length > 0 && (
+                            <div className="p-6 rounded-xl border border-yellow-600 bg-neutral-900/90">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <UserPlus size={18} className="text-yellow-600"/>
+                                    <h2 className="text-lg font-semibold text-gray-100">Editing For</h2>
+                                </div>
+                                <div className="space-y-3">
+                                    {editingFor.map(owner => (
+                                        <div key={owner.username} className="p-3 rounded-lg border border-yellow-700/40 bg-neutral-950/50">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <img
+                                                    src={owner.profile_image_url}
+                                                    alt={`${owner.username}'s profile picture`}
+                                                    className="h-6 w-6 rounded-full object-cover"
+                                                />
+                                                <p className="text-gray-100 font-medium">{owner.username}</p>
+                                            </div>
+                                            {owner.nuzlocke_enabled === 1 || owner.soullink_enabled === 1 ? (
+                                                <div className="flex flex-col gap-1 text-sm">
+                                                    {owner.nuzlocke_enabled === 1 && (
+                                                        <a href={`${baseUrl}/nuzlocke/${owner.username}`}
+                                                           className="flex items-center gap-1.5 text-yellow-600 hover:underline">
+                                                            <Gamepad2 size={14}/> Nuzlocke Page
+                                                        </a>
+                                                    )}
+                                                    {owner.soullink_enabled === 1 && (
+                                                        <a href={`${baseUrl}/soullink/${owner.username}`}
+                                                           className="flex items-center gap-1.5 text-yellow-600 hover:underline">
+                                                            <Swords size={14}/> Soullink Page
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <p className="text-xs text-gray-500">No pages enabled yet.</p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {user.role >= 10 && (
                             <div className="p-6 rounded-xl border border-yellow-600 bg-neutral-900/90">
                                 <div className="flex items-center gap-2 mb-4">
@@ -207,7 +256,8 @@ export default async function Home() {
                                                 <span className="text-xs text-gray-400">Role {user.role}</span>
                                             </div>
                                             <p className="text-xs text-gray-500">{user.twitch_id}</p>
-                                            <p className="text-xs text-gray-400 mt-1">Page Enabled: {user.nuzlocke_enabled === 1 ? "Yes" : "No"}</p>
+                                            <p className="text-xs text-gray-400 mt-1">Nuzlocke Enabled: {user.nuzlocke_enabled === 1 ? "Yes" : "No"}</p>
+                                            <p className="text-xs text-gray-400 mt-1">Soullink Enabled: {user.soullink_enabled === 1 ? "Yes" : "No"}</p>
                                             <p className="text-xs text-gray-500">Created At: {user.created_at} | Updated At: {user.updated_at}</p>
                                         </div>)
                                     })}

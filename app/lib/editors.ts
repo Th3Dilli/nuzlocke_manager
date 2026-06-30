@@ -1,4 +1,4 @@
-import {deleteTeamEditor, insertTeamEditor, selectTeamEditor, selectTeamEditors} from "@/app/lib/database";
+import {deleteTeamEditor, insertTeamEditor, selectEditingFor, selectTeamEditor, selectTeamEditors} from "@/app/lib/database";
 
 // Editors are extra Twitch users an owner has granted permission to edit their
 // team. Grants are stored by Twitch username (lowercase login); they take
@@ -7,6 +7,11 @@ import {deleteTeamEditor, insertTeamEditor, selectTeamEditor, selectTeamEditors}
 
 export function getTeamEditors(owner: string): string[] {
     return (selectTeamEditors.all(owner) as Array<{ editor: string }>).map(r => r.editor);
+}
+
+// Owners whose team `editor` has been granted permission to edit.
+export function getEditingFor(editor: string): string[] {
+    return (selectEditingFor.all(editor) as Array<{ owner: string }>).map(r => r.owner);
 }
 
 export function addTeamEditor(owner: string, editor: string): void {

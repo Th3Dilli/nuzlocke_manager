@@ -1,4 +1,4 @@
-import {selectUser, selectUsers, updatePageEnabled, updateToken, upsertUser} from '@/app/lib/database'
+import {selectUser, selectUserByUsername, selectUsers, updatePageEnabled, updateToken, upsertUser} from '@/app/lib/database'
 import { randomBytes } from 'crypto'
 import {TwitchUser} from "@/app/lib/types/twitchUser";
 
@@ -54,6 +54,10 @@ export function changePageEnabled(twitch_id: string, isNuzlockeEnabled: number, 
 
 export function getUser(twitch_id: string): User | null {
     return (selectUser.get(twitch_id) as User | undefined) ?? null
+}
+
+export function getUserByUsername(username: string): User | null {
+    return (selectUserByUsername.get(username) as User | undefined) ?? null
 }
 
 export function getUsers(): User[] | null {

@@ -90,6 +90,10 @@ export const selectUser = database.prepare<[string]>(`SELECT *
                                                       FROM users
                                                       WHERE twitch_id = ?`)
 
+export const selectUserByUsername = database.prepare<[string]>(`SELECT *
+                                                      FROM users
+                                                      WHERE username = ?`)
+
 export const selectUsers = database.prepare(`SELECT twitch_id, username, role, nuzlocke_enabled, profile_image_url, created_at, updated_at
                                                       FROM users`)
 
@@ -159,6 +163,11 @@ export const selectTeamEditors = database.prepare<[string]>(`SELECT editor
 export const selectTeamEditor = database.prepare<[string, string]>(`SELECT 1
                                                                    FROM team_editors
                                                                    WHERE owner = ?
-                                                                     AND editor = ?`);
+                                                                     AND editor = ?`)
+
+export const selectEditingFor = database.prepare<[string]>(`SELECT owner
+                                                            FROM team_editors
+                                                            WHERE editor = ?
+                                                            ORDER BY owner`);
 
 export default database
