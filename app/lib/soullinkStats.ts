@@ -1,5 +1,5 @@
-import {normalizeGraveyard, normalizeLabel, normalizeShowLabel, normalizeTeam} from "@/app/lib/types/NuzlockeState";
-import {DEFAULT_SOULLINK_LABELS, emptySoullinkState, SoullinkState} from "@/app/lib/types/SoullinkState";
+import {normalizeColor, normalizeGraveyard, normalizeLabel, normalizeShowLabel, normalizeTeam} from "@/app/lib/types/NuzlockeState";
+import {DEFAULT_SOULLINK_LABELS, DEFAULT_SOULLINK_SETTINGS, emptySoullinkState, SoullinkState} from "@/app/lib/types/SoullinkState";
 import {getSoullinkEnabledUsers, selectSoullinkStmt, upsertSoullinkStmt} from "@/app/lib/database";
 import {User} from "@/app/lib/users";
 
@@ -54,6 +54,10 @@ type SoullinkRow = {
     graveyard1_label: string;
     show_graveyard2_label: number;
     graveyard2_label: string;
+    frame_border_color: string;
+    team_color: string;
+    graveyard_color: string;
+    text_color: string;
 };
 
 function loadStat(user: string): SoullinkState {
@@ -81,6 +85,10 @@ function loadStat(user: string): SoullinkState {
             graveyard1Label: normalizeLabel(row.graveyard1_label, DEFAULT_SOULLINK_LABELS.graveyard1Label),
             showGraveyard2Label: normalizeShowLabel(!!row.show_graveyard2_label, DEFAULT_SOULLINK_LABELS.showGraveyard2Label),
             graveyard2Label: normalizeLabel(row.graveyard2_label, DEFAULT_SOULLINK_LABELS.graveyard2Label),
+            frameBorderColor: normalizeColor(row.frame_border_color, DEFAULT_SOULLINK_SETTINGS.frameBorderColor),
+            teamColor: normalizeColor(row.team_color, DEFAULT_SOULLINK_SETTINGS.teamColor),
+            graveyardColor: normalizeColor(row.graveyard_color, DEFAULT_SOULLINK_SETTINGS.graveyardColor),
+            textColor: normalizeColor(row.text_color, DEFAULT_SOULLINK_SETTINGS.textColor),
         };
     }
     return emptySoullinkState(user);
@@ -121,6 +129,11 @@ export function setStats(user: string, s: Partial<Omit<SoullinkState, "user">>) 
             if (s[textKey] !== undefined) userStat[textKey] = normalizeLabel(s[textKey], userStat[textKey]);
         }
 
+        if (s.frameBorderColor !== undefined) userStat.frameBorderColor = normalizeColor(s.frameBorderColor, userStat.frameBorderColor);
+        if (s.teamColor !== undefined) userStat.teamColor = normalizeColor(s.teamColor, userStat.teamColor);
+        if (s.graveyardColor !== undefined) userStat.graveyardColor = normalizeColor(s.graveyardColor, userStat.graveyardColor);
+        if (s.textColor !== undefined) userStat.textColor = normalizeColor(s.textColor, userStat.textColor);
+
         upsertSoullinkStmt.run({
             user,
             team1: JSON.stringify(userStat.team1),
@@ -143,6 +156,10 @@ export function setStats(user: string, s: Partial<Omit<SoullinkState, "user">>) 
             graveyard1_label: userStat.graveyard1Label,
             show_graveyard2_label: userStat.showGraveyard2Label ? 1 : 0,
             graveyard2_label: userStat.graveyard2Label,
+            frame_border_color: userStat.frameBorderColor,
+            team_color: userStat.teamColor,
+            graveyard_color: userStat.graveyardColor,
+            text_color: userStat.textColor,
         });
 
         subscribers.get(user)?.forEach(cb => cb(userStat));

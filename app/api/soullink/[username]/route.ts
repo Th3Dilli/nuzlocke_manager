@@ -2,7 +2,7 @@ import {getSessionUser} from "@/app/lib/session";
 import {getStats, setStats} from "@/app/lib/soullinkStats";
 import {canEditTeam} from "@/app/lib/editors";
 import {POKEMON} from "@/app/lib/pokemon";
-import {MAX_GRAVEYARD, normalizeLabel, normalizeShowLabel, TEAM_SIZE} from "@/app/lib/types/NuzlockeState";
+import {MAX_GRAVEYARD, normalizeColor, normalizeLabel, normalizeShowLabel, TEAM_SIZE} from "@/app/lib/types/NuzlockeState";
 import {SoullinkState} from "@/app/lib/types/SoullinkState";
 
 const validIds = new Set(POKEMON.map(p => p.id));
@@ -17,6 +17,8 @@ const LABEL_FIELDS = [
     ["showGraveyard1Label", "graveyard1Label"],
     ["showGraveyard2Label", "graveyard2Label"],
 ] as const;
+
+const SETTINGS_FIELDS = ["frameBorderColor", "teamColor", "graveyardColor", "textColor"] as const;
 
 function parseTeam(rawTeam: unknown): number[] | { error: string } {
     if (!Array.isArray(rawTeam) || rawTeam.length > TEAM_SIZE) {
@@ -80,7 +82,8 @@ export async function POST(
 
     const fields = ["team1", "team2", "graveyard1", "graveyard2"] as const;
     const hasLabels = LABEL_FIELDS.some(([show, text]) => show in body || text in body);
-    if (!fields.some(f => f in body) && !hasLabels) {
+    const hasSettings = SETTINGS_FIELDS.some(field => field in body);
+    if (!fields.some(f => f in body) && !hasLabels && !hasSettings) {
         return new Response("Nothing to update", {status: 400});
     }
 
@@ -112,6 +115,10 @@ export async function POST(
     for (const [showKey, textKey] of LABEL_FIELDS) {
         if (showKey in body) update[showKey] = normalizeShowLabel(body[showKey], current[showKey]);
         if (textKey in body) update[textKey] = normalizeLabel(body[textKey], current[textKey]);
+    }
+
+    for (const field of SETTINGS_FIELDS) {
+        if (field in body) update[field] = normalizeColor(body[field], current[field]);
     }
 
     setStats(username, update);

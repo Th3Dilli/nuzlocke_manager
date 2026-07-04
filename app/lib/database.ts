@@ -58,7 +58,11 @@ database.exec(`
         show_graveyard1_label  INTEGER NOT NULL DEFAULT 1,
         graveyard1_label       TEXT    NOT NULL DEFAULT 'Graveyard 1',
         show_graveyard2_label  INTEGER NOT NULL DEFAULT 1,
-        graveyard2_label       TEXT    NOT NULL DEFAULT 'Graveyard 2'
+        graveyard2_label       TEXT    NOT NULL DEFAULT 'Graveyard 2',
+        frame_border_color     TEXT    NOT NULL DEFAULT '#f87171',
+        team_color             TEXT    NOT NULL DEFAULT '#eab308',
+        graveyard_color        TEXT    NOT NULL DEFAULT '#eab308',
+        text_color             TEXT    NOT NULL DEFAULT '#fde047'
     );
 
     CREATE TABLE IF NOT EXISTS users
@@ -222,17 +226,23 @@ export const upsertSoullinkStmt = database.prepare<{
     graveyard1_label: string;
     show_graveyard2_label: number;
     graveyard2_label: string;
+    frame_border_color: string;
+    team_color: string;
+    graveyard_color: string;
+    text_color: string;
 }>(`
     INSERT INTO soullink (user, team1, team2, graveyard1, graveyard2, show_soullink1_label, soullink1_label,
                            show_soullink2_label, soullink2_label, show_trainer1_label, trainer1_label,
                            show_trainer2_label, trainer2_label, show_team1_label, team1_label,
                            show_team2_label, team2_label, show_graveyard1_label, graveyard1_label,
-                           show_graveyard2_label, graveyard2_label)
+                           show_graveyard2_label, graveyard2_label,
+                           frame_border_color, team_color, graveyard_color, text_color)
     VALUES (@user, @team1, @team2, @graveyard1, @graveyard2, @show_soullink1_label, @soullink1_label,
             @show_soullink2_label, @soullink2_label, @show_trainer1_label, @trainer1_label,
             @show_trainer2_label, @trainer2_label, @show_team1_label, @team1_label,
             @show_team2_label, @team2_label, @show_graveyard1_label, @graveyard1_label,
-            @show_graveyard2_label, @graveyard2_label)
+            @show_graveyard2_label, @graveyard2_label,
+            @frame_border_color, @team_color, @graveyard_color, @text_color)
     ON CONFLICT(user) DO UPDATE SET team1                 = excluded.team1,
                                      team2                 = excluded.team2,
                                      graveyard1            = excluded.graveyard1,
@@ -252,7 +262,11 @@ export const upsertSoullinkStmt = database.prepare<{
                                      show_graveyard1_label = excluded.show_graveyard1_label,
                                      graveyard1_label      = excluded.graveyard1_label,
                                      show_graveyard2_label = excluded.show_graveyard2_label,
-                                     graveyard2_label      = excluded.graveyard2_label
+                                     graveyard2_label      = excluded.graveyard2_label,
+                                     frame_border_color    = excluded.frame_border_color,
+                                     team_color            = excluded.team_color,
+                                     graveyard_color       = excluded.graveyard_color,
+                                     text_color            = excluded.text_color
 `);
 
 export const selectSoullinkStmt = database.prepare(`SELECT *

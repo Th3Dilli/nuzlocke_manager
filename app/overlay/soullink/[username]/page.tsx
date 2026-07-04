@@ -69,24 +69,24 @@ function OverlayInner({username}: { username: string }) {
             <div className="flex shrink-0 justify-center gap-4">
                 <div className="flex flex-col items-center gap-4">
                     <div className="flex shrink-0 gap-4">
-                        <Frame label={stats.showSoullink1Label ? stats.soullink1Label : undefined} className="h-[var(--main-h)] w-[var(--main-w)] shrink-0"/>
-                        <TeamBox label={stats.showTeam1Label ? stats.team1Label : ""} team={stats.team1} direction="column" className="h-[var(--main-h)] w-[var(--team-w)] shrink-0"/>
+                        <Frame label={stats.showSoullink1Label ? stats.soullink1Label : undefined} color={stats.frameBorderColor} textColor={stats.textColor} className="h-[var(--main-h)] w-[var(--main-w)] shrink-0"/>
+                        <TeamBox label={stats.showTeam1Label ? stats.team1Label : ""} team={stats.team1} direction="column" color={stats.teamColor} textColor={stats.textColor} className="h-[var(--main-h)] w-[var(--team-w)] shrink-0"/>
                     </div>
-                    <Frame label={stats.showTrainer1Label ? stats.trainer1Label : undefined} className="h-[var(--trainer-size)] w-[var(--trainer-size)] shrink-0"/>
+                    <Frame label={stats.showTrainer1Label ? stats.trainer1Label : undefined} color={stats.frameBorderColor} textColor={stats.textColor} className="h-[var(--trainer-size)] w-[var(--trainer-size)] shrink-0"/>
                 </div>
                 <div className="flex flex-col items-center gap-4">
                     <div className="flex shrink-0 gap-4">
-                        <TeamBox label={stats.showTeam2Label ? stats.team2Label : ""} team={stats.team2} direction="column" className="h-[var(--main-h)] w-[var(--team-w)] shrink-0"/>
-                        <Frame label={stats.showSoullink2Label ? stats.soullink2Label : undefined} className="h-[var(--main-h)] w-[var(--main-w)] shrink-0"/>
+                        <TeamBox label={stats.showTeam2Label ? stats.team2Label : ""} team={stats.team2} direction="column" color={stats.teamColor} textColor={stats.textColor} className="h-[var(--main-h)] w-[var(--team-w)] shrink-0"/>
+                        <Frame label={stats.showSoullink2Label ? stats.soullink2Label : undefined} color={stats.frameBorderColor} textColor={stats.textColor} className="h-[var(--main-h)] w-[var(--main-w)] shrink-0"/>
                     </div>
-                    <Frame label={stats.showTrainer2Label ? stats.trainer2Label : undefined} className="h-[var(--trainer-size)] w-[var(--trainer-size)] shrink-0"/>
+                    <Frame label={stats.showTrainer2Label ? stats.trainer2Label : undefined} color={stats.frameBorderColor} textColor={stats.textColor} className="h-[var(--trainer-size)] w-[var(--trainer-size)] shrink-0"/>
                 </div>
             </div>
 
             <div className="flex h-[var(--graveyard-h)] shrink-0 gap-4">
-                <Graveyard label={stats.showGraveyard1Label ? stats.graveyard1Label : undefined} pokemon={stats.graveyard1} className="min-w-0 flex-1">
+                <Graveyard label={stats.showGraveyard1Label ? stats.graveyard1Label : undefined} pokemon={stats.graveyard1} color={stats.graveyardColor} textColor={stats.textColor} className="min-w-0 flex-1">
                 </Graveyard>
-                <Graveyard label={stats.showGraveyard2Label ? stats.graveyard2Label : undefined} pokemon={stats.graveyard2} className="min-w-0 flex-1">
+                <Graveyard label={stats.showGraveyard2Label ? stats.graveyard2Label : undefined} pokemon={stats.graveyard2} color={stats.graveyardColor} textColor={stats.textColor} className="min-w-0 flex-1">
                 </Graveyard>
             </div>
         </div>
@@ -116,10 +116,10 @@ function GraveyardEntries({graveyard}: { graveyard: number[] }) {
 // A transparent, red-bordered cut-out with a floating pokéball title tab. The
 // streamer places the matching OBS source (game capture / webcam) behind the
 // browser source and aligns it to this frame.
-function Frame({label, className, children}: { label?: string; className?: string; children?: ReactNode }) {
+function Frame({label, className, children, color = "#f87171", textColor}: { label?: string; className?: string; children?: ReactNode; color?: string; textColor?: string }) {
     return (
-        <div className={`relative rounded-2xl border-8 border-red-400 ${className ?? ""}`}>
-            {label ? <TitleTab label={label}/> : <></>}
+        <div className={`relative rounded-2xl border-8 ${className ?? ""}`} style={{borderColor: color}}>
+            {label ? <TitleTab label={label} borderColor={color} textColor={textColor}/> : <></>}
             {children}
         </div>
     );

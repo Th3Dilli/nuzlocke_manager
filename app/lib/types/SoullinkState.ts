@@ -1,4 +1,4 @@
-import {emptyTeam, normalizeLabel, normalizeShowLabel} from "@/app/lib/types/NuzlockeState";
+import {emptyTeam, normalizeColor, normalizeLabel, normalizeShowLabel} from "@/app/lib/types/NuzlockeState";
 
 // Per-section label settings: whether the overlay shows a title tab for that
 // section, and what custom text it displays. One pair per side (1/2) for the
@@ -65,7 +65,34 @@ export function normalizeSoullinkLabels(input: unknown, fallback: SoullinkLabels
     };
 }
 
-export type SoullinkState = SoullinkLabels & {
+// Overlay border/text colors, shared across both sides.
+export type SoullinkSettings = {
+    frameBorderColor: string;
+    teamColor: string;
+    graveyardColor: string;
+    textColor: string;
+};
+
+export const DEFAULT_SOULLINK_SETTINGS: SoullinkSettings = {
+    frameBorderColor: "#f87171",
+    teamColor: "#eab308",
+    graveyardColor: "#eab308",
+    textColor: "#fde047",
+};
+
+// Coerce arbitrary input (e.g. parsed JSON) into a full set of overlay color
+// settings, falling back field-by-field to defaults for anything missing/invalid.
+export function normalizeSoullinkSettings(input: unknown, fallback: SoullinkSettings = DEFAULT_SOULLINK_SETTINGS): SoullinkSettings {
+    const source = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
+    return {
+        frameBorderColor: normalizeColor(source.frameBorderColor, fallback.frameBorderColor),
+        teamColor: normalizeColor(source.teamColor, fallback.teamColor),
+        graveyardColor: normalizeColor(source.graveyardColor, fallback.graveyardColor),
+        textColor: normalizeColor(source.textColor, fallback.textColor),
+    };
+}
+
+export type SoullinkState = SoullinkLabels & SoullinkSettings & {
     user: string;
     // Always length TEAM_SIZE. Each entry is a Pokémon id, or 0 for an empty slot.
     team1: number[];
@@ -84,5 +111,6 @@ export function emptySoullinkState(user: string): SoullinkState {
         graveyard1: [],
         graveyard2: [],
         ...DEFAULT_SOULLINK_LABELS,
+        ...DEFAULT_SOULLINK_SETTINGS,
     };
 }

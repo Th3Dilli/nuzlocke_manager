@@ -7,6 +7,7 @@ import TeamEditor from "@/app/components/TeamEditor";
 import GraveyardEditor from "@/app/components/GraveyardEditor";
 import EditorManager from "@/app/components/EditorManager";
 import LabelsEditor, {LabelSection} from "@/app/components/LabelsEditor";
+import SoullinkSettingsEditor from "@/app/components/SoullinkSettingsEditor";
 import TeamBox, {Graveyard} from "@/app/components/TeamBox";
 
 type SoullinkLabelKey = "showSoullink1Label" | "soullink1Label" | "showSoullink2Label" | "soullink2Label"
@@ -45,18 +46,21 @@ function GraveyardEntries({graveyard}: { graveyard: number[] }) {
     );
 }
 
-function TeamColumn({label, team, teamLabel, graveyard, graveyardLabel}: {
+function TeamColumn({label, team, teamLabel, graveyard, graveyardLabel, teamColor, graveyardColor, textColor}: {
     label: string;
     team: number[];
     teamLabel?: string;
     graveyard: number[];
     graveyardLabel?: string;
+    teamColor?: string;
+    graveyardColor?: string;
+    textColor?: string;
 }) {
     return (
         <div className="flex flex-1 flex-col items-center gap-2">
             <h2 className="text-lg font-bold text-yellow-300">{label}</h2>
-            <TeamBox team={team} label={teamLabel ?? ""} className="w-full max-w-md"/>
-            <Graveyard label={graveyardLabel} pokemon={graveyard} className="w-full min-h-20">
+            <TeamBox team={team} label={teamLabel ?? ""} color={teamColor} textColor={textColor} className="w-full max-w-md"/>
+            <Graveyard label={graveyardLabel} pokemon={graveyard} color={graveyardColor} textColor={textColor} className="w-full min-h-20">
             </Graveyard>
         </div>
     );
@@ -172,6 +176,9 @@ function HomeInner({username}: { username: string }) {
                         teamLabel={stats.showTeam1Label ? stats.team1Label : ""}
                         graveyard={stats.graveyard1}
                         graveyardLabel={stats.showGraveyard1Label ? stats.graveyard1Label : undefined}
+                        teamColor={stats.teamColor}
+                        graveyardColor={stats.graveyardColor}
+                        textColor={stats.textColor}
                     />
                     <TeamColumn
                         label="Team 2"
@@ -179,6 +186,9 @@ function HomeInner({username}: { username: string }) {
                         teamLabel={stats.showTeam2Label ? stats.team2Label : ""}
                         graveyard={stats.graveyard2}
                         graveyardLabel={stats.showGraveyard2Label ? stats.graveyard2Label : undefined}
+                        teamColor={stats.teamColor}
+                        graveyardColor={stats.graveyardColor}
+                        textColor={stats.textColor}
                     />
                 </div>
 
@@ -215,6 +225,17 @@ function HomeInner({username}: { username: string }) {
                             graveyard1Label: stats.graveyard1Label,
                             showGraveyard2Label: stats.showGraveyard2Label,
                             graveyard2Label: stats.graveyard2Label,
+                        }}
+                    />
+                )}
+                {canEdit && (
+                    <SoullinkSettingsEditor
+                        apiUrl={apiUrl}
+                        values={{
+                            frameBorderColor: stats.frameBorderColor,
+                            teamColor: stats.teamColor,
+                            graveyardColor: stats.graveyardColor,
+                            textColor: stats.textColor,
                         }}
                     />
                 )}
