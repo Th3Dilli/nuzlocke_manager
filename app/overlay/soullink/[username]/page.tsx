@@ -45,41 +45,36 @@ function OverlayInner({username}: { username: string }) {
     )
 
     return (
-        <div className="h-[1080px] w-[1920px] gap-2  overlay border-2 border-red-500">
-            <div className="flex flex-col gap-2 w-full h-full">
-                <div className="flex flex-row gap-2 p-2">
-                    {/*<div className="flex-1 ">*/}
-                        <div className="flex-1 flex flex-row gap-2">
-
-                            <Frame label={stats.showSoullink1Label ? stats.soullink1Label : undefined}
-                                   color={stats.frameBorderColor}
-                                   textColor={stats.textColor}
-                                   className="aspect-4/3 flex-1"/>
-                            <div className="w-36">
-                                <TeamBoxV label={stats.showTeam1Label ? stats.team1Label : ""}
-                                          team={stats.team1}
-                                          color={stats.teamColor}
-                                          textColor={stats.textColor} className="h-120 "/>
-                            </div>
-                            <div className="w-36">
-                            </div>
+        <div className="h-[1080px] w-[1920px] gap-2 overlay">
+            <div className="flex flex-col  w-full h-full">
+                <div className="flex flex-row p-2">
+                    <div className="flex-1 flex flex-row gap-2">
+                        <Frame label={stats.showSoullink1Label ? stats.soullink1Label : undefined}
+                               color={stats.frameBorderColor}
+                               textColor={stats.textColor}
+                               className="aspect-4/3 flex-1"/>
+                        <div className="w-34">
+                            <TeamBoxV label={stats.showTeam1Label ? stats.team1Label : ""}
+                                      team={stats.team1}
+                                      color={stats.teamColor}
+                                      textColor={stats.textColor} className="h-123"/>
                         </div>
-                    {/*</div>*/}
-                    <div className="flex-1">
-                        <div className="flex flex-row-reverse gap-2">
+                    </div>
 
-                            <Frame label={stats.showSoullink1Label ? stats.soullink1Label : undefined}
-                                   color={stats.frameBorderColor}
-                                   textColor={stats.textColor}
-                                   className="aspect-4/3 flex-1"/>
-                            <div className="w-36">
-                                <TeamBoxV label={stats.showTeam1Label ? stats.team1Label : ""}
-                                          team={stats.team1}
-                                          color={stats.teamColor}
-                                          textColor={stats.textColor} className="h-120 "/>
-                            </div>
-                            <div className="w-36">
-                            </div>
+                    <div className="w-74">
+                        
+                    </div>
+
+                    <div className="flex-1 flex flex-row-reverse gap-2">
+                        <Frame label={stats.showSoullink2Label ? stats.soullink2Label : undefined}
+                               color={stats.frameBorderColor}
+                               textColor={stats.textColor}
+                               className="aspect-4/3 flex-1"/>
+                        <div className="w-34">
+                            <TeamBoxV label={stats.showTeam2Label ? stats.team2Label : ""}
+                                      team={stats.team2}
+                                      color={stats.teamColor}
+                                      textColor={stats.textColor} className="h-123"/>
                         </div>
                     </div>
                 </div>
@@ -89,7 +84,7 @@ function OverlayInner({username}: { username: string }) {
                                textColor={stats.textColor} className="flex-1"/>
                     </div>
 
-                    <div className="flex-1 w-1/2 h-full flex flex-col gap-2 min-h-0">
+                    <div className="flex-1 w-1/2 h-full flex flex-col gap-3 min-h-0">
                         <Frame
                                color={stats.frameBorderColor}
                                textColor={stats.textColor}
@@ -98,7 +93,7 @@ function OverlayInner({username}: { username: string }) {
                                    color={stats.graveyardColor} textColor={stats.textColor} size="10" className="flex-1 min-h-0"/>
                     </div>
 
-                    <div className="flex-1 w-1/2 h-full flex flex-col gap-2 min-h-0">
+                    <div className="flex-1 w-1/2 h-full flex flex-col gap-3 min-h-0">
                         <Frame
                                color={stats.frameBorderColor}
                                textColor={stats.textColor}

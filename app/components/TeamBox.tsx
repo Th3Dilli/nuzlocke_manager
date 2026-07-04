@@ -100,7 +100,7 @@ export function TitleTabV({label, borderColor = "#dc2626", textColor = "#fde047"
     return (
         <div
             style={{borderColor, color: textColor}}
-            className="absolute left-2 top-0 flex -translate-y-4 items-center gap-2 rounded-full border-2 bg-neutral-900 px-3 py-0.5 text-sm font-bold">
+            className="absolute left-2 top-0 flex -translate-y-3 items-center gap-2 rounded-full border-2 bg-neutral-900 px-3 py-0.5 text-sm font-bold">
             <Pokeball className="h-4 w-4"/>
             {label}
         </div>
