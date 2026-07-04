@@ -9,9 +9,6 @@ function OverlayInner({username}: { username: string }) {
     const [state, setState] = useState<NuzlockeState>();
     const [notFound, setNotFound] = useState(false);
 
-    // allowed values 1100 - 1420
-    const mainWidth = 1200;
-    const camMode: CamMode = "1";
     useEffect(() => {
         const es = new EventSource(`/api/${username}/stream`);
         es.onmessage = (e) => {
@@ -48,55 +45,55 @@ function OverlayInner({username}: { username: string }) {
             Loading...
         </div>
     )
-    type CamMode = '1' | '2' | '3' | '4';
     function getLayout(state: NuzlockeState) {
+        const camMode = state.camMode;
         if (camMode === "4") {
             return (<div className="flex flex-1 flex-row gap-2">
-                <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} className={`flex-1`}/>
+                <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-1`}/>
                 <div className="flex-1"></div>
             </div>)
         } else if (camMode === "3") {
             return (<div className="flex flex-1 flex-row gap-2">
                 <div className="flex-1"></div>
-                <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} className={`flex-1`}/>
+                <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-1`}/>
             </div>)
         } else if (camMode === "2") {
             return (<div className="flex flex-1 flex-row gap-2">
                 <div className="flex-none w-1/4"></div>
-                <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} className={`flex-auto w-1/2`}/>
+                <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-auto w-1/2`}/>
                 <div className="flex-auto w-1/4"></div>
             </div>)
         } else if (camMode === "1") {
             return (
-                <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} className={`flex-1`}/>
+                <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-1`}/>
             )
         }
     }
     return (
-        <div className="flex h-[1080px] w-[1920px] gap-2 p-2 overlay border border-yellow-700">
+        <div className="flex h-[1080px] w-[1920px] gap-2 p-2 overlay">
 
-            <div className={`flex flex-col gap-2 `} style={{width: `${mainWidth}px`}}>
-                <Frame label={state.showNuzlockeLabel ? state.nuzlockeLabel : undefined} className={`aspect-4/3`} />
+            <div className={`flex flex-col gap-2 `} style={{width: `${state.mainWidth}px`}}>
+                <Frame label={state.showNuzlockeLabel ? state.nuzlockeLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`aspect-4/3`} />
 
                 <Graveyard label={state.showGraveyardLabel ? state.graveyardLabel : undefined} pokemon={state.graveyard}
-                           className="flex-1">
+                           color={state.graveyardColor} textColor={state.textColor} className="flex-1">
                 </Graveyard>
             </div>
 
             <div className="flex flex-1 flex-col gap-4">
                 {getLayout(state)}
-                <TeamBox team={state.team} label={state.showTeamLabel ? state.teamLabel : ""} className="h-24"/>
-                <Frame className="aspect-4/3 "/>
+                <TeamBox team={state.team} label={state.showTeamLabel ? state.teamLabel : ""} color={state.teamColor} textColor={state.textColor} className="h-24"/>
+                <Frame color={state.frameBorderColor} textColor={state.textColor} className="aspect-4/3 "/>
             </div>
 
         </div>
     );
 }
 
-function Frame({label, className}: { label?: string; className?: string }) {
+function Frame({label, className, color = "#f87171", textColor}: { label?: string; className?: string; color?: string; textColor?: string }) {
     return (
-        <div className={`relative rounded-2xl border-12 border-red-400 ${className ?? ""}`}>
-            {label ? <TitleTab label={label}/> : <></>}
+        <div className={`relative rounded-2xl border-12 box-content ${className ?? ""}`} style={{borderColor: color}}>
+            {label ? <TitleTab label={label} borderColor={color} textColor={textColor}/> : <></>}
         </div>
     );
 }

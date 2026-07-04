@@ -1,8 +1,12 @@
 import {
     DEFAULT_LABELS,
+    DEFAULT_SETTINGS,
     emptyTeam,
+    normalizeCamMode,
+    normalizeColor,
     normalizeGraveyard,
     normalizeLabel,
+    normalizeMainWidth,
     normalizeShowLabel,
     normalizeTeam,
     NuzlockeState
@@ -60,6 +64,12 @@ type NuzlockeRow = {
     team_label: string;
     show_graveyard_label: number;
     graveyard_label: string;
+    main_width: number;
+    cam_mode: string;
+    frame_border_color: string;
+    team_color: string;
+    graveyard_color: string;
+    text_color: string;
 };
 
 function loadStat(user: string): NuzlockeState {
@@ -77,9 +87,15 @@ function loadStat(user: string): NuzlockeState {
             teamLabel: normalizeLabel(row.team_label, DEFAULT_LABELS.teamLabel),
             showGraveyardLabel: normalizeShowLabel(!!row.show_graveyard_label, DEFAULT_LABELS.showGraveyardLabel),
             graveyardLabel: normalizeLabel(row.graveyard_label, DEFAULT_LABELS.graveyardLabel),
+            mainWidth: normalizeMainWidth(row.main_width, DEFAULT_SETTINGS.mainWidth),
+            camMode: normalizeCamMode(row.cam_mode, DEFAULT_SETTINGS.camMode),
+            frameBorderColor: normalizeColor(row.frame_border_color, DEFAULT_SETTINGS.frameBorderColor),
+            teamColor: normalizeColor(row.team_color, DEFAULT_SETTINGS.teamColor),
+            graveyardColor: normalizeColor(row.graveyard_color, DEFAULT_SETTINGS.graveyardColor),
+            textColor: normalizeColor(row.text_color, DEFAULT_SETTINGS.textColor),
         };
     }
-    return {user: user, team: emptyTeam(), graveyard: [], ...DEFAULT_LABELS};
+    return {user: user, team: emptyTeam(), graveyard: [], ...DEFAULT_LABELS, ...DEFAULT_SETTINGS};
 }
 
 export function updateUserToken(username: string, api_token: string) {
@@ -111,6 +127,12 @@ export function setStats(user: string, s: NuzlockeState) {
         userStat.teamLabel = normalizeLabel(s.teamLabel, userStat.teamLabel);
         userStat.showGraveyardLabel = normalizeShowLabel(s.showGraveyardLabel, userStat.showGraveyardLabel);
         userStat.graveyardLabel = normalizeLabel(s.graveyardLabel, userStat.graveyardLabel);
+        userStat.mainWidth = normalizeMainWidth(s.mainWidth, userStat.mainWidth);
+        userStat.camMode = normalizeCamMode(s.camMode, userStat.camMode);
+        userStat.frameBorderColor = normalizeColor(s.frameBorderColor, userStat.frameBorderColor);
+        userStat.teamColor = normalizeColor(s.teamColor, userStat.teamColor);
+        userStat.graveyardColor = normalizeColor(s.graveyardColor, userStat.graveyardColor);
+        userStat.textColor = normalizeColor(s.textColor, userStat.textColor);
 
         upsertStmt.run({
             user,
@@ -124,6 +146,12 @@ export function setStats(user: string, s: NuzlockeState) {
             team_label: userStat.teamLabel,
             show_graveyard_label: userStat.showGraveyardLabel ? 1 : 0,
             graveyard_label: userStat.graveyardLabel,
+            main_width: userStat.mainWidth,
+            cam_mode: userStat.camMode,
+            frame_border_color: userStat.frameBorderColor,
+            team_color: userStat.teamColor,
+            graveyard_color: userStat.graveyardColor,
+            text_color: userStat.textColor,
         });
 
         subscribers.get(user)?.forEach(cb => cb(userStat));

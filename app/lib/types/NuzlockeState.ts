@@ -28,7 +28,61 @@ export const DEFAULT_LABELS: NuzlockeLabels = {
     graveyardLabel: "Graveyard",
 };
 
-export type NuzlockeState = NuzlockeLabels & {
+// Which webcam layout slot the trainer cam frame is left blank for.
+export type CamMode = "1" | "2" | "3" | "4";
+
+export const MIN_MAIN_WIDTH = 1100;
+export const MAX_MAIN_WIDTH = 1420;
+
+export type NuzlockeSettings = {
+    mainWidth: number;
+    camMode: CamMode;
+    frameBorderColor: string;
+    teamColor: string;
+    graveyardColor: string;
+    textColor: string;
+};
+
+export const DEFAULT_SETTINGS: NuzlockeSettings = {
+    mainWidth: 1200,
+    camMode: "1",
+    frameBorderColor: "#f87171",
+    teamColor: "#eab308",
+    graveyardColor: "#eab308",
+    textColor: "#fde047",
+};
+
+const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
+
+export function normalizeColor(input: unknown, fallback: string): string {
+    return typeof input === "string" && HEX_COLOR_RE.test(input) ? input : fallback;
+}
+
+export function normalizeMainWidth(input: unknown, fallback: number): number {
+    const value = Number(input);
+    if (!Number.isFinite(value)) return fallback;
+    return Math.min(MAX_MAIN_WIDTH, Math.max(MIN_MAIN_WIDTH, Math.round(value)));
+}
+
+export function normalizeCamMode(input: unknown, fallback: CamMode): CamMode {
+    return input === "1" || input === "2" || input === "3" || input === "4" ? input : fallback;
+}
+
+// Coerce arbitrary input (e.g. parsed JSON) into a full set of overlay layout
+// settings, falling back field-by-field to defaults for anything missing/invalid.
+export function normalizeSettings(input: unknown, fallback: NuzlockeSettings = DEFAULT_SETTINGS): NuzlockeSettings {
+    const source = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
+    return {
+        mainWidth: normalizeMainWidth(source.mainWidth, fallback.mainWidth),
+        camMode: normalizeCamMode(source.camMode, fallback.camMode),
+        frameBorderColor: normalizeColor(source.frameBorderColor, fallback.frameBorderColor),
+        teamColor: normalizeColor(source.teamColor, fallback.teamColor),
+        graveyardColor: normalizeColor(source.graveyardColor, fallback.graveyardColor),
+        textColor: normalizeColor(source.textColor, fallback.textColor),
+    };
+}
+
+export type NuzlockeState = NuzlockeLabels & NuzlockeSettings & {
     user: string;
     // Always length TEAM_SIZE. Each entry is a Pokémon id, or 0 for an empty slot.
     team: number[];
@@ -114,5 +168,11 @@ export function statsEqual(a: NuzlockeState, b: NuzlockeState): boolean {
         && a.showTeamLabel === b.showTeamLabel
         && a.teamLabel === b.teamLabel
         && a.showGraveyardLabel === b.showGraveyardLabel
-        && a.graveyardLabel === b.graveyardLabel;
+        && a.graveyardLabel === b.graveyardLabel
+        && a.mainWidth === b.mainWidth
+        && a.camMode === b.camMode
+        && a.frameBorderColor === b.frameBorderColor
+        && a.teamColor === b.teamColor
+        && a.graveyardColor === b.graveyardColor
+        && a.textColor === b.textColor;
 }

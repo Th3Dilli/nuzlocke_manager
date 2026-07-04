@@ -2,7 +2,15 @@ import {getSessionUser} from "@/app/lib/session";
 import {getStats, setStats} from "@/app/lib/stats";
 import {canEditTeam} from "@/app/lib/editors";
 import {POKEMON} from "@/app/lib/pokemon";
-import {MAX_GRAVEYARD, normalizeLabel, normalizeShowLabel, TEAM_SIZE} from "@/app/lib/types/NuzlockeState";
+import {
+    MAX_GRAVEYARD,
+    normalizeCamMode,
+    normalizeColor,
+    normalizeLabel,
+    normalizeMainWidth,
+    normalizeShowLabel,
+    TEAM_SIZE
+} from "@/app/lib/types/NuzlockeState";
 
 const validIds = new Set(POKEMON.map(p => p.id));
 
@@ -12,6 +20,8 @@ const LABEL_FIELDS = [
     ["showTeamLabel", "teamLabel"],
     ["showGraveyardLabel", "graveyardLabel"],
 ] as const;
+
+const SETTINGS_FIELDS = ["mainWidth", "camMode", "frameBorderColor", "teamColor", "graveyardColor", "textColor"] as const;
 
 // Update the team, graveyard, and/or label settings for a user's stats page.
 // The page owner and any editor the owner has granted may write to it. The
@@ -44,7 +54,8 @@ export async function POST(
     const hasTeam = "team" in body;
     const hasGraveyard = "graveyard" in body;
     const hasLabels = LABEL_FIELDS.some(([show, text]) => show in body || text in body);
-    if (!hasTeam && !hasGraveyard && !hasLabels) {
+    const hasSettings = SETTINGS_FIELDS.some(field => field in body);
+    if (!hasTeam && !hasGraveyard && !hasLabels && !hasSettings) {
         return new Response("Nothing to update", {status: 400});
     }
 
@@ -103,6 +114,15 @@ export async function POST(
         graveyardLabel: normalizeLabel(body.graveyardLabel, current.graveyardLabel),
     };
 
-    setStats(username, {user: username, team, graveyard, ...labels});
+    const settings = {
+        mainWidth: normalizeMainWidth(body.mainWidth, current.mainWidth),
+        camMode: normalizeCamMode(body.camMode, current.camMode),
+        frameBorderColor: normalizeColor(body.frameBorderColor, current.frameBorderColor),
+        teamColor: normalizeColor(body.teamColor, current.teamColor),
+        graveyardColor: normalizeColor(body.graveyardColor, current.graveyardColor),
+        textColor: normalizeColor(body.textColor, current.textColor),
+    };
+
+    setStats(username, {user: username, team, graveyard, ...labels, ...settings});
     return Response.json({ok: true});
 }

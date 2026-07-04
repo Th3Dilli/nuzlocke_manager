@@ -27,7 +27,13 @@ database.exec(`
         show_team_label      INTEGER NOT NULL DEFAULT 1,
         team_label           TEXT    NOT NULL DEFAULT 'Team',
         show_graveyard_label INTEGER NOT NULL DEFAULT 1,
-        graveyard_label      TEXT    NOT NULL DEFAULT 'Graveyard'
+        graveyard_label      TEXT    NOT NULL DEFAULT 'Graveyard',
+        main_width           INTEGER NOT NULL DEFAULT 1200,
+        cam_mode             TEXT    NOT NULL DEFAULT '1',
+        frame_border_color   TEXT    NOT NULL DEFAULT '#f87171',
+        team_color           TEXT    NOT NULL DEFAULT '#eab308',
+        graveyard_color      TEXT    NOT NULL DEFAULT '#eab308',
+        text_color           TEXT    NOT NULL DEFAULT '#fde047'
     );
 
     CREATE TABLE IF NOT EXISTS soullink
@@ -85,6 +91,8 @@ database.exec(`
         PRIMARY KEY (owner, editor)
     );
 `)
+
+
 
 export const upsertUser = database.prepare<{ twitch_id: string; username: string; profile_image_url: string; now: string }>(`
     INSERT INTO users (twitch_id, username, role, nuzlocke_enabled, soullink_enabled, api_token, profile_image_url, created_at, updated_at)
@@ -157,11 +165,19 @@ export const upsertStmt = database.prepare<{
     team_label: string;
     show_graveyard_label: number;
     graveyard_label: string;
+    main_width: number;
+    cam_mode: string;
+    frame_border_color: string;
+    team_color: string;
+    graveyard_color: string;
+    text_color: string;
 }>(`
     INSERT INTO nuzlocke (user, team, graveyard, show_nuzlocke_label, nuzlocke_label, show_trainer_label,
-                           trainer_label, show_team_label, team_label, show_graveyard_label, graveyard_label)
+                           trainer_label, show_team_label, team_label, show_graveyard_label, graveyard_label,
+                           main_width, cam_mode, frame_border_color, team_color, graveyard_color, text_color)
     VALUES (@user, @team, @graveyard, @show_nuzlocke_label, @nuzlocke_label, @show_trainer_label,
-            @trainer_label, @show_team_label, @team_label, @show_graveyard_label, @graveyard_label)
+            @trainer_label, @show_team_label, @team_label, @show_graveyard_label, @graveyard_label,
+            @main_width, @cam_mode, @frame_border_color, @team_color, @graveyard_color, @text_color)
     ON CONFLICT(user) DO UPDATE SET team                 = excluded.team,
                                     graveyard            = excluded.graveyard,
                                     show_nuzlocke_label  = excluded.show_nuzlocke_label,
@@ -171,7 +187,13 @@ export const upsertStmt = database.prepare<{
                                     show_team_label      = excluded.show_team_label,
                                     team_label           = excluded.team_label,
                                     show_graveyard_label = excluded.show_graveyard_label,
-                                    graveyard_label      = excluded.graveyard_label
+                                    graveyard_label      = excluded.graveyard_label,
+                                    main_width           = excluded.main_width,
+                                    cam_mode             = excluded.cam_mode,
+                                    frame_border_color   = excluded.frame_border_color,
+                                    team_color           = excluded.team_color,
+                                    graveyard_color      = excluded.graveyard_color,
+                                    text_color           = excluded.text_color
 `);
 
 export const selectStmt = database.prepare(`SELECT *

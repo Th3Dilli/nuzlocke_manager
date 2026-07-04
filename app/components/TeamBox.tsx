@@ -1,13 +1,15 @@
 
-export default function TeamBox({team, direction = "row", className, label = "Team"}: {
+export default function TeamBox({team, direction = "row", className, label = "Team", color = "#eab308", textColor}: {
     team: number[];
     direction?: "row" | "column";
     className?: string;
     label?: string;
+    color?: string;
+    textColor?: string;
 }) {
     return (
-        <div className={`relative shrink-0 p-3 pt-5 bgdark rounded-2xl border-[5px] border-yellow-500 h-20 ${className ?? ""}`}>
-            {label ? <TitleTab label={label} borderColor="border-yellow-500"/> : <></>}
+        <div className={`relative shrink-0 p-3 pt-5 bgdark rounded-2xl border-[5px] h-20 ${className ?? ""}`} style={{borderColor: color}}>
+            {label ? <TitleTab label={label} borderColor={color} textColor={textColor}/> : <></>}
             <div className={`flex gap-2 h-full ${direction === "column" ? "flex-col" : "flex-row"}`}>
                 {team.map((id, i) => (
                     <div key={i} className="flex flex-1 aspect-square min-h-0 min-w-0 items-center justify-center">
@@ -28,10 +30,10 @@ export default function TeamBox({team, direction = "row", className, label = "Te
     );
 }
 
-export function Graveyard({label, className, pokemon}: { label?: string; className?: string; pokemon: number[] }) {
+export function Graveyard({label, className, pokemon, color = "#eab308", textColor}: { label?: string; className?: string; pokemon: number[]; color?: string; textColor?: string }) {
     return (
-        <div className={`relative rounded-2xl border-6 border-yellow-500 bgdark ${className ?? ""}`}>
-            {label ? <TitleTab label={label} borderColor="border-yellow-500"/> : <></>}
+        <div className={`relative rounded-2xl border-6 bgdark ${className ?? ""}`} style={{borderColor: color}}>
+            {label ? <TitleTab label={label} borderColor={color} textColor={textColor}/> : <></>}
 
             <div className="overflow-hidden">
                 <div className="flex flex-row flex-wrap min-h-0 min-w-0 h-fill items-center ">
@@ -53,10 +55,11 @@ export function Graveyard({label, className, pokemon}: { label?: string; classNa
     );
 }
 
-export function TitleTab({label, borderColor = "border-red-600"}: { label: string; borderColor?: string; }) {
+export function TitleTab({label, borderColor = "#dc2626", textColor = "#fde047"}: { label: string; borderColor?: string; textColor?: string; }) {
     return (
         <div
-            className={`absolute left-5 top-0 flex -translate-y-4 items-center gap-2 rounded-full border-2 bg-neutral-900 px-3 py-0.5 text-sm font-bold  text-yellow-300  ${borderColor ?? ""}`}>
+            style={{borderColor, color: textColor}}
+            className="absolute left-5 top-0 flex -translate-y-4 items-center gap-2 rounded-full border-2 bg-neutral-900 px-3 py-0.5 text-sm font-bold">
             <Pokeball className="h-4 w-4"/>
             {label}
         </div>

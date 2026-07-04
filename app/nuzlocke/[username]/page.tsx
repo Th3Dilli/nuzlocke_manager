@@ -7,6 +7,7 @@ import TeamEditor from "@/app/components/TeamEditor";
 import GraveyardEditor from "@/app/components/GraveyardEditor";
 import EditorManager from "@/app/components/EditorManager";
 import LabelsEditor, {LabelSection} from "@/app/components/LabelsEditor";
+import OverlaySettingsEditor from "@/app/components/OverlaySettingsEditor";
 import TeamBox, {Graveyard} from "@/app/components/TeamBox";
 
 type NuzlockeLabelKey = "showNuzlockeLabel" | "nuzlockeLabel" | "showTrainerLabel" | "trainerLabel"
@@ -123,8 +124,8 @@ function HomeInner({username}: { username: string }) {
                     </a>
                 </div>
                 <div className="flex justify-center items-center gap-2">
-                    <TeamBox team={stats.team} label={stats.showTeamLabel ? stats.teamLabel : ""} className="w-full max-w-md"/>
-                    <Graveyard label={stats.showGraveyardLabel ? stats.graveyardLabel : undefined} pokemon={stats.graveyard} className="w-full flex-1 min-h-20">
+                    <TeamBox team={stats.team} label={stats.showTeamLabel ? stats.teamLabel : ""} color={stats.teamColor} textColor={stats.textColor} className="w-full max-w-md"/>
+                    <Graveyard label={stats.showGraveyardLabel ? stats.graveyardLabel : undefined} pokemon={stats.graveyard} color={stats.graveyardColor} textColor={stats.textColor} className="w-full flex-1 min-h-20">
                     </Graveyard>
                 </div>
 
@@ -143,6 +144,19 @@ function HomeInner({username}: { username: string }) {
                             teamLabel: stats.teamLabel,
                             showGraveyardLabel: stats.showGraveyardLabel,
                             graveyardLabel: stats.graveyardLabel,
+                        }}
+                    />
+                )}
+                {canEdit && (
+                    <OverlaySettingsEditor
+                        apiUrl={`/api/${username}`}
+                        values={{
+                            mainWidth: stats.mainWidth,
+                            camMode: stats.camMode,
+                            frameBorderColor: stats.frameBorderColor,
+                            teamColor: stats.teamColor,
+                            graveyardColor: stats.graveyardColor,
+                            textColor: stats.textColor,
                         }}
                     />
                 )}
