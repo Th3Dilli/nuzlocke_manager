@@ -3,7 +3,7 @@
 import {useMemo, useState} from "react";
 import {AlertTriangle, Check, X} from "lucide-react";
 import {Pokeball} from "@/app/components/TeamBox";
-import {CamMode, MAX_MAIN_WIDTH, MIN_MAIN_WIDTH, NuzlockeSettings} from "@/app/lib/types/NuzlockeState";
+import {CamMode, DEFAULT_SETTINGS, MAX_MAIN_WIDTH, MIN_MAIN_WIDTH, NuzlockeSettings} from "@/app/lib/types/NuzlockeState";
 
 const CAM_MODE_OPTIONS: { value: CamMode; label: string }[] = [
     {value: "1", label: "Full width"},
@@ -62,6 +62,18 @@ export default function OverlaySettingsEditor({apiUrl, values: remoteValues}: {
         setError(null);
     }
 
+    function resetColors() {
+        setValues(prev => ({
+            ...prev,
+            frameBorderColor: DEFAULT_SETTINGS.frameBorderColor,
+            teamColor: DEFAULT_SETTINGS.teamColor,
+            graveyardColor: DEFAULT_SETTINGS.graveyardColor,
+            textColor: DEFAULT_SETTINGS.textColor,
+        }));
+        setSaved(false);
+        setError(null);
+    }
+
     async function handleSave() {
         setSaving(true);
         setError(null);
@@ -93,6 +105,12 @@ export default function OverlaySettingsEditor({apiUrl, values: remoteValues}: {
                 </div>
                 <div className="flex items-center gap-3">
                     {error && <span className="text-sm text-red-400">{error}</span>}
+                    <button
+                        onClick={resetColors}
+                        className="cursor-pointer rounded border border-yellow-600 px-3 py-2 text-sm font-medium text-gray-200 transition-colors hover:bg-yellow-600/10"
+                    >
+                        Reset colors
+                    </button>
                     <button
                         onClick={handleSave}
                         disabled={saving || !dirty}

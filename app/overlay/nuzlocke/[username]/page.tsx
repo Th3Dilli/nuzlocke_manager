@@ -83,7 +83,7 @@ function OverlayInner({username}: { username: string }) {
             <div className="flex flex-1 flex-col gap-4">
                 {getLayout(state)}
                 <TeamBox team={state.team} label={state.showTeamLabel ? state.teamLabel : ""} color={state.teamColor} textColor={state.textColor} className="h-24"/>
-                <Frame color={state.frameBorderColor} textColor={state.textColor} className="aspect-4/3 "/>
+                <Frame color={state.frameBorderColor} textColor={state.textColor} className="aspect-4/3"/>
             </div>
 
         </div>

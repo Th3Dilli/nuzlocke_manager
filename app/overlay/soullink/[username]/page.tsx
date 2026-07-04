@@ -2,16 +2,8 @@
 
 import {SoullinkState} from "@/app/lib/types/SoullinkState";
 import {ReactNode, Suspense, use, useEffect, useState} from "react";
-import TeamBox, {Graveyard, TitleTab} from "@/app/components/TeamBox";
+import {Graveyard, TeamBoxV, TitleTab} from "@/app/components/TeamBox";
 
-// Width of each main game-capture frame (4:3, so height follows). The two
-// frames flank a vertical team-box strip in the leftover center space —
-// tune this (and TEAM_COLUMN_WIDTH below) to taste once placed in OBS.
-const MAIN_FRAME_WIDTH = 740;
-const TEAM_COLUMN_WIDTH = 150;
-// Square trainer cam, one per side, centered below that side's main frame.
-const TRAINER_SIZE = 310;
-const GRAVEYARD_HEIGHT = 150;
 
 function OverlayInner({username}: { username: string }) {
 
@@ -53,74 +45,83 @@ function OverlayInner({username}: { username: string }) {
     )
 
     return (
-        <div
-            className="overlay relative flex h-[1080px] w-[1920px] flex-col gap-4 overflow-hidden p-4 text-yellow-300 bg-transparent"
-            style={{
-                "--main-w": `${MAIN_FRAME_WIDTH}px`,
-                "--main-h": `${(MAIN_FRAME_WIDTH * 3) / 4}px`,
-                "--team-w": `${TEAM_COLUMN_WIDTH}px`,
-                "--trainer-size": `${TRAINER_SIZE}px`,
-                "--graveyard-h": `${GRAVEYARD_HEIGHT}px`,
-            } as React.CSSProperties}
-        >
-            {/* Two side groups: each side's main 4:3 frame + vertical team
-                box on top, with that side's square trainer cam centered
-                below it. Pinned to the top, graveyards fill the rest. */}
-            <div className="flex shrink-0 justify-center gap-4">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="flex shrink-0 gap-4">
-                        <Frame label={stats.showSoullink1Label ? stats.soullink1Label : undefined} color={stats.frameBorderColor} textColor={stats.textColor} className="h-[var(--main-h)] w-[var(--main-w)] shrink-0"/>
-                        <TeamBox label={stats.showTeam1Label ? stats.team1Label : ""} team={stats.team1} direction="column" color={stats.teamColor} textColor={stats.textColor} className="h-[var(--main-h)] w-[var(--team-w)] shrink-0"/>
-                    </div>
-                    <Frame label={stats.showTrainer1Label ? stats.trainer1Label : undefined} color={stats.frameBorderColor} textColor={stats.textColor} className="h-[var(--trainer-size)] w-[var(--trainer-size)] shrink-0"/>
-                </div>
-                <div className="flex flex-col items-center gap-4">
-                    <div className="flex shrink-0 gap-4">
-                        <TeamBox label={stats.showTeam2Label ? stats.team2Label : ""} team={stats.team2} direction="column" color={stats.teamColor} textColor={stats.textColor} className="h-[var(--main-h)] w-[var(--team-w)] shrink-0"/>
-                        <Frame label={stats.showSoullink2Label ? stats.soullink2Label : undefined} color={stats.frameBorderColor} textColor={stats.textColor} className="h-[var(--main-h)] w-[var(--main-w)] shrink-0"/>
-                    </div>
-                    <Frame label={stats.showTrainer2Label ? stats.trainer2Label : undefined} color={stats.frameBorderColor} textColor={stats.textColor} className="h-[var(--trainer-size)] w-[var(--trainer-size)] shrink-0"/>
-                </div>
-            </div>
+        <div className="h-[1080px] w-[1920px] gap-2  overlay border-2 border-red-500">
+            <div className="flex flex-col gap-2 w-full h-full">
+                <div className="flex flex-row gap-2 p-2">
+                    {/*<div className="flex-1 ">*/}
+                        <div className="flex-1 flex flex-row gap-2">
 
-            <div className="flex h-[var(--graveyard-h)] shrink-0 gap-4">
-                <Graveyard label={stats.showGraveyard1Label ? stats.graveyard1Label : undefined} pokemon={stats.graveyard1} color={stats.graveyardColor} textColor={stats.textColor} className="min-w-0 flex-1">
-                </Graveyard>
-                <Graveyard label={stats.showGraveyard2Label ? stats.graveyard2Label : undefined} pokemon={stats.graveyard2} color={stats.graveyardColor} textColor={stats.textColor} className="min-w-0 flex-1">
-                </Graveyard>
+                            <Frame label={stats.showSoullink1Label ? stats.soullink1Label : undefined}
+                                   color={stats.frameBorderColor}
+                                   textColor={stats.textColor}
+                                   className="aspect-4/3 flex-1"/>
+                            <div className="w-36">
+                                <TeamBoxV label={stats.showTeam1Label ? stats.team1Label : ""}
+                                          team={stats.team1}
+                                          color={stats.teamColor}
+                                          textColor={stats.textColor} className="h-120 "/>
+                            </div>
+                            <div className="w-36">
+                            </div>
+                        </div>
+                    {/*</div>*/}
+                    <div className="flex-1">
+                        <div className="flex flex-row-reverse gap-2">
+
+                            <Frame label={stats.showSoullink1Label ? stats.soullink1Label : undefined}
+                                   color={stats.frameBorderColor}
+                                   textColor={stats.textColor}
+                                   className="aspect-4/3 flex-1"/>
+                            <div className="w-36">
+                                <TeamBoxV label={stats.showTeam1Label ? stats.team1Label : ""}
+                                          team={stats.team1}
+                                          color={stats.teamColor}
+                                          textColor={stats.textColor} className="h-120 "/>
+                            </div>
+                            <div className="w-36">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="flex-1 flex flex-row p-2 gap-2 ">
+                    <div className="flex-1 flex w-1/2 h-full ">
+                        <Frame label={stats.showTrainer1Label ? stats.trainer1Label : undefined} color={stats.frameBorderColor}
+                               textColor={stats.textColor} className="flex-1"/>
+                    </div>
+
+                    <div className="flex-1 w-1/2 h-full flex flex-col gap-2 min-h-0">
+                        <Frame
+                               color={stats.frameBorderColor}
+                               textColor={stats.textColor}
+                               className="aspect-4/3"/>
+                        <Graveyard label={stats.showGraveyard1Label ? stats.graveyard1Label : undefined} pokemon={stats.graveyard1}
+                                   color={stats.graveyardColor} textColor={stats.textColor} size="10" className="flex-1 min-h-0"/>
+                    </div>
+
+                    <div className="flex-1 w-1/2 h-full flex flex-col gap-2 min-h-0">
+                        <Frame
+                               color={stats.frameBorderColor}
+                               textColor={stats.textColor}
+                               className="aspect-4/3"/>
+                        <Graveyard label={stats.showGraveyard2Label ? stats.graveyard2Label : undefined} pokemon={stats.graveyard2}
+                                   color={stats.graveyardColor} textColor={stats.textColor} size="10" className="flex-1 min-h-0"/>
+                    </div>
+
+                    <div className="flex-1 flex">
+                        <Frame label={stats.showTrainer2Label ? stats.trainer2Label : undefined} color={stats.frameBorderColor}
+                               textColor={stats.textColor} className="flex-1"/>
+                    </div>
+                </div>
             </div>
         </div>
     );
 }
 
-function GraveyardEntries({graveyard}: { graveyard: number[] }) {
-    return (
-        <div className="flex h-full flex-row flex-wrap content-start ">
-            {graveyard.length === 0 ? (
-                <span className="m-auto text-lg opacity-40">No fallen Pokémon yet</span>
-            ) : (
-                graveyard.map((id, i) => (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                        key={`${id}-${i}`}
-                        src={`/showdown/${id}.gif`}
-                        alt=""
-                        className="h-16 w-16 object-contain opacity-80 [image-rendering:pixelated]"
-                    />
-                ))
-            )}
-        </div>
-    );
-}
 
-// A transparent, red-bordered cut-out with a floating pokéball title tab. The
-// streamer places the matching OBS source (game capture / webcam) behind the
-// browser source and aligns it to this frame.
-function Frame({label, className, children, color = "#f87171", textColor}: { label?: string; className?: string; children?: ReactNode; color?: string; textColor?: string }) {
+function Frame({label, className, color = "#f87171", textColor}: { label?: string; className?: string; color?: string; textColor?: string }) {
     return (
-        <div className={`relative rounded-2xl border-8 ${className ?? ""}`} style={{borderColor: color}}>
+        <div className={`relative rounded-2xl border-12 box-content ${className ?? ""}`} style={{borderColor: color}}>
             {label ? <TitleTab label={label} borderColor={color} textColor={textColor}/> : <></>}
-            {children}
         </div>
     );
 }

@@ -26,26 +26,6 @@ const LABEL_SECTIONS: LabelSection<SoullinkLabelKey>[] = [
     {key: "showGraveyard2Label", textKey: "graveyard2Label", title: "Graveyard 2", placeholder: "Graveyard 2"},
 ];
 
-function GraveyardEntries({graveyard}: { graveyard: number[] }) {
-    return (
-        <div className="flex min-h-16 flex-row flex-wrap content-start ">
-            {graveyard.length === 0 ? (
-                <span className="m-auto text-lg opacity-40">No fallen Pokémon yet</span>
-            ) : (
-                graveyard.map((id, i) => (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                        key={`${id}-${i}`}
-                        src={`/showdown/${id}.gif`}
-                        alt=""
-                        className="h-16 w-16 object-contain opacity-80 [image-rendering:pixelated]"
-                    />
-                ))
-            )}
-        </div>
-    );
-}
-
 function TeamColumn({label, team, teamLabel, graveyard, graveyardLabel, teamColor, graveyardColor, textColor}: {
     label: string;
     team: number[];

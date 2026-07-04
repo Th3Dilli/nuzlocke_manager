@@ -3,7 +3,7 @@
 import {useMemo, useState} from "react";
 import {AlertTriangle, Check, X} from "lucide-react";
 import {Pokeball} from "@/app/components/TeamBox";
-import {SoullinkSettings} from "@/app/lib/types/SoullinkState";
+import {DEFAULT_SOULLINK_SETTINGS, SoullinkSettings} from "@/app/lib/types/SoullinkState";
 
 function settingsEqual(a: SoullinkSettings, b: SoullinkSettings): boolean {
     return a.frameBorderColor === b.frameBorderColor
@@ -51,6 +51,12 @@ export default function SoullinkSettingsEditor({apiUrl, values: remoteValues}: {
         setError(null);
     }
 
+    function resetColors() {
+        setValues(DEFAULT_SOULLINK_SETTINGS);
+        setSaved(false);
+        setError(null);
+    }
+
     async function handleSave() {
         setSaving(true);
         setError(null);
@@ -82,6 +88,12 @@ export default function SoullinkSettingsEditor({apiUrl, values: remoteValues}: {
                 </div>
                 <div className="flex items-center gap-3">
                     {error && <span className="text-sm text-red-400">{error}</span>}
+                    <button
+                        onClick={resetColors}
+                        className="cursor-pointer rounded border border-yellow-600 px-3 py-2 text-sm font-medium text-gray-200 transition-colors hover:bg-yellow-600/10"
+                    >
+                        Reset colors
+                    </button>
                     <button
                         onClick={handleSave}
                         disabled={saving || !dirty}
