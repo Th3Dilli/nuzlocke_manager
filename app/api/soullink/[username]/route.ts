@@ -2,9 +2,21 @@ import {getSessionUser} from "@/app/lib/session";
 import {getStats, setStats} from "@/app/lib/soullinkStats";
 import {canEditTeam} from "@/app/lib/editors";
 import {POKEMON} from "@/app/lib/pokemon";
-import {MAX_GRAVEYARD, TEAM_SIZE} from "@/app/lib/types/NuzlockeState";
+import {MAX_GRAVEYARD, normalizeLabel, normalizeShowLabel, TEAM_SIZE} from "@/app/lib/types/NuzlockeState";
+import {SoullinkState} from "@/app/lib/types/SoullinkState";
 
 const validIds = new Set(POKEMON.map(p => p.id));
+
+const LABEL_FIELDS = [
+    ["showSoullink1Label", "soullink1Label"],
+    ["showSoullink2Label", "soullink2Label"],
+    ["showTrainer1Label", "trainer1Label"],
+    ["showTrainer2Label", "trainer2Label"],
+    ["showTeam1Label", "team1Label"],
+    ["showTeam2Label", "team2Label"],
+    ["showGraveyard1Label", "graveyard1Label"],
+    ["showGraveyard2Label", "graveyard2Label"],
+] as const;
 
 function parseTeam(rawTeam: unknown): number[] | { error: string } {
     if (!Array.isArray(rawTeam) || rawTeam.length > TEAM_SIZE) {
@@ -67,17 +79,19 @@ export async function POST(
     }
 
     const fields = ["team1", "team2", "graveyard1", "graveyard2"] as const;
-    if (!fields.some(f => f in body)) {
+    const hasLabels = LABEL_FIELDS.some(([show, text]) => show in body || text in body);
+    if (!fields.some(f => f in body) && !hasLabels) {
         return new Response("Nothing to update", {status: 400});
     }
 
     // setStats only mutates an existing cache entry, which only exists while the
     // soullink page is enabled. Bail out early with a clear status otherwise.
-    if (!getStats(username)) {
+    const current = getStats(username);
+    if (!current) {
         return new Response("Stats page not enabled", {status: 409});
     }
 
-    const update: Partial<Record<typeof fields[number], number[]>> = {};
+    const update: Partial<Omit<SoullinkState, "user">> = {};
 
     for (const field of ["team1", "team2"] as const) {
         if (field in body) {
@@ -93,6 +107,11 @@ export async function POST(
             if (!Array.isArray(result)) return new Response(result.error, {status: 400});
             update[field] = result;
         }
+    }
+
+    for (const [showKey, textKey] of LABEL_FIELDS) {
+        if (showKey in body) update[showKey] = normalizeShowLabel(body[showKey], current[showKey]);
+        if (textKey in body) update[textKey] = normalizeLabel(body[textKey], current[textKey]);
     }
 
     setStats(username, update);

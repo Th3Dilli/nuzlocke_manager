@@ -54,7 +54,7 @@ function OverlayInner({username}: { username: string }) {
 
     return (
         <div
-            className="overlay relative flex h-[1080px] w-[1920px] flex-col gap-4 overflow-hidden p-4 text-yellow-300 bg-transparent page-bg"
+            className="overlay relative flex h-[1080px] w-[1920px] flex-col gap-4 overflow-hidden p-4 text-yellow-300 bg-transparent"
             style={{
                 "--main-w": `${MAIN_FRAME_WIDTH}px`,
                 "--main-h": `${(MAIN_FRAME_WIDTH * 3) / 4}px`,
@@ -69,26 +69,24 @@ function OverlayInner({username}: { username: string }) {
             <div className="flex shrink-0 justify-center gap-4">
                 <div className="flex flex-col items-center gap-4">
                     <div className="flex shrink-0 gap-4">
-                        <Frame label="Soul Link 1" className="h-[var(--main-h)] w-[var(--main-w)] shrink-0"/>
-                        <TeamBox label="Team 1" team={stats.team1} direction="column" className="h-[var(--main-h)] w-[var(--team-w)] shrink-0"/>
+                        <Frame label={stats.showSoullink1Label ? stats.soullink1Label : undefined} className="h-[var(--main-h)] w-[var(--main-w)] shrink-0"/>
+                        <TeamBox label={stats.showTeam1Label ? stats.team1Label : ""} team={stats.team1} direction="column" className="h-[var(--main-h)] w-[var(--team-w)] shrink-0"/>
                     </div>
-                    <Frame label="Trainer 1" className="h-[var(--trainer-size)] w-[var(--trainer-size)] shrink-0"/>
+                    <Frame label={stats.showTrainer1Label ? stats.trainer1Label : undefined} className="h-[var(--trainer-size)] w-[var(--trainer-size)] shrink-0"/>
                 </div>
                 <div className="flex flex-col items-center gap-4">
                     <div className="flex shrink-0 gap-4">
-                        <TeamBox label="Team 2" team={stats.team2} direction="column" className="h-[var(--main-h)] w-[var(--team-w)] shrink-0"/>
-                        <Frame label="Soul Link  2" className="h-[var(--main-h)] w-[var(--main-w)] shrink-0"/>
+                        <TeamBox label={stats.showTeam2Label ? stats.team2Label : ""} team={stats.team2} direction="column" className="h-[var(--main-h)] w-[var(--team-w)] shrink-0"/>
+                        <Frame label={stats.showSoullink2Label ? stats.soullink2Label : undefined} className="h-[var(--main-h)] w-[var(--main-w)] shrink-0"/>
                     </div>
-                    <Frame label="Trainer 2" className="h-[var(--trainer-size)] w-[var(--trainer-size)] shrink-0"/>
+                    <Frame label={stats.showTrainer2Label ? stats.trainer2Label : undefined} className="h-[var(--trainer-size)] w-[var(--trainer-size)] shrink-0"/>
                 </div>
             </div>
 
             <div className="flex h-[var(--graveyard-h)] shrink-0 gap-4">
-                <Graveyard label="Graveyard 1" className="min-w-0 flex-1">
-                    <GraveyardEntries graveyard={stats.graveyard1}/>
+                <Graveyard label={stats.showGraveyard1Label ? stats.graveyard1Label : undefined} pokemon={stats.graveyard1} className="min-w-0 flex-1">
                 </Graveyard>
-                <Graveyard label="Graveyard 2" className="min-w-0 flex-1">
-                    <GraveyardEntries graveyard={stats.graveyard2}/>
+                <Graveyard label={stats.showGraveyard2Label ? stats.graveyard2Label : undefined} pokemon={stats.graveyard2} className="min-w-0 flex-1">
                 </Graveyard>
             </div>
         </div>

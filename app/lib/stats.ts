@@ -1,4 +1,12 @@
-import {emptyTeam, normalizeGraveyard, normalizeTeam, NuzlockeState} from "@/app/lib/types/NuzlockeState";
+import {
+    DEFAULT_LABELS,
+    emptyTeam,
+    normalizeGraveyard,
+    normalizeLabel,
+    normalizeShowLabel,
+    normalizeTeam,
+    NuzlockeState
+} from "@/app/lib/types/NuzlockeState";
 import {getUserToken, selectStmt, upsertStmt} from "@/app/lib/database";
 import {User} from "@/app/lib/users";
 
@@ -40,16 +48,38 @@ function safeParse(value: string): unknown {
     }
 }
 
+type NuzlockeRow = {
+    user: string;
+    team: string;
+    graveyard: string;
+    show_nuzlocke_label: number;
+    nuzlocke_label: string;
+    show_trainer_label: number;
+    trainer_label: string;
+    show_team_label: number;
+    team_label: string;
+    show_graveyard_label: number;
+    graveyard_label: string;
+};
+
 function loadStat(user: string): NuzlockeState {
-    const row = selectStmt.get(user) as { user: string; team: string; graveyard: string } | undefined;
+    const row = selectStmt.get(user) as NuzlockeRow | undefined;
     if (row) {
         return {
             user: row.user,
             team: normalizeTeam(safeParse(row.team)),
             graveyard: normalizeGraveyard(safeParse(row.graveyard)),
+            showNuzlockeLabel: normalizeShowLabel(!!row.show_nuzlocke_label, DEFAULT_LABELS.showNuzlockeLabel),
+            nuzlockeLabel: normalizeLabel(row.nuzlocke_label, DEFAULT_LABELS.nuzlockeLabel),
+            showTrainerLabel: normalizeShowLabel(!!row.show_trainer_label, DEFAULT_LABELS.showTrainerLabel),
+            trainerLabel: normalizeLabel(row.trainer_label, DEFAULT_LABELS.trainerLabel),
+            showTeamLabel: normalizeShowLabel(!!row.show_team_label, DEFAULT_LABELS.showTeamLabel),
+            teamLabel: normalizeLabel(row.team_label, DEFAULT_LABELS.teamLabel),
+            showGraveyardLabel: normalizeShowLabel(!!row.show_graveyard_label, DEFAULT_LABELS.showGraveyardLabel),
+            graveyardLabel: normalizeLabel(row.graveyard_label, DEFAULT_LABELS.graveyardLabel),
         };
     }
-    return {user: user, team: emptyTeam(), graveyard: []};
+    return {user: user, team: emptyTeam(), graveyard: [], ...DEFAULT_LABELS};
 }
 
 export function updateUserToken(username: string, api_token: string) {
@@ -73,11 +103,27 @@ export function setStats(user: string, s: NuzlockeState) {
         userStat.user = s.user;
         userStat.team = normalizeTeam(s.team);
         userStat.graveyard = normalizeGraveyard(s.graveyard);
+        userStat.showNuzlockeLabel = normalizeShowLabel(s.showNuzlockeLabel, userStat.showNuzlockeLabel);
+        userStat.nuzlockeLabel = normalizeLabel(s.nuzlockeLabel, userStat.nuzlockeLabel);
+        userStat.showTrainerLabel = normalizeShowLabel(s.showTrainerLabel, userStat.showTrainerLabel);
+        userStat.trainerLabel = normalizeLabel(s.trainerLabel, userStat.trainerLabel);
+        userStat.showTeamLabel = normalizeShowLabel(s.showTeamLabel, userStat.showTeamLabel);
+        userStat.teamLabel = normalizeLabel(s.teamLabel, userStat.teamLabel);
+        userStat.showGraveyardLabel = normalizeShowLabel(s.showGraveyardLabel, userStat.showGraveyardLabel);
+        userStat.graveyardLabel = normalizeLabel(s.graveyardLabel, userStat.graveyardLabel);
 
         upsertStmt.run({
             user,
             team: JSON.stringify(userStat.team),
             graveyard: JSON.stringify(userStat.graveyard),
+            show_nuzlocke_label: userStat.showNuzlockeLabel ? 1 : 0,
+            nuzlocke_label: userStat.nuzlockeLabel,
+            show_trainer_label: userStat.showTrainerLabel ? 1 : 0,
+            trainer_label: userStat.trainerLabel,
+            show_team_label: userStat.showTeamLabel ? 1 : 0,
+            team_label: userStat.teamLabel,
+            show_graveyard_label: userStat.showGraveyardLabel ? 1 : 0,
+            graveyard_label: userStat.graveyardLabel,
         });
 
         subscribers.get(user)?.forEach(cb => cb(userStat));

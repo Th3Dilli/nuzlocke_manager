@@ -6,7 +6,24 @@ import {Suspense, useEffect, useState} from "react";
 import TeamEditor from "@/app/components/TeamEditor";
 import GraveyardEditor from "@/app/components/GraveyardEditor";
 import EditorManager from "@/app/components/EditorManager";
+import LabelsEditor, {LabelSection} from "@/app/components/LabelsEditor";
 import TeamBox, {Graveyard} from "@/app/components/TeamBox";
+
+type SoullinkLabelKey = "showSoullink1Label" | "soullink1Label" | "showSoullink2Label" | "soullink2Label"
+    | "showTrainer1Label" | "trainer1Label" | "showTrainer2Label" | "trainer2Label"
+    | "showTeam1Label" | "team1Label" | "showTeam2Label" | "team2Label"
+    | "showGraveyard1Label" | "graveyard1Label" | "showGraveyard2Label" | "graveyard2Label";
+
+const LABEL_SECTIONS: LabelSection<SoullinkLabelKey>[] = [
+    {key: "showSoullink1Label", textKey: "soullink1Label", title: "Soul Link 1", placeholder: "Soul Link 1"},
+    {key: "showSoullink2Label", textKey: "soullink2Label", title: "Soul Link 2", placeholder: "Soul Link 2"},
+    {key: "showTrainer1Label", textKey: "trainer1Label", title: "Trainer 1", placeholder: "Trainer 1"},
+    {key: "showTrainer2Label", textKey: "trainer2Label", title: "Trainer 2", placeholder: "Trainer 2"},
+    {key: "showTeam1Label", textKey: "team1Label", title: "Team 1", placeholder: "Team 1"},
+    {key: "showTeam2Label", textKey: "team2Label", title: "Team 2", placeholder: "Team 2"},
+    {key: "showGraveyard1Label", textKey: "graveyard1Label", title: "Graveyard 1", placeholder: "Graveyard 1"},
+    {key: "showGraveyard2Label", textKey: "graveyard2Label", title: "Graveyard 2", placeholder: "Graveyard 2"},
+];
 
 function GraveyardEntries({graveyard}: { graveyard: number[] }) {
     return (
@@ -28,13 +45,18 @@ function GraveyardEntries({graveyard}: { graveyard: number[] }) {
     );
 }
 
-function TeamColumn({label, team, graveyard}: { label: string; team: number[]; graveyard: number[] }) {
+function TeamColumn({label, team, teamLabel, graveyard, graveyardLabel}: {
+    label: string;
+    team: number[];
+    teamLabel?: string;
+    graveyard: number[];
+    graveyardLabel?: string;
+}) {
     return (
         <div className="flex flex-1 flex-col items-center gap-2">
             <h2 className="text-lg font-bold text-yellow-300">{label}</h2>
-            <TeamBox team={team} className="w-full max-w-md"/>
-            <Graveyard label="Graveyard" className="w-full min-h-20">
-                <GraveyardEntries graveyard={graveyard}/>
+            <TeamBox team={team} label={teamLabel ?? ""} className="w-full max-w-md"/>
+            <Graveyard label={graveyardLabel} pokemon={graveyard} className="w-full min-h-20">
             </Graveyard>
         </div>
     );
@@ -144,8 +166,20 @@ function HomeInner({username}: { username: string }) {
                 </div>
 
                 <div className="flex flex-col items-stretch gap-4 md:flex-row md:justify-center">
-                    <TeamColumn label="Team 1" team={stats.team1} graveyard={stats.graveyard1}/>
-                    <TeamColumn label="Team 2" team={stats.team2} graveyard={stats.graveyard2}/>
+                    <TeamColumn
+                        label="Team 1"
+                        team={stats.team1}
+                        teamLabel={stats.showTeam1Label ? stats.team1Label : ""}
+                        graveyard={stats.graveyard1}
+                        graveyardLabel={stats.showGraveyard1Label ? stats.graveyard1Label : undefined}
+                    />
+                    <TeamColumn
+                        label="Team 2"
+                        team={stats.team2}
+                        teamLabel={stats.showTeam2Label ? stats.team2Label : ""}
+                        graveyard={stats.graveyard2}
+                        graveyardLabel={stats.showGraveyard2Label ? stats.graveyard2Label : undefined}
+                    />
                 </div>
 
                 {canEdit && (
@@ -159,6 +193,30 @@ function HomeInner({username}: { username: string }) {
                             <GraveyardEditor apiUrl={apiUrl} field="graveyard2" graveyard={stats.graveyard2} label="Edit Graveyard 2"/>
                         </div>
                     </div>
+                )}
+                {canEdit && (
+                    <LabelsEditor
+                        apiUrl={apiUrl}
+                        sections={LABEL_SECTIONS}
+                        values={{
+                            showSoullink1Label: stats.showSoullink1Label,
+                            soullink1Label: stats.soullink1Label,
+                            showSoullink2Label: stats.showSoullink2Label,
+                            soullink2Label: stats.soullink2Label,
+                            showTrainer1Label: stats.showTrainer1Label,
+                            trainer1Label: stats.trainer1Label,
+                            showTrainer2Label: stats.showTrainer2Label,
+                            trainer2Label: stats.trainer2Label,
+                            showTeam1Label: stats.showTeam1Label,
+                            team1Label: stats.team1Label,
+                            showTeam2Label: stats.showTeam2Label,
+                            team2Label: stats.team2Label,
+                            showGraveyard1Label: stats.showGraveyard1Label,
+                            graveyard1Label: stats.graveyard1Label,
+                            showGraveyard2Label: stats.showGraveyard2Label,
+                            graveyard2Label: stats.graveyard2Label,
+                        }}
+                    />
                 )}
                 {(isOwner || canManageEditors) && <EditorManager username={username} isOwner={isOwner}/>}
             </main>

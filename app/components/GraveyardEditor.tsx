@@ -1,7 +1,7 @@
 "use client";
 
 import {useMemo, useState} from "react";
-import {POKEMON} from "@/app/lib/pokemon";
+import {DEFAULT_LANGUAGE, POKEMON, pokemonName} from "@/app/lib/pokemon";
 import {MAX_GRAVEYARD} from "@/app/lib/types/NuzlockeState";
 import {AlertTriangle, Check, Search, X} from "lucide-react";
 import {Pokeball} from "@/app/components/TeamBox";
@@ -155,11 +155,11 @@ function GraveyardEntry({index, id, onRemove}: { index: number; id: number; onRe
         <li className="flex items-center gap-3 rounded-lg border border-yellow-700 bg-neutral-800 p-2">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-neutral-900">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="h-12 w-12 [image-rendering:pixelated]" src={`/showdown/${id}.gif`} alt={pokemon?.name ?? String(id)}/>
+                <img className="h-12 w-12 [image-rendering:pixelated]" src={`/showdown/${id}.gif`} alt={pokemon ? pokemonName(pokemon, DEFAULT_LANGUAGE) : String(id)}/>
             </div>
             <div className="min-w-0 flex-1">
                 <div className="text-xs text-gray-500">#{index + 1}</div>
-                <div className="truncate capitalize text-gray-200">{pokemon?.name ?? id}</div>
+                <div className="truncate capitalize text-gray-200">{pokemon ? pokemonName(pokemon, DEFAULT_LANGUAGE) : id}</div>
             </div>
             <button
                 onClick={onRemove}
@@ -181,7 +181,7 @@ function AddPokemon({onAdd, disabled}: { onAdd: (id: number) => void; disabled: 
     const suggestions = useMemo(() => {
         const q = query.trim().toLowerCase();
         if (!q) return [];
-        return POKEMON.filter(p => p.name.includes(q)).slice(0, MAX_SUGGESTIONS);
+        return POKEMON.filter(p => p.names.en.toLowerCase().includes(q) || pokemonName(p, DEFAULT_LANGUAGE).toLowerCase().includes(q)).slice(0, MAX_SUGGESTIONS);
     }, [query]);
 
     function choose(id: number) {
@@ -220,8 +220,8 @@ function AddPokemon({onAdd, disabled}: { onAdd: (id: number) => void; disabled: 
                                 className="flex w-full cursor-pointer items-center gap-3 px-2 py-1.5 text-left hover:bg-neutral-800"
                             >
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img className="h-10 w-10" src={`/showdown/${p.id}.gif`} alt={p.name}/>
-                                <span className="capitalize text-sm text-gray-200">{p.name}</span>
+                                <img className="h-10 w-10" src={`/showdown/${p.id}.gif`} alt={pokemonName(p, DEFAULT_LANGUAGE)}/>
+                                <span className="capitalize text-sm text-gray-200">{pokemonName(p, DEFAULT_LANGUAGE)}</span>
                             </button>
                         </li>
                     ))}

@@ -2,16 +2,24 @@ import {getSessionUser} from "@/app/lib/session";
 import {getStats, setStats} from "@/app/lib/stats";
 import {canEditTeam} from "@/app/lib/editors";
 import {POKEMON} from "@/app/lib/pokemon";
-import {MAX_GRAVEYARD, TEAM_SIZE} from "@/app/lib/types/NuzlockeState";
+import {MAX_GRAVEYARD, normalizeLabel, normalizeShowLabel, TEAM_SIZE} from "@/app/lib/types/NuzlockeState";
 
 const validIds = new Set(POKEMON.map(p => p.id));
 
-// Update the team and/or graveyard for a user's stats page. The page owner and
-// any editor the owner has granted may write to it. The body may contain
-// `team` (number[], length <= TEAM_SIZE, 0 = empty slot) and/or `graveyard`
-// (number[], any length up to MAX_GRAVEYARD, valid ids only). Omitted fields are
-// left unchanged. setStats persists to the DB and pushes the change to any live
-// SSE subscribers (page + overlay).
+const LABEL_FIELDS = [
+    ["showNuzlockeLabel", "nuzlockeLabel"],
+    ["showTrainerLabel", "trainerLabel"],
+    ["showTeamLabel", "teamLabel"],
+    ["showGraveyardLabel", "graveyardLabel"],
+] as const;
+
+// Update the team, graveyard, and/or label settings for a user's stats page.
+// The page owner and any editor the owner has granted may write to it. The
+// body may contain `team` (number[], length <= TEAM_SIZE, 0 = empty slot),
+// `graveyard` (number[], any length up to MAX_GRAVEYARD, valid ids only),
+// and/or any of the show*Label (boolean) / *Label (string) fields. Omitted
+// fields are left unchanged. setStats persists to the DB and pushes the
+// change to any live SSE subscribers (page + overlay).
 export async function POST(
     request: Request,
     {params}: { params: Promise<{ username: string }> }
@@ -35,7 +43,8 @@ export async function POST(
 
     const hasTeam = "team" in body;
     const hasGraveyard = "graveyard" in body;
-    if (!hasTeam && !hasGraveyard) {
+    const hasLabels = LABEL_FIELDS.some(([show, text]) => show in body || text in body);
+    if (!hasTeam && !hasGraveyard && !hasLabels) {
         return new Response("Nothing to update", {status: 400});
     }
 
@@ -83,6 +92,17 @@ export async function POST(
         }
     }
 
-    setStats(username, {user: username, team, graveyard});
+    const labels = {
+        showNuzlockeLabel: normalizeShowLabel(body.showNuzlockeLabel, current.showNuzlockeLabel),
+        nuzlockeLabel: normalizeLabel(body.nuzlockeLabel, current.nuzlockeLabel),
+        showTrainerLabel: normalizeShowLabel(body.showTrainerLabel, current.showTrainerLabel),
+        trainerLabel: normalizeLabel(body.trainerLabel, current.trainerLabel),
+        showTeamLabel: normalizeShowLabel(body.showTeamLabel, current.showTeamLabel),
+        teamLabel: normalizeLabel(body.teamLabel, current.teamLabel),
+        showGraveyardLabel: normalizeShowLabel(body.showGraveyardLabel, current.showGraveyardLabel),
+        graveyardLabel: normalizeLabel(body.graveyardLabel, current.graveyardLabel),
+    };
+
+    setStats(username, {user: username, team, graveyard, ...labels});
     return Response.json({ok: true});
 }

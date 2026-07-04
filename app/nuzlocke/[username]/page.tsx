@@ -6,7 +6,18 @@ import {Suspense, useEffect, useState} from "react";
 import TeamEditor from "@/app/components/TeamEditor";
 import GraveyardEditor from "@/app/components/GraveyardEditor";
 import EditorManager from "@/app/components/EditorManager";
+import LabelsEditor, {LabelSection} from "@/app/components/LabelsEditor";
 import TeamBox, {Graveyard} from "@/app/components/TeamBox";
+
+type NuzlockeLabelKey = "showNuzlockeLabel" | "nuzlockeLabel" | "showTrainerLabel" | "trainerLabel"
+    | "showTeamLabel" | "teamLabel" | "showGraveyardLabel" | "graveyardLabel";
+
+const LABEL_SECTIONS: LabelSection<NuzlockeLabelKey>[] = [
+    {key: "showNuzlockeLabel", textKey: "nuzlockeLabel", title: "Nuzlocke", placeholder: "Nuzlocke"},
+    {key: "showTrainerLabel", textKey: "trainerLabel", title: "Trainer", placeholder: "Trainer"},
+    {key: "showTeamLabel", textKey: "teamLabel", title: "Team", placeholder: "Team"},
+    {key: "showGraveyardLabel", textKey: "graveyardLabel", title: "Graveyard", placeholder: "Graveyard"},
+];
 
 
 function HomeInner({username}: { username: string }) {
@@ -112,28 +123,29 @@ function HomeInner({username}: { username: string }) {
                     </a>
                 </div>
                 <div className="flex justify-center items-center gap-2">
-                    <TeamBox team={stats.team} className="w-full max-w-md"/>
-                    <Graveyard label="Graveyard" className="w-full flex-1 min-h-20">
-                        <div className="flex min-h-16 flex-row flex-wrap content-start ">
-                            {stats.graveyard.length === 0 ? (
-                                <span className="m-auto text-lg opacity-40">No fallen Pokémon yet</span>
-                            ) : (
-                                stats.graveyard.map((id, i) => (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img
-                                        key={`${id}-${i}`}
-                                        src={`/showdown/${id}.gif`}
-                                        alt=""
-                                        className="h-16 w-16 object-contain opacity-80 [image-rendering:pixelated]"
-                                    />
-                                ))
-                            )}
-                        </div>
+                    <TeamBox team={stats.team} label={stats.showTeamLabel ? stats.teamLabel : ""} className="w-full max-w-md"/>
+                    <Graveyard label={stats.showGraveyardLabel ? stats.graveyardLabel : undefined} pokemon={stats.graveyard} className="w-full flex-1 min-h-20">
                     </Graveyard>
                 </div>
 
                 {canEdit && <TeamEditor apiUrl={`/api/${username}`} field="team" team={stats.team} label="Edit Team"/>}
                 {canEdit && <GraveyardEditor apiUrl={`/api/${username}`} field="graveyard" graveyard={stats.graveyard} label="Edit Graveyard"/>}
+                {canEdit && (
+                    <LabelsEditor
+                        apiUrl={`/api/${username}`}
+                        sections={LABEL_SECTIONS}
+                        values={{
+                            showNuzlockeLabel: stats.showNuzlockeLabel,
+                            nuzlockeLabel: stats.nuzlockeLabel,
+                            showTrainerLabel: stats.showTrainerLabel,
+                            trainerLabel: stats.trainerLabel,
+                            showTeamLabel: stats.showTeamLabel,
+                            teamLabel: stats.teamLabel,
+                            showGraveyardLabel: stats.showGraveyardLabel,
+                            graveyardLabel: stats.graveyardLabel,
+                        }}
+                    />
+                )}
                 {(isOwner || canManageEditors) && <EditorManager username={username} isOwner={isOwner}/>}
             </main>
         </div>

@@ -4,7 +4,31 @@ export const TEAM_SIZE = 6;
 // is otherwise free-form: any number of fallen Pokémon, in order.
 export const MAX_GRAVEYARD = 100;
 
-export type NuzlockeState = {
+// Per-section label settings: whether the overlay shows a title tab for that
+// section, and what custom text it displays.
+export type NuzlockeLabels = {
+    showNuzlockeLabel: boolean;
+    nuzlockeLabel: string;
+    showTrainerLabel: boolean;
+    trainerLabel: string;
+    showTeamLabel: boolean;
+    teamLabel: string;
+    showGraveyardLabel: boolean;
+    graveyardLabel: string;
+};
+
+export const DEFAULT_LABELS: NuzlockeLabels = {
+    showNuzlockeLabel: true,
+    nuzlockeLabel: "Nuzlocke",
+    showTrainerLabel: true,
+    trainerLabel: "Trainer",
+    showTeamLabel: true,
+    teamLabel: "Team",
+    showGraveyardLabel: true,
+    graveyardLabel: "Graveyard",
+};
+
+export type NuzlockeState = NuzlockeLabels & {
     user: string;
     // Always length TEAM_SIZE. Each entry is a Pokémon id, or 0 for an empty slot.
     team: number[];
@@ -12,6 +36,36 @@ export type NuzlockeState = {
     // empty slots — the list is just the fallen Pokémon in the order they died.
     graveyard: number[];
 };
+
+const MAX_LABEL_LENGTH = 40;
+
+// Coerce arbitrary input into a valid label string: trims, caps length, and
+// falls back to the given default when empty/not a string.
+export function normalizeLabel(input: unknown, fallback: string): string {
+    if (typeof input !== "string") return fallback;
+    const trimmed = input.trim().slice(0, MAX_LABEL_LENGTH);
+    return trimmed || fallback;
+}
+
+export function normalizeShowLabel(input: unknown, fallback: boolean): boolean {
+    return typeof input === "boolean" ? input : fallback;
+}
+
+// Coerce arbitrary input (e.g. parsed JSON) into a full set of label settings,
+// falling back field-by-field to defaults for anything missing/invalid.
+export function normalizeLabels(input: unknown, fallback: NuzlockeLabels = DEFAULT_LABELS): NuzlockeLabels {
+    const source = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
+    return {
+        showNuzlockeLabel: normalizeShowLabel(source.showNuzlockeLabel, fallback.showNuzlockeLabel),
+        nuzlockeLabel: normalizeLabel(source.nuzlockeLabel, fallback.nuzlockeLabel),
+        showTrainerLabel: normalizeShowLabel(source.showTrainerLabel, fallback.showTrainerLabel),
+        trainerLabel: normalizeLabel(source.trainerLabel, fallback.trainerLabel),
+        showTeamLabel: normalizeShowLabel(source.showTeamLabel, fallback.showTeamLabel),
+        teamLabel: normalizeLabel(source.teamLabel, fallback.teamLabel),
+        showGraveyardLabel: normalizeShowLabel(source.showGraveyardLabel, fallback.showGraveyardLabel),
+        graveyardLabel: normalizeLabel(source.graveyardLabel, fallback.graveyardLabel),
+    };
+}
 
 export function emptyTeam(): number[] {
     return Array(TEAM_SIZE).fill(0);
@@ -52,5 +106,13 @@ function arraysEqual(a: number[], b: number[]): boolean {
 export function statsEqual(a: NuzlockeState, b: NuzlockeState): boolean {
     return a.user === b.user
         && arraysEqual(a.team, b.team)
-        && arraysEqual(a.graveyard, b.graveyard);
+        && arraysEqual(a.graveyard, b.graveyard)
+        && a.showNuzlockeLabel === b.showNuzlockeLabel
+        && a.nuzlockeLabel === b.nuzlockeLabel
+        && a.showTrainerLabel === b.showTrainerLabel
+        && a.trainerLabel === b.trainerLabel
+        && a.showTeamLabel === b.showTeamLabel
+        && a.teamLabel === b.teamLabel
+        && a.showGraveyardLabel === b.showGraveyardLabel
+        && a.graveyardLabel === b.graveyardLabel;
 }

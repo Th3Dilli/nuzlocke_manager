@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate:pokemon": "node scripts/generate-pokemon.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^12.10.0",
