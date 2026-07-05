@@ -46,7 +46,7 @@ function ToggleSwitch({name, label, defaultChecked, Icon}: {
                 >
                 </div>
                 <div
-                    className="absolute left-[2px] top-[2px] w-5 h-5 bg-white rounded-full shadow-sm peer-checked:translate-x-full transition-transform duration-200 ease-in-out"
+                    className="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow-sm peer-checked:translate-x-full transition-transform duration-200 ease-in-out"
                 ></div>
             </label>
         </div>
@@ -221,16 +221,28 @@ export default async function Home() {
                                             {owner.nuzlocke_enabled === 1 || owner.soullink_enabled === 1 ? (
                                                 <div className="flex flex-col gap-1 text-sm">
                                                     {owner.nuzlocke_enabled === 1 && (
-                                                        <a href={`${baseUrl}/nuzlocke/${owner.username}`}
-                                                           className="flex items-center gap-1.5 text-yellow-600 hover:underline">
-                                                            <Gamepad2 size={14}/> Nuzlocke Page
-                                                        </a>
+                                                        <>
+                                                            <a href={`${baseUrl}/nuzlocke/${owner.username}`}
+                                                               className="flex items-center gap-1.5 text-yellow-600 hover:underline">
+                                                                <Gamepad2 size={14}/> Nuzlocke Page
+                                                            </a>
+                                                            <a href={`${baseUrl}/overlay/nuzlocke/${owner.username}`}
+                                                               className="flex items-center gap-1.5 text-yellow-600 hover:underline">
+                                                                <Monitor size={14}/> Nuzlocke Overlay
+                                                            </a>
+                                                        </>
                                                     )}
                                                     {owner.soullink_enabled === 1 && (
-                                                        <a href={`${baseUrl}/soullink/${owner.username}`}
-                                                           className="flex items-center gap-1.5 text-yellow-600 hover:underline">
-                                                            <Swords size={14}/> Soullink Page
-                                                        </a>
+                                                        <>
+                                                            <a href={`${baseUrl}/soullink/${owner.username}`}
+                                                               className="flex items-center gap-1.5 text-yellow-600 hover:underline">
+                                                                <Swords size={14}/> Soullink Page
+                                                            </a>
+                                                            <a href={`${baseUrl}/overlay/soullink/${owner.username}`}
+                                                               className="flex items-center gap-1.5 text-yellow-600 hover:underline">
+                                                                <Monitor size={14}/> Soullink Overlay
+                                                            </a>
+                                                        </>
                                                     )}
                                                 </div>
                                             ) : (
@@ -274,9 +286,11 @@ export default async function Home() {
         <div className="min-h-screen w-full flex items-center justify-center ">
             <div className="w-full max-w-sm p-8 rounded-xl shadow-lg border border-yellow-600 bg-neutral-900">
                 <div className="flex justify-center">
+                    {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
                     <a href="/api/auth/twitch"
                        className="flex flex-row items-center gap-2 bg-[#9146ff] hover:bg-[#7d2ff7] text-white text-sm font-bold pl-2 pr-3 py-1.5 rounded-lg transition-colors">
-                        <img src="glitch_white.svg" className="w-4 h-4">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="glitch_white.svg" className="w-4 h-4" alt="twitch logo">
                         </img>
                         <p>Login with Twitch</p>
                     </a>
