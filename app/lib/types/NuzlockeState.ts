@@ -15,6 +15,8 @@ export type NuzlockeLabels = {
     teamLabel: string;
     showGraveyardLabel: boolean;
     graveyardLabel: string;
+    showBadgesLabel: boolean;
+    badgesLabel: string;
 };
 
 export const DEFAULT_LABELS: NuzlockeLabels = {
@@ -26,10 +28,15 @@ export const DEFAULT_LABELS: NuzlockeLabels = {
     teamLabel: "Team",
     showGraveyardLabel: true,
     graveyardLabel: "Graveyard",
+    showBadgesLabel: true,
+    badgesLabel: "Badges",
 };
 
 // Which webcam layout slot the trainer cam frame is left blank for.
-export type CamMode = "1" | "2" | "3" | "4";
+export type CamMode = "1" | "2" | "3" | "4" | "5";
+
+export const CAM_MODES: readonly CamMode[] = ["1", "2", "3", "4", "5"];
+const CAM_MODE_SET: ReadonlySet<string> = new Set(CAM_MODES);
 
 export const MIN_MAIN_WIDTH = 1100;
 export const MAX_MAIN_WIDTH = 1420;
@@ -65,7 +72,7 @@ export function normalizeMainWidth(input: unknown, fallback: number): number {
 }
 
 export function normalizeCamMode(input: unknown, fallback: CamMode): CamMode {
-    return input === "1" || input === "2" || input === "3" || input === "4" ? input : fallback;
+    return typeof input === "string" && CAM_MODE_SET.has(input) ? (input as CamMode) : fallback;
 }
 
 // Coerce arbitrary input (e.g. parsed JSON) into a full set of overlay layout
@@ -120,6 +127,8 @@ export function normalizeLabels(input: unknown, fallback: NuzlockeLabels = DEFAU
         teamLabel: normalizeLabel(source.teamLabel, fallback.teamLabel),
         showGraveyardLabel: normalizeShowLabel(source.showGraveyardLabel, fallback.showGraveyardLabel),
         graveyardLabel: normalizeLabel(source.graveyardLabel, fallback.graveyardLabel),
+        showBadgesLabel: normalizeShowLabel(source.showBadgesLabel, fallback.showBadgesLabel),
+        badgesLabel: normalizeLabel(source.badgesLabel, fallback.badgesLabel),
     };
 }
 
@@ -184,6 +193,8 @@ export function statsEqual(a: NuzlockeState, b: NuzlockeState): boolean {
         && a.teamLabel === b.teamLabel
         && a.showGraveyardLabel === b.showGraveyardLabel
         && a.graveyardLabel === b.graveyardLabel
+        && a.showBadgesLabel === b.showBadgesLabel
+        && a.badgesLabel === b.badgesLabel
         && a.mainWidth === b.mainWidth
         && a.camMode === b.camMode
         && a.frameBorderColor === b.frameBorderColor

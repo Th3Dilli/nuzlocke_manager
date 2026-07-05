@@ -12,13 +12,14 @@ import OverlaySettingsEditor from "@/app/components/OverlaySettingsEditor";
 import TeamBox, {Graveyard} from "@/app/components/TeamBox";
 
 type NuzlockeLabelKey = "showNuzlockeLabel" | "nuzlockeLabel" | "showTrainerLabel" | "trainerLabel"
-    | "showTeamLabel" | "teamLabel" | "showGraveyardLabel" | "graveyardLabel";
+    | "showTeamLabel" | "teamLabel" | "showGraveyardLabel" | "graveyardLabel" | "showBadgesLabel" | "badgesLabel";
 
 const LABEL_SECTIONS: LabelSection<NuzlockeLabelKey>[] = [
     {key: "showNuzlockeLabel", textKey: "nuzlockeLabel", title: "Nuzlocke", placeholder: "Nuzlocke"},
     {key: "showTrainerLabel", textKey: "trainerLabel", title: "Trainer", placeholder: "Trainer"},
     {key: "showTeamLabel", textKey: "teamLabel", title: "Team", placeholder: "Team"},
     {key: "showGraveyardLabel", textKey: "graveyardLabel", title: "Graveyard", placeholder: "Graveyard"},
+    {key: "showBadgesLabel", textKey: "badgesLabel", title: "Badges", placeholder: "Badges"},
 ];
 
 
@@ -146,6 +147,8 @@ function HomeInner({username}: { username: string }) {
                             teamLabel: stats.teamLabel,
                             showGraveyardLabel: stats.showGraveyardLabel,
                             graveyardLabel: stats.graveyardLabel,
+                            showBadgesLabel: stats.showBadgesLabel,
+                            badgesLabel: stats.badgesLabel,
                         }}
                     />
                 )}

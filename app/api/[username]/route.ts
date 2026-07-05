@@ -21,6 +21,7 @@ const LABEL_FIELDS = [
     ["showTrainerLabel", "trainerLabel"],
     ["showTeamLabel", "teamLabel"],
     ["showGraveyardLabel", "graveyardLabel"],
+    ["showBadgesLabel", "badgesLabel"],
 ] as const;
 
 const SETTINGS_FIELDS = ["mainWidth", "camMode", "frameBorderColor", "teamColor", "graveyardColor", "textColor"] as const;
@@ -133,6 +134,8 @@ export async function POST(
         teamLabel: normalizeLabel(body.teamLabel, current.teamLabel),
         showGraveyardLabel: normalizeShowLabel(body.showGraveyardLabel, current.showGraveyardLabel),
         graveyardLabel: normalizeLabel(body.graveyardLabel, current.graveyardLabel),
+        showBadgesLabel: normalizeShowLabel(body.showBadgesLabel, current.showBadgesLabel),
+        badgesLabel: normalizeLabel(body.badgesLabel, current.badgesLabel),
     };
 
     const settings = {

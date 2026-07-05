@@ -20,6 +20,10 @@ export type SoullinkLabels = {
     graveyard1Label: string;
     showGraveyard2Label: boolean;
     graveyard2Label: string;
+    // Badges are shared by both trainers (see SoullinkState.badges), so there's
+    // a single pair here rather than one per side.
+    showBadgesLabel: boolean;
+    badgesLabel: string;
 };
 
 export const DEFAULT_SOULLINK_LABELS: SoullinkLabels = {
@@ -39,6 +43,8 @@ export const DEFAULT_SOULLINK_LABELS: SoullinkLabels = {
     graveyard1Label: "Graveyard 1",
     showGraveyard2Label: true,
     graveyard2Label: "Graveyard 2",
+    showBadgesLabel: true,
+    badgesLabel: "Badges",
 };
 
 // Coerce arbitrary input (e.g. parsed JSON) into a full set of label settings,
@@ -62,6 +68,8 @@ export function normalizeSoullinkLabels(input: unknown, fallback: SoullinkLabels
         graveyard1Label: normalizeLabel(source.graveyard1Label, fallback.graveyard1Label),
         showGraveyard2Label: normalizeShowLabel(source.showGraveyard2Label, fallback.showGraveyard2Label),
         graveyard2Label: normalizeLabel(source.graveyard2Label, fallback.graveyard2Label),
+        showBadgesLabel: normalizeShowLabel(source.showBadgesLabel, fallback.showBadgesLabel),
+        badgesLabel: normalizeLabel(source.badgesLabel, fallback.badgesLabel),
     };
 }
 

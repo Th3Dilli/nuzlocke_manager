@@ -7,10 +7,11 @@ import Collapsible from "@/app/components/Collapsible";
 import {CamMode, DEFAULT_SETTINGS, MAX_MAIN_WIDTH, MIN_MAIN_WIDTH, NuzlockeSettings} from "@/app/lib/types/NuzlockeState";
 
 const CAM_MODE_OPTIONS: { value: CamMode; label: string }[] = [
-    {value: "1", label: "Full width"},
-    {value: "2", label: "Centered (half width)"},
-    {value: "3", label: "Right half"},
-    {value: "4", label: "Left half"},
+    {value: "1", label: "Full width right"},
+    {value: "2", label: "Full width left"},
+    {value: "3", label: "Centered (half width)"},
+    {value: "4", label: "Right half"},
+    {value: "5", label: "Left half"},
 ];
 
 function settingsEqual(a: NuzlockeSettings, b: NuzlockeSettings): boolean {

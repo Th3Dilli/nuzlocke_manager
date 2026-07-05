@@ -18,6 +18,7 @@ const LABEL_FIELDS = [
     ["showTeam2Label", "team2Label"],
     ["showGraveyard1Label", "graveyard1Label"],
     ["showGraveyard2Label", "graveyard2Label"],
+    ["showBadgesLabel", "badgesLabel"],
 ] as const;
 
 const SETTINGS_FIELDS = ["frameBorderColor", "teamColor", "graveyardColor", "textColor"] as const;

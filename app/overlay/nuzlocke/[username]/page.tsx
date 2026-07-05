@@ -47,32 +47,38 @@ function OverlayInner({username}: { username: string }) {
     )
     function getLayout(state: NuzlockeState) {
         const camMode = state.camMode;
-        if (camMode === "4") {
+        if (camMode === "5") {
             return (<div className="flex flex-1 flex-row gap-2">
                 <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-1`}/>
                 <div className="flex-1">
                     <BadgesV badges={state.badges} label={""} textColor={state.textColor} className="h-102 w-42"/>
                 </div>
             </div>)
-        } else if (camMode === "3") {
+        } else if (camMode === "4") {
             return (<div className="flex flex-1 flex-row gap-2">
                 <div className="flex-1 flex">
                     <div className="flex-1"></div>
-                    <BadgesV badges={state.badges} label={""} textColor={state.textColor} className="h-102 w-42"/>
+                    <BadgesV badges={state.badges} label={state.showBadgesLabel ? state.badgesLabel : undefined} textColor={state.textColor} className="h-102 w-42"/>
                 </div>
                 <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-1`}/>
             </div>)
-        } else if (camMode === "2") {
+        } else if (camMode === "3") {
             return (<div className="flex flex-1 flex-row gap-2">
                 <div className="flex-none w-1/4"></div>
                 <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-auto w-1/2`}/>
                 {/*<div className="flex-auto w-1/4"></div>*/}
-                <BadgesV badges={state.badges} label={""} textColor={state.textColor} className="h-102 w-1/4 flex-auto"/>
+                <BadgesV badges={state.badges} label={state.showBadgesLabel ? state.badgesLabel : undefined} textColor={state.textColor} className="h-102 w-1/4 flex-auto"/>
+            </div>)
+        } else if (camMode === "2") {
+            return (<div className="flex flex-1 flex-row gap-2">
+                <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-auto w-1/2`}/>
+                <BadgesV badges={state.badges} label={state.showBadgesLabel ? state.badgesLabel : undefined} textColor={state.textColor} className="h-102 w-40"/>
             </div>)
         } else if (camMode === "1") {
-            return (
-                <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-1`}/>
-            )
+            return (<div className="flex flex-1 flex-row gap-2">
+                <BadgesV badges={state.badges} label={state.showBadgesLabel ? state.badgesLabel : undefined} textColor={state.textColor} className="h-102 w-40"/>
+                <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-auto w-1/2`}/>
+            </div>)
         }
     }
     return (

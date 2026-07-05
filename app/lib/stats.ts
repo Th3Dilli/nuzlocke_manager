@@ -66,6 +66,8 @@ type NuzlockeRow = {
     team_label: string;
     show_graveyard_label: number;
     graveyard_label: string;
+    show_badges_label: number;
+    badges_label: string;
     main_width: number;
     cam_mode: string;
     frame_border_color: string;
@@ -90,6 +92,8 @@ function loadStat(user: string): NuzlockeState {
             teamLabel: normalizeLabel(row.team_label, DEFAULT_LABELS.teamLabel),
             showGraveyardLabel: normalizeShowLabel(!!row.show_graveyard_label, DEFAULT_LABELS.showGraveyardLabel),
             graveyardLabel: normalizeLabel(row.graveyard_label, DEFAULT_LABELS.graveyardLabel),
+            showBadgesLabel: normalizeShowLabel(!!row.show_badges_label, DEFAULT_LABELS.showBadgesLabel),
+            badgesLabel: normalizeLabel(row.badges_label, DEFAULT_LABELS.badgesLabel),
             mainWidth: normalizeMainWidth(row.main_width, DEFAULT_SETTINGS.mainWidth),
             camMode: normalizeCamMode(row.cam_mode, DEFAULT_SETTINGS.camMode),
             frameBorderColor: normalizeColor(row.frame_border_color, DEFAULT_SETTINGS.frameBorderColor),
@@ -131,6 +135,8 @@ export function setStats(user: string, s: NuzlockeState) {
         userStat.teamLabel = normalizeLabel(s.teamLabel, userStat.teamLabel);
         userStat.showGraveyardLabel = normalizeShowLabel(s.showGraveyardLabel, userStat.showGraveyardLabel);
         userStat.graveyardLabel = normalizeLabel(s.graveyardLabel, userStat.graveyardLabel);
+        userStat.showBadgesLabel = normalizeShowLabel(s.showBadgesLabel, userStat.showBadgesLabel);
+        userStat.badgesLabel = normalizeLabel(s.badgesLabel, userStat.badgesLabel);
         userStat.mainWidth = normalizeMainWidth(s.mainWidth, userStat.mainWidth);
         userStat.camMode = normalizeCamMode(s.camMode, userStat.camMode);
         userStat.frameBorderColor = normalizeColor(s.frameBorderColor, userStat.frameBorderColor);
@@ -151,6 +157,8 @@ export function setStats(user: string, s: NuzlockeState) {
             team_label: userStat.teamLabel,
             show_graveyard_label: userStat.showGraveyardLabel ? 1 : 0,
             graveyard_label: userStat.graveyardLabel,
+            show_badges_label: userStat.showBadgesLabel ? 1 : 0,
+            badges_label: userStat.badgesLabel,
             main_width: userStat.mainWidth,
             cam_mode: userStat.camMode,
             frame_border_color: userStat.frameBorderColor,

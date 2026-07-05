@@ -55,6 +55,8 @@ type SoullinkRow = {
     graveyard1_label: string;
     show_graveyard2_label: number;
     graveyard2_label: string;
+    show_badges_label: number;
+    badges_label: string;
     frame_border_color: string;
     team_color: string;
     graveyard_color: string;
@@ -87,6 +89,8 @@ function loadStat(user: string): SoullinkState {
             graveyard1Label: normalizeLabel(row.graveyard1_label, DEFAULT_SOULLINK_LABELS.graveyard1Label),
             showGraveyard2Label: normalizeShowLabel(!!row.show_graveyard2_label, DEFAULT_SOULLINK_LABELS.showGraveyard2Label),
             graveyard2Label: normalizeLabel(row.graveyard2_label, DEFAULT_SOULLINK_LABELS.graveyard2Label),
+            showBadgesLabel: normalizeShowLabel(!!row.show_badges_label, DEFAULT_SOULLINK_LABELS.showBadgesLabel),
+            badgesLabel: normalizeLabel(row.badges_label, DEFAULT_SOULLINK_LABELS.badgesLabel),
             frameBorderColor: normalizeColor(row.frame_border_color, DEFAULT_SOULLINK_SETTINGS.frameBorderColor),
             teamColor: normalizeColor(row.team_color, DEFAULT_SOULLINK_SETTINGS.teamColor),
             graveyardColor: normalizeColor(row.graveyard_color, DEFAULT_SOULLINK_SETTINGS.graveyardColor),
@@ -116,6 +120,7 @@ const LABEL_KEYS = [
     ["showTeam2Label", "team2Label"],
     ["showGraveyard1Label", "graveyard1Label"],
     ["showGraveyard2Label", "graveyard2Label"],
+    ["showBadgesLabel", "badgesLabel"],
 ] as const;
 
 export function setStats(user: string, s: Partial<Omit<SoullinkState, "user">>) {
@@ -160,6 +165,8 @@ export function setStats(user: string, s: Partial<Omit<SoullinkState, "user">>) 
             graveyard1_label: userStat.graveyard1Label,
             show_graveyard2_label: userStat.showGraveyard2Label ? 1 : 0,
             graveyard2_label: userStat.graveyard2Label,
+            show_badges_label: userStat.showBadgesLabel ? 1 : 0,
+            badges_label: userStat.badgesLabel,
             frame_border_color: userStat.frameBorderColor,
             team_color: userStat.teamColor,
             graveyard_color: userStat.graveyardColor,
