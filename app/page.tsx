@@ -196,7 +196,11 @@ export default async function Home() {
                                     <ListChecks size={16} className="text-yellow-600"/> Setup Guide
                                 </div>
                                 <ul className="list-disc list-inside text-sm text-gray-400 space-y-1">
-                                    <li>Enable the Stats Page</li>
+                                    <li>Enable the page you need.</li>
+                                    <li>Add your other users as editors to allow them to edit the overlay.</li>
+                                    <li>Change the overlay settings (color, cam mode, etc)</li>
+                                    <li>Add a background that you like in your OBS scene.</li>
+                                    <li>Add the emulator screens on top of the background and finally add the overlay on top of the emulator screens. Make sure to set in OBS the overlay browser source dimensions to 1920 x 1080.</li>
                                 </ul>
                             </div>
                         </div>
@@ -290,7 +294,7 @@ export default async function Home() {
                     <a href="/api/auth/twitch"
                        className="flex flex-row items-center gap-2 bg-[#9146ff] hover:bg-[#7d2ff7] text-white text-sm font-bold pl-2 pr-3 py-1.5 rounded-lg transition-colors">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src="glitch_white.svg" className="w-4 h-4" alt="twitch logo">
+                        <img src="/glitch_white.svg" className="w-4 h-4" alt="twitch logo">
                         </img>
                         <p>Login with Twitch</p>
                     </a>

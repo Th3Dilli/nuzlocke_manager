@@ -40,7 +40,8 @@ export default async function Header() {
             <Link href="/api/auth/twitch">
                 <button className="flex items-center gap-2 bg-violet-500 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded">
 
-                    <img src="glitch_white.svg" className="w-4 h-4">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/glitch_white.svg" className="w-4 h-4" alt="twitch logo">
                     </img>
                     Login with Twitch
                 </button>
