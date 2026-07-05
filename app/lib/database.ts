@@ -99,19 +99,6 @@ database.exec(`
     );
 `)
 
-// Migration: add the badges column to pre-existing nuzlocke/soullink tables
-// (CREATE TABLE IF NOT EXISTS above only covers fresh installs). Must run
-// before any statement referencing the column is prepared below.
-const nuzlockeColumns = database.prepare(`PRAGMA table_info(nuzlocke)`).all() as Array<{ name: string }>;
-if (!nuzlockeColumns.some(c => c.name === "badges")) {
-    database.exec(`ALTER TABLE nuzlocke ADD COLUMN badges TEXT NOT NULL DEFAULT '[]'`);
-}
-const soullinkColumns = database.prepare(`PRAGMA table_info(soullink)`).all() as Array<{ name: string }>;
-if (!soullinkColumns.some(c => c.name === "badges")) {
-    database.exec(`ALTER TABLE soullink ADD COLUMN badges TEXT NOT NULL DEFAULT '[]'`);
-}
-
-
 export const upsertUser = database.prepare<{ twitch_id: string; username: string; profile_image_url: string; now: string }>(`
     INSERT INTO users (twitch_id, username, role, nuzlocke_enabled, soullink_enabled, api_token, profile_image_url, created_at, updated_at)
     VALUES (@twitch_id, @username, 0, false, false, NULL, @profile_image_url, @now, @now)
