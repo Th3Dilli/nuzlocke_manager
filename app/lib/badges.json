@@ -1,0 +1,410 @@
+[
+    {
+        "id": 1,
+        "group": "1",
+        "name": "Felsorden",
+        "city": "Marmoria City"
+    },
+    {
+        "id": 2,
+        "group": "1",
+        "name": "Quellorden",
+        "city": "Azuria City"
+    },
+    {
+        "id": 3,
+        "group": "1",
+        "name": "Donnerorden",
+        "city": "Orania City"
+    },
+    {
+        "id": 4,
+        "group": "1",
+        "name": "Farborden",
+        "city": "Prismania City"
+    },
+    {
+        "id": 5,
+        "group": "1",
+        "name": "Seelenorden",
+        "city": "Fuchsania City"
+    },
+    {
+        "id": 6,
+        "group": "1",
+        "name": "Sumpforden",
+        "city": "Saffronia City"
+    },
+    {
+        "id": 7,
+        "group": "1",
+        "name": "Vulkanorden",
+        "city": "Zinnoberinsel"
+    },
+    {
+        "id": 8,
+        "group": "1",
+        "name": "Erdorden",
+        "city": "Vertania City"
+    },
+    {
+        "id": 9,
+        "group": "2",
+        "name": "Flügelorden",
+        "city": "Viola City"
+    },
+    {
+        "id": 10,
+        "group": "2",
+        "name": "Insektorden",
+        "city": "Azalea City"
+    },
+    {
+        "id": 11,
+        "group": "2",
+        "name": "Basisorden",
+        "city": "Dukatia City"
+    },
+    {
+        "id": 12,
+        "group": "2",
+        "name": "Phantomorden",
+        "city": "Teak City"
+    },
+    {
+        "id": 13,
+        "group": "2",
+        "name": "Faustorden",
+        "city": "Anemonia City"
+    },
+    {
+        "id": 14,
+        "group": "2",
+        "name": "Stahlorden",
+        "city": "Oliviana City"
+    },
+    {
+        "id": 15,
+        "group": "2",
+        "name": "Eisorden",
+        "city": "Mahagonia City"
+    },
+    {
+        "id": 16,
+        "group": "2",
+        "name": "Drachenorden",
+        "city": "Ebenholz City"
+    },
+    {
+        "id": 17,
+        "group": "3",
+        "name": "Steinorden",
+        "city": "Metarost City"
+    },
+    {
+        "id": 18,
+        "group": "3",
+        "name": "Knöchelorden",
+        "city": "Faustauhaven"
+    },
+    {
+        "id": 19,
+        "group": "3",
+        "name": "Dynamo-Orden",
+        "city": "Malvenfroh City"
+    },
+    {
+        "id": 20,
+        "group": "3",
+        "name": "Hitzeorden",
+        "city": "Bad Lavastadt"
+    },
+    {
+        "id": 21,
+        "group": "3",
+        "name": "Balanceorden",
+        "city": "Blütenburg City"
+    },
+    {
+        "id": 22,
+        "group": "3",
+        "name": "Federorden",
+        "city": "Baumhausen City"
+    },
+    {
+        "id": 23,
+        "group": "3",
+        "name": "Mentalorden",
+        "city": "Moosbach City"
+    },
+    {
+        "id": 24,
+        "group": "3",
+        "name": "Schauerorden",
+        "city": "Xeneroville"
+    },
+    {
+        "id": 25,
+        "group": "4",
+        "name": "Kohleorden",
+        "city": "Erzelingen"
+    },
+    {
+        "id": 26,
+        "group": "4",
+        "name": "Waldorden",
+        "city": "Ewigenau"
+    },
+    {
+        "id": 27,
+        "group": "4",
+        "name": "Bergorden",
+        "city": "Schleiede"
+    },
+    {
+        "id": 28,
+        "group": "4",
+        "name": "Fennorden",
+        "city": "Weideburg"
+    },
+    {
+        "id": 29,
+        "group": "4",
+        "name": "Reliktorden",
+        "city": "Herzhofen"
+    },
+    {
+        "id": 30,
+        "group": "4",
+        "name": "Minenorden",
+        "city": "Fleetburg"
+    },
+    {
+        "id": 31,
+        "group": "4",
+        "name": "Firnorden",
+        "city": "Blizzach"
+    },
+    {
+        "id": 32,
+        "group": "4",
+        "name": "Lichtorden",
+        "city": "Sonnewik"
+    },
+    {
+        "id": 33,
+        "group": "5",
+        "name": "Triorden",
+        "city": "Orion City"
+    },
+    {
+        "id": 34,
+        "group": "5",
+        "name": "Grundorden",
+        "city": "Eventura City"
+    },
+    {
+        "id": 35,
+        "group": "5",
+        "name": "Giftorden",
+        "city": "Vapydro City"
+    },
+    {
+        "id": 36,
+        "group": "5",
+        "name": "Käferorden",
+        "city": "Stratos City"
+    },
+    {
+        "id": 37,
+        "group": "5",
+        "name": "Voltorden",
+        "city": "Rayono City"
+    },
+    {
+        "id": 38,
+        "group": "5",
+        "name": "Seismo-Orden",
+        "city": "Marea City"
+    },
+    {
+        "id": 39,
+        "group": "5",
+        "name": "Jetorden",
+        "city": "Panaero City"
+    },
+    {
+        "id": 40,
+        "group": "5",
+        "name": "Eiszapforden",
+        "city": "Nevaio City"
+    },
+    {
+        "id": 41,
+        "group": "5",
+        "name": "Legendenorden",
+        "city": "Twindrake City"
+    },
+    {
+        "id": 42,
+        "group": "5",
+        "name": "Wellenorden",
+        "city": "Abidaya City"
+    },
+    {
+        "id": 43,
+        "group": "6",
+        "name": "Krabbelorden",
+        "city": "Nouvaria City"
+    },
+    {
+        "id": 44,
+        "group": "6",
+        "name": "Wallorden",
+        "city": "Relievera City"
+    },
+    {
+        "id": 45,
+        "group": "6",
+        "name": "Rauforden",
+        "city": "Yantara City"
+    },
+    {
+        "id": 46,
+        "group": "6",
+        "name": "Blattorden",
+        "city": "Tempera City"
+    },
+    {
+        "id": 47,
+        "group": "6",
+        "name": "Ampere-Orden",
+        "city": "Illumina City"
+    },
+    {
+        "id": 48,
+        "group": "6",
+        "name": "Feenorden",
+        "city": "Romantia City"
+    },
+    {
+        "id": 49,
+        "group": "6",
+        "name": "Psi-Orden",
+        "city": "Fluxia City"
+    },
+    {
+        "id": 50,
+        "group": "6",
+        "name": "Eisbergorden",
+        "city": "Fractalia City"
+    },
+    {
+        "id": 51,
+        "group": "8",
+        "name": "Pflanzen-Orden",
+        "city": "Turffield"
+    },
+    {
+        "id": 52,
+        "group": "8",
+        "name": "Wasser-Orden",
+        "city": "Keelton"
+    },
+    {
+        "id": 53,
+        "group": "8",
+        "name": "Feuer-Orden",
+        "city": "Engine City"
+    },
+    {
+        "id": 54,
+        "group": "8",
+        "name": "Kampf-Orden",
+        "city": "Passbeck"
+    },
+    {
+        "id": 55,
+        "group": "8",
+        "name": "Geister-Orden",
+        "city": "Passbeck"
+    },
+    {
+        "id": 56,
+        "group": "8",
+        "name": "Feen-Orden",
+        "city": "Fairballey"
+    },
+    {
+        "id": 57,
+        "group": "8",
+        "name": "Gesteins-Orden",
+        "city": "Circhester"
+    },
+    {
+        "id": 58,
+        "group": "8",
+        "name": "Eis-Orden",
+        "city": "Circhester"
+    },
+    {
+        "id": 59,
+        "group": "8",
+        "name": "Unlicht-Orden",
+        "city": "Spikeford"
+    },
+    {
+        "id": 60,
+        "group": "8",
+        "name": "Drachen-Orden",
+        "city": "Claw City"
+    },
+    {
+        "id": 61,
+        "group": "9",
+        "name": "Käfer-Arenaorden",
+        "city": "Moldrid"
+    },
+    {
+        "id": 62,
+        "group": "9",
+        "name": "Pflanzen-Arenaorden",
+        "city": "Bolardin"
+    },
+    {
+        "id": 63,
+        "group": "9",
+        "name": "Elektro-Arenaorden",
+        "city": "Fermanca City"
+    },
+    {
+        "id": 64,
+        "group": "9",
+        "name": "Wasser-Arenaorden",
+        "city": "Garrafosa City"
+    },
+    {
+        "id": 65,
+        "group": "9",
+        "name": "Normal-Arenaorden",
+        "city": "Mesclarra"
+    },
+    {
+        "id": 66,
+        "group": "9",
+        "name": "Geister-Arenaorden",
+        "city": "Frigomonta"
+    },
+    {
+        "id": 67,
+        "group": "9",
+        "name": "Psycho-Arenaorden",
+        "city": "Asarilla"
+    },
+    {
+        "id": 68,
+        "group": "9",
+        "name": "Eis-Arenaorden",
+        "city": "Montanata"
+    }
+]
