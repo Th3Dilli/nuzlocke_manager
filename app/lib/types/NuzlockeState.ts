@@ -89,6 +89,8 @@ export type NuzlockeState = NuzlockeLabels & NuzlockeSettings & {
     // Variable length (0..MAX_GRAVEYARD). Each entry is a valid Pokémon id; no
     // empty slots — the list is just the fallen Pokémon in the order they died.
     graveyard: number[];
+    // Ids of earned gym badges (see app/lib/badges.json), ascending, no duplicates.
+    badges: number[];
 };
 
 const MAX_LABEL_LENGTH = 40;
@@ -153,6 +155,18 @@ export function normalizeGraveyard(input: unknown): number[] {
     return out;
 }
 
+// Coerce arbitrary input into a valid badges list: unique positive integer ids,
+// sorted ascending. Ids are validated against the badge catalog by the caller.
+export function normalizeBadges(input: unknown): number[] {
+    if (!Array.isArray(input)) return [];
+    const ids = new Set<number>();
+    for (const value of input) {
+        const id = Number(value);
+        if (Number.isInteger(id) && id > 0) ids.add(id);
+    }
+    return Array.from(ids).sort((a, b) => a - b);
+}
+
 function arraysEqual(a: number[], b: number[]): boolean {
     return a.length === b.length && a.every((v, i) => v === b[i]);
 }
@@ -161,6 +175,7 @@ export function statsEqual(a: NuzlockeState, b: NuzlockeState): boolean {
     return a.user === b.user
         && arraysEqual(a.team, b.team)
         && arraysEqual(a.graveyard, b.graveyard)
+        && arraysEqual(a.badges, b.badges)
         && a.showNuzlockeLabel === b.showNuzlockeLabel
         && a.nuzlockeLabel === b.nuzlockeLabel
         && a.showTrainerLabel === b.showTrainerLabel

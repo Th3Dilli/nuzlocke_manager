@@ -2,7 +2,7 @@
 
 import {SoullinkState} from "@/app/lib/types/SoullinkState";
 import {ReactNode, Suspense, use, useEffect, useState} from "react";
-import {Graveyard, TeamBoxV, TitleTab} from "@/app/components/TeamBox";
+import {BadgesV, Graveyard, TeamBoxV, TitleTab} from "@/app/components/TeamBox";
 
 
 function OverlayInner({username}: { username: string }) {
@@ -61,8 +61,8 @@ function OverlayInner({username}: { username: string }) {
                         </div>
                     </div>
 
-                    <div className="w-74">
-                        
+                    <div className="w-74 px-8">
+                        <BadgesV badges={stats.badges} label={""} textColor={stats.textColor} className="h-123 flex-auto"/>
                     </div>
 
                     <div className="flex-1 flex flex-row-reverse gap-2">

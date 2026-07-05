@@ -1,4 +1,4 @@
-import {normalizeColor, normalizeGraveyard, normalizeLabel, normalizeShowLabel, normalizeTeam} from "@/app/lib/types/NuzlockeState";
+import {normalizeBadges, normalizeColor, normalizeGraveyard, normalizeLabel, normalizeShowLabel, normalizeTeam} from "@/app/lib/types/NuzlockeState";
 import {DEFAULT_SOULLINK_LABELS, DEFAULT_SOULLINK_SETTINGS, emptySoullinkState, SoullinkState} from "@/app/lib/types/SoullinkState";
 import {getSoullinkEnabledUsers, selectSoullinkStmt, upsertSoullinkStmt} from "@/app/lib/database";
 import {User} from "@/app/lib/users";
@@ -38,6 +38,7 @@ type SoullinkRow = {
     team2: string;
     graveyard1: string;
     graveyard2: string;
+    badges: string;
     show_soullink1_label: number;
     soullink1_label: string;
     show_soullink2_label: number;
@@ -69,6 +70,7 @@ function loadStat(user: string): SoullinkState {
             team2: normalizeTeam(safeParse(row.team2)),
             graveyard1: normalizeGraveyard(safeParse(row.graveyard1)),
             graveyard2: normalizeGraveyard(safeParse(row.graveyard2)),
+            badges: normalizeBadges(safeParse(row.badges)),
             showSoullink1Label: normalizeShowLabel(!!row.show_soullink1_label, DEFAULT_SOULLINK_LABELS.showSoullink1Label),
             soullink1Label: normalizeLabel(row.soullink1_label, DEFAULT_SOULLINK_LABELS.soullink1Label),
             showSoullink2Label: normalizeShowLabel(!!row.show_soullink2_label, DEFAULT_SOULLINK_LABELS.showSoullink2Label),
@@ -123,6 +125,7 @@ export function setStats(user: string, s: Partial<Omit<SoullinkState, "user">>) 
         if (s.team2) userStat.team2 = normalizeTeam(s.team2);
         if (s.graveyard1) userStat.graveyard1 = normalizeGraveyard(s.graveyard1);
         if (s.graveyard2) userStat.graveyard2 = normalizeGraveyard(s.graveyard2);
+        if (s.badges) userStat.badges = normalizeBadges(s.badges);
 
         for (const [showKey, textKey] of LABEL_KEYS) {
             if (s[showKey] !== undefined) userStat[showKey] = normalizeShowLabel(s[showKey], userStat[showKey]);
@@ -140,6 +143,7 @@ export function setStats(user: string, s: Partial<Omit<SoullinkState, "user">>) 
             team2: JSON.stringify(userStat.team2),
             graveyard1: JSON.stringify(userStat.graveyard1),
             graveyard2: JSON.stringify(userStat.graveyard2),
+            badges: JSON.stringify(userStat.badges),
             show_soullink1_label: userStat.showSoullink1Label ? 1 : 0,
             soullink1_label: userStat.soullink1Label,
             show_soullink2_label: userStat.showSoullink2Label ? 1 : 0,

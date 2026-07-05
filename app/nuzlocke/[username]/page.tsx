@@ -5,6 +5,7 @@ import {NuzlockeState} from "@/app/lib/types/NuzlockeState";
 import {Suspense, useEffect, useState} from "react";
 import TeamEditor from "@/app/components/TeamEditor";
 import GraveyardEditor from "@/app/components/GraveyardEditor";
+import BadgesEditor from "@/app/components/BadgesEditor";
 import EditorManager from "@/app/components/EditorManager";
 import LabelsEditor, {LabelSection} from "@/app/components/LabelsEditor";
 import OverlaySettingsEditor from "@/app/components/OverlaySettingsEditor";
@@ -131,6 +132,7 @@ function HomeInner({username}: { username: string }) {
 
                 {canEdit && <TeamEditor apiUrl={`/api/${username}`} field="team" team={stats.team} label="Edit Team"/>}
                 {canEdit && <GraveyardEditor apiUrl={`/api/${username}`} field="graveyard" graveyard={stats.graveyard} label="Edit Graveyard"/>}
+                {canEdit && <BadgesEditor apiUrl={`/api/${username}`} field="badges" badges={stats.badges} label="Edit Badges"/>}
                 {canEdit && (
                     <LabelsEditor
                         apiUrl={`/api/${username}`}

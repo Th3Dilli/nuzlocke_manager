@@ -60,6 +60,32 @@ export function TeamBoxV({team, className, label = "Team", color = "#eab308", te
     );
 }
 
+export function BadgesV({badges, className, label = "Badges", color = "#eab308", textColor}: {
+    badges: number[];
+    className?: string;
+    label?: string;
+    color?: string;
+    textColor?: string;
+}) {
+    return (
+        <div className={`relative shrink-0 p-3 pt-2 bgdark rounded-2xl border-[5px] h-20 ${className ?? ""}`} style={{borderColor: color}}>
+            {label ? <TitleTabV label={label} borderColor={color} textColor={textColor}/> : <></>}
+            <div className={`flex flex-wrap gap-2 h-full  items-center justify-center`}>
+                {badges.map((id, i) => (
+                    <div key={i} className="flex flex-1 aspect-square h-14 w-14 items-center justify-center">
+                        {/*// eslint-disable-next-line @next/next/no-img-element*/}
+                        <img
+                            src={`/badges/${id}.png`}
+                            alt=""
+                            className="h-full [image-rendering:pixelated]"
+                        />
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 export function Graveyard({label, className, pokemon, color = "#eab308", textColor, size = "12"}: { label?: string; className?: string; pokemon: number[]; color?: string; textColor?: string, size?: string }) {
     return (
         <div className={`relative rounded-2xl border-6 bgdark ${className ?? ""}`} style={{borderColor: color}}>

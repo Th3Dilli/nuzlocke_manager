@@ -3,6 +3,7 @@
 import {useMemo, useState} from "react";
 import {AlertTriangle, Check, X} from "lucide-react";
 import {Pokeball} from "@/app/components/TeamBox";
+import Collapsible from "@/app/components/Collapsible";
 import {CamMode, DEFAULT_SETTINGS, MAX_MAIN_WIDTH, MIN_MAIN_WIDTH, NuzlockeSettings} from "@/app/lib/types/NuzlockeState";
 
 const CAM_MODE_OPTIONS: { value: CamMode; label: string }[] = [
@@ -97,13 +98,11 @@ export default function OverlaySettingsEditor({apiUrl, values: remoteValues}: {
     }
 
     return (
-        <div className="mt-6 rounded-xl border border-yellow-600 bgdark p-4">
-            <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <Pokeball className="h-5 w-5"/>
-                    <h2 className="text-xl font-bold text-yellow-300">Overlay Settings</h2>
-                </div>
-                <div className="flex items-center gap-3">
+        <Collapsible
+            icon={<Pokeball className="h-5 w-5"/>}
+            title="Overlay Settings"
+            headerRight={
+                <>
                     {error && <span className="text-sm text-red-400">{error}</span>}
                     <button
                         onClick={resetColors}
@@ -118,9 +117,9 @@ export default function OverlaySettingsEditor({apiUrl, values: remoteValues}: {
                     >
                         {saved ? <><Check className="h-4 w-4"/> Saved</> : saving ? "Saving…" : "Save Settings"}
                     </button>
-                </div>
-            </div>
-
+                </>
+            }
+        >
             {remoteChanged && (
                 <div className="mb-4 flex items-center justify-between gap-3 rounded-md border border-amber-500 bg-amber-500/10 px-3 py-2 text-sm text-amber-300">
                     <span className="flex items-center gap-2">
@@ -219,6 +218,6 @@ export default function OverlaySettingsEditor({apiUrl, values: remoteValues}: {
                     </label>
                 </div>
             </div>
-        </div>
+        </Collapsible>
     );
 }

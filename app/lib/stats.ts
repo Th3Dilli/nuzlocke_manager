@@ -2,6 +2,7 @@ import {
     DEFAULT_LABELS,
     DEFAULT_SETTINGS,
     emptyTeam,
+    normalizeBadges,
     normalizeCamMode,
     normalizeColor,
     normalizeGraveyard,
@@ -56,6 +57,7 @@ type NuzlockeRow = {
     user: string;
     team: string;
     graveyard: string;
+    badges: string;
     show_nuzlocke_label: number;
     nuzlocke_label: string;
     show_trainer_label: number;
@@ -79,6 +81,7 @@ function loadStat(user: string): NuzlockeState {
             user: row.user,
             team: normalizeTeam(safeParse(row.team)),
             graveyard: normalizeGraveyard(safeParse(row.graveyard)),
+            badges: normalizeBadges(safeParse(row.badges)),
             showNuzlockeLabel: normalizeShowLabel(!!row.show_nuzlocke_label, DEFAULT_LABELS.showNuzlockeLabel),
             nuzlockeLabel: normalizeLabel(row.nuzlocke_label, DEFAULT_LABELS.nuzlockeLabel),
             showTrainerLabel: normalizeShowLabel(!!row.show_trainer_label, DEFAULT_LABELS.showTrainerLabel),
@@ -95,7 +98,7 @@ function loadStat(user: string): NuzlockeState {
             textColor: normalizeColor(row.text_color, DEFAULT_SETTINGS.textColor),
         };
     }
-    return {user: user, team: emptyTeam(), graveyard: [], ...DEFAULT_LABELS, ...DEFAULT_SETTINGS};
+    return {user: user, team: emptyTeam(), graveyard: [], badges: [], ...DEFAULT_LABELS, ...DEFAULT_SETTINGS};
 }
 
 export function updateUserToken(username: string, api_token: string) {
@@ -119,6 +122,7 @@ export function setStats(user: string, s: NuzlockeState) {
         userStat.user = s.user;
         userStat.team = normalizeTeam(s.team);
         userStat.graveyard = normalizeGraveyard(s.graveyard);
+        userStat.badges = normalizeBadges(s.badges);
         userStat.showNuzlockeLabel = normalizeShowLabel(s.showNuzlockeLabel, userStat.showNuzlockeLabel);
         userStat.nuzlockeLabel = normalizeLabel(s.nuzlockeLabel, userStat.nuzlockeLabel);
         userStat.showTrainerLabel = normalizeShowLabel(s.showTrainerLabel, userStat.showTrainerLabel);
@@ -138,6 +142,7 @@ export function setStats(user: string, s: NuzlockeState) {
             user,
             team: JSON.stringify(userStat.team),
             graveyard: JSON.stringify(userStat.graveyard),
+            badges: JSON.stringify(userStat.badges),
             show_nuzlocke_label: userStat.showNuzlockeLabel ? 1 : 0,
             nuzlocke_label: userStat.nuzlockeLabel,
             show_trainer_label: userStat.showTrainerLabel ? 1 : 0,

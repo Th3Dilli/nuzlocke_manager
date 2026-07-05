@@ -5,6 +5,7 @@ import {DEFAULT_LANGUAGE, POKEMON, pokemonName} from "@/app/lib/pokemon";
 import {MAX_GRAVEYARD} from "@/app/lib/types/NuzlockeState";
 import {AlertTriangle, Check, Search, X} from "lucide-react";
 import {Pokeball} from "@/app/components/TeamBox";
+import Collapsible from "@/app/components/Collapsible";
 
 const MAX_SUGGESTIONS = 8;
 
@@ -95,14 +96,11 @@ export default function GraveyardEditor({apiUrl, field, graveyard: remoteGraveya
     }
 
     return (
-        <div className="mt-6 rounded-xl border border-yellow-600 bgdark p-4">
-            <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <Pokeball className="h-5 w-5"/>
-                    <h2 className="text-xl font-bold text-yellow-300">{label}</h2>
-                    <span className="text-sm text-gray-500">{graveyard.length}/{MAX_GRAVEYARD}</span>
-                </div>
-                <div className="flex items-center gap-3">
+        <Collapsible
+            icon={<Pokeball className="h-5 w-5"/>}
+            title={<>{label} <span className="text-sm font-normal text-gray-500">{graveyard.length}/{MAX_GRAVEYARD}</span></>}
+            headerRight={
+                <>
                     {error && <span className="text-sm text-red-400">{error}</span>}
                     <button
                         onClick={handleSave}
@@ -111,9 +109,9 @@ export default function GraveyardEditor({apiUrl, field, graveyard: remoteGraveya
                     >
                         {saved ? <><Check className="h-4 w-4"/> Saved</> : saving ? "Saving…" : "Save Graveyard"}
                     </button>
-                </div>
-            </div>
-
+                </>
+            }
+        >
             {remoteChanged && (
                 <div className="mb-4 flex items-center justify-between gap-3 rounded-md border border-amber-500 bg-amber-500/10 px-3 py-2 text-sm text-amber-300">
                     <span className="flex items-center gap-2">
@@ -145,7 +143,7 @@ export default function GraveyardEditor({apiUrl, field, graveyard: remoteGraveya
                     ))}
                 </ul>
             )}
-        </div>
+        </Collapsible>
     );
 }
 

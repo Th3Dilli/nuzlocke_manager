@@ -101,6 +101,9 @@ export type SoullinkState = SoullinkLabels & SoullinkSettings & {
     // empty slots — the list is just the fallen Pokémon in the order they died.
     graveyard1: number[];
     graveyard2: number[];
+    // Ids of earned gym badges (see app/lib/badges.json), shared by both
+    // trainers since a soul link run plays through the same gyms together.
+    badges: number[];
 };
 
 export function emptySoullinkState(user: string): SoullinkState {
@@ -110,6 +113,7 @@ export function emptySoullinkState(user: string): SoullinkState {
         team2: emptyTeam(),
         graveyard1: [],
         graveyard2: [],
+        badges: [],
         ...DEFAULT_SOULLINK_LABELS,
         ...DEFAULT_SOULLINK_SETTINGS,
     };

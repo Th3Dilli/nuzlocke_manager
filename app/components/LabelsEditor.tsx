@@ -3,6 +3,7 @@
 import {useMemo, useState} from "react";
 import {AlertTriangle, Check, X} from "lucide-react";
 import {Pokeball} from "@/app/components/TeamBox";
+import Collapsible from "@/app/components/Collapsible";
 
 export type LabelSection<T extends string = string> = {
     key: T;
@@ -90,13 +91,11 @@ export default function LabelsEditor<T extends string>({apiUrl, values: remoteVa
     }
 
     return (
-        <div className="mt-6 rounded-xl border border-yellow-600 bgdark p-4">
-            <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <Pokeball className="h-5 w-5"/>
-                    <h2 className="text-xl font-bold text-yellow-300">{label}</h2>
-                </div>
-                <div className="flex items-center gap-3">
+        <Collapsible
+            icon={<Pokeball className="h-5 w-5"/>}
+            title={label}
+            headerRight={
+                <>
                     {error && <span className="text-sm text-red-400">{error}</span>}
                     <button
                         onClick={handleSave}
@@ -105,9 +104,9 @@ export default function LabelsEditor<T extends string>({apiUrl, values: remoteVa
                     >
                         {saved ? <><Check className="h-4 w-4"/> Saved</> : saving ? "Saving…" : "Save Labels"}
                     </button>
-                </div>
-            </div>
-
+                </>
+            }
+        >
             {remoteChanged && (
                 <div className="mb-4 flex items-center justify-between gap-3 rounded-md border border-amber-500 bg-amber-500/10 px-3 py-2 text-sm text-amber-300">
                     <span className="flex items-center gap-2">
@@ -152,6 +151,6 @@ export default function LabelsEditor<T extends string>({apiUrl, values: remoteVa
                     </div>
                 ))}
             </div>
-        </div>
+        </Collapsible>
     );
 }

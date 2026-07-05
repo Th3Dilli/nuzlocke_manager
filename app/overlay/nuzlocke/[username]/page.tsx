@@ -2,7 +2,7 @@
 
 import {NuzlockeState} from "@/app/lib/types/NuzlockeState";
 import {Component, ReactNode, Suspense, use, useEffect, useState} from "react";
-import TeamBox, {Graveyard, Pokeball, TitleTab} from "@/app/components/TeamBox";
+import TeamBox, {BadgesV, Graveyard, Pokeball, TitleTab} from "@/app/components/TeamBox";
 
 function OverlayInner({username}: { username: string }) {
 
@@ -50,18 +50,24 @@ function OverlayInner({username}: { username: string }) {
         if (camMode === "4") {
             return (<div className="flex flex-1 flex-row gap-2">
                 <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-1`}/>
-                <div className="flex-1"></div>
+                <div className="flex-1">
+                    <BadgesV badges={state.badges} label={""} textColor={state.textColor} className="h-102 w-42"/>
+                </div>
             </div>)
         } else if (camMode === "3") {
             return (<div className="flex flex-1 flex-row gap-2">
-                <div className="flex-1"></div>
+                <div className="flex-1 flex">
+                    <div className="flex-1"></div>
+                    <BadgesV badges={state.badges} label={""} textColor={state.textColor} className="h-102 w-42"/>
+                </div>
                 <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-1`}/>
             </div>)
         } else if (camMode === "2") {
             return (<div className="flex flex-1 flex-row gap-2">
                 <div className="flex-none w-1/4"></div>
                 <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-auto w-1/2`}/>
-                <div className="flex-auto w-1/4"></div>
+                {/*<div className="flex-auto w-1/4"></div>*/}
+                <BadgesV badges={state.badges} label={""} textColor={state.textColor} className="h-102 w-1/4 flex-auto"/>
             </div>)
         } else if (camMode === "1") {
             return (
@@ -97,13 +103,6 @@ function Frame({label, className, color = "#f87171", textColor}: { label?: strin
         </div>
     );
 }
-
-
-
-
-
-// Decorative CSS pokéball used for badges and empty team slots.
-
 
 export default function Overlay({params}: { params: Promise<{ username: string }> }) {
     const {username} = use(params);

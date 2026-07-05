@@ -2,6 +2,7 @@ import {getSessionUser} from "@/app/lib/session";
 import {getStats, setStats} from "@/app/lib/stats";
 import {canEditTeam} from "@/app/lib/editors";
 import {POKEMON} from "@/app/lib/pokemon";
+import {BADGES} from "@/app/lib/badges";
 import {
     MAX_GRAVEYARD,
     normalizeCamMode,
@@ -13,6 +14,7 @@ import {
 } from "@/app/lib/types/NuzlockeState";
 
 const validIds = new Set(POKEMON.map(p => p.id));
+const validBadgeIds = new Set(BADGES.map(b => b.id));
 
 const LABEL_FIELDS = [
     ["showNuzlockeLabel", "nuzlockeLabel"],
@@ -27,7 +29,8 @@ const SETTINGS_FIELDS = ["mainWidth", "camMode", "frameBorderColor", "teamColor"
 // The page owner and any editor the owner has granted may write to it. The
 // body may contain `team` (number[], length <= TEAM_SIZE, 0 = empty slot),
 // `graveyard` (number[], any length up to MAX_GRAVEYARD, valid ids only),
-// and/or any of the show*Label (boolean) / *Label (string) fields. Omitted
+// `badges` (number[], valid badge ids only), and/or any of the show*Label
+// (boolean) / *Label (string) fields. Omitted
 // fields are left unchanged. setStats persists to the DB and pushes the
 // change to any live SSE subscribers (page + overlay).
 export async function POST(
@@ -53,9 +56,10 @@ export async function POST(
 
     const hasTeam = "team" in body;
     const hasGraveyard = "graveyard" in body;
+    const hasBadges = "badges" in body;
     const hasLabels = LABEL_FIELDS.some(([show, text]) => show in body || text in body);
     const hasSettings = SETTINGS_FIELDS.some(field => field in body);
-    if (!hasTeam && !hasGraveyard && !hasLabels && !hasSettings) {
+    if (!hasTeam && !hasGraveyard && !hasBadges && !hasLabels && !hasSettings) {
         return new Response("Nothing to update", {status: 400});
     }
 
@@ -103,6 +107,23 @@ export async function POST(
         }
     }
 
+    let badges = current.badges;
+    if (hasBadges) {
+        const rawBadges = body.badges;
+        if (!Array.isArray(rawBadges)) {
+            return new Response("Invalid badges", {status: 400});
+        }
+        const ids = new Set<number>();
+        for (const value of rawBadges) {
+            const id = Number(value);
+            if (!Number.isInteger(id) || !validBadgeIds.has(id)) {
+                return new Response(`Invalid badge id: ${value}`, {status: 400});
+            }
+            ids.add(id);
+        }
+        badges = Array.from(ids).sort((a, b) => a - b);
+    }
+
     const labels = {
         showNuzlockeLabel: normalizeShowLabel(body.showNuzlockeLabel, current.showNuzlockeLabel),
         nuzlockeLabel: normalizeLabel(body.nuzlockeLabel, current.nuzlockeLabel),
@@ -123,6 +144,6 @@ export async function POST(
         textColor: normalizeColor(body.textColor, current.textColor),
     };
 
-    setStats(username, {user: username, team, graveyard, ...labels, ...settings});
+    setStats(username, {user: username, team, graveyard, badges, ...labels, ...settings});
     return Response.json({ok: true});
 }

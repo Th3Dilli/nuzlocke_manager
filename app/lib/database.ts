@@ -20,6 +20,7 @@ database.exec(`
         user                 TEXT PRIMARY KEY,
         team                 TEXT    NOT NULL DEFAULT '[]',
         graveyard            TEXT    NOT NULL DEFAULT '[]',
+        badges               TEXT    NOT NULL DEFAULT '[]',
         show_nuzlocke_label  INTEGER NOT NULL DEFAULT 1,
         nuzlocke_label       TEXT    NOT NULL DEFAULT 'Nuzlocke',
         show_trainer_label   INTEGER NOT NULL DEFAULT 1,
@@ -43,6 +44,7 @@ database.exec(`
         team2                  TEXT    NOT NULL DEFAULT '[]',
         graveyard1             TEXT    NOT NULL DEFAULT '[]',
         graveyard2             TEXT    NOT NULL DEFAULT '[]',
+        badges                 TEXT    NOT NULL DEFAULT '[]',
         show_soullink1_label   INTEGER NOT NULL DEFAULT 1,
         soullink1_label        TEXT    NOT NULL DEFAULT 'Soul Link 1',
         show_soullink2_label   INTEGER NOT NULL DEFAULT 1,
@@ -96,6 +98,18 @@ database.exec(`
         PRIMARY KEY (owner, editor)
     );
 `)
+
+// Migration: add the badges column to pre-existing nuzlocke/soullink tables
+// (CREATE TABLE IF NOT EXISTS above only covers fresh installs). Must run
+// before any statement referencing the column is prepared below.
+const nuzlockeColumns = database.prepare(`PRAGMA table_info(nuzlocke)`).all() as Array<{ name: string }>;
+if (!nuzlockeColumns.some(c => c.name === "badges")) {
+    database.exec(`ALTER TABLE nuzlocke ADD COLUMN badges TEXT NOT NULL DEFAULT '[]'`);
+}
+const soullinkColumns = database.prepare(`PRAGMA table_info(soullink)`).all() as Array<{ name: string }>;
+if (!soullinkColumns.some(c => c.name === "badges")) {
+    database.exec(`ALTER TABLE soullink ADD COLUMN badges TEXT NOT NULL DEFAULT '[]'`);
+}
 
 
 export const upsertUser = database.prepare<{ twitch_id: string; username: string; profile_image_url: string; now: string }>(`
@@ -161,6 +175,7 @@ export const upsertStmt = database.prepare<{
     user: string;
     team: string;
     graveyard: string;
+    badges: string;
     show_nuzlocke_label: number;
     nuzlocke_label: string;
     show_trainer_label: number;
@@ -176,14 +191,15 @@ export const upsertStmt = database.prepare<{
     graveyard_color: string;
     text_color: string;
 }>(`
-    INSERT INTO nuzlocke (user, team, graveyard, show_nuzlocke_label, nuzlocke_label, show_trainer_label,
+    INSERT INTO nuzlocke (user, team, graveyard, badges, show_nuzlocke_label, nuzlocke_label, show_trainer_label,
                            trainer_label, show_team_label, team_label, show_graveyard_label, graveyard_label,
                            main_width, cam_mode, frame_border_color, team_color, graveyard_color, text_color)
-    VALUES (@user, @team, @graveyard, @show_nuzlocke_label, @nuzlocke_label, @show_trainer_label,
+    VALUES (@user, @team, @graveyard, @badges, @show_nuzlocke_label, @nuzlocke_label, @show_trainer_label,
             @trainer_label, @show_team_label, @team_label, @show_graveyard_label, @graveyard_label,
             @main_width, @cam_mode, @frame_border_color, @team_color, @graveyard_color, @text_color)
     ON CONFLICT(user) DO UPDATE SET team                 = excluded.team,
                                     graveyard            = excluded.graveyard,
+                                    badges               = excluded.badges,
                                     show_nuzlocke_label  = excluded.show_nuzlocke_label,
                                     nuzlocke_label       = excluded.nuzlocke_label,
                                     show_trainer_label   = excluded.show_trainer_label,
@@ -210,6 +226,7 @@ export const upsertSoullinkStmt = database.prepare<{
     team2: string;
     graveyard1: string;
     graveyard2: string;
+    badges: string;
     show_soullink1_label: number;
     soullink1_label: string;
     show_soullink2_label: number;
@@ -231,13 +248,13 @@ export const upsertSoullinkStmt = database.prepare<{
     graveyard_color: string;
     text_color: string;
 }>(`
-    INSERT INTO soullink (user, team1, team2, graveyard1, graveyard2, show_soullink1_label, soullink1_label,
+    INSERT INTO soullink (user, team1, team2, graveyard1, graveyard2, badges, show_soullink1_label, soullink1_label,
                            show_soullink2_label, soullink2_label, show_trainer1_label, trainer1_label,
                            show_trainer2_label, trainer2_label, show_team1_label, team1_label,
                            show_team2_label, team2_label, show_graveyard1_label, graveyard1_label,
                            show_graveyard2_label, graveyard2_label,
                            frame_border_color, team_color, graveyard_color, text_color)
-    VALUES (@user, @team1, @team2, @graveyard1, @graveyard2, @show_soullink1_label, @soullink1_label,
+    VALUES (@user, @team1, @team2, @graveyard1, @graveyard2, @badges, @show_soullink1_label, @soullink1_label,
             @show_soullink2_label, @soullink2_label, @show_trainer1_label, @trainer1_label,
             @show_trainer2_label, @trainer2_label, @show_team1_label, @team1_label,
             @show_team2_label, @team2_label, @show_graveyard1_label, @graveyard1_label,
@@ -247,6 +264,7 @@ export const upsertSoullinkStmt = database.prepare<{
                                      team2                 = excluded.team2,
                                      graveyard1            = excluded.graveyard1,
                                      graveyard2            = excluded.graveyard2,
+                                     badges                = excluded.badges,
                                      show_soullink1_label  = excluded.show_soullink1_label,
                                      soullink1_label       = excluded.soullink1_label,
                                      show_soullink2_label  = excluded.show_soullink2_label,

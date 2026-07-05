@@ -2,6 +2,7 @@
 
 import {FormEvent, useEffect, useState} from "react";
 import {Plus, Shield, UserPlus, X} from "lucide-react";
+import Collapsible from "@/app/components/Collapsible";
 
 type Editor = { editorId: string; editorName: string; canManage: boolean };
 
@@ -96,11 +97,7 @@ export default function EditorManager({username, isOwner}: { username: string; i
     }
 
     return (
-        <div className="mt-6 rounded-xl border border-yellow-600 bgdark p-4">
-            <div className="mb-1 flex items-center gap-2">
-                <UserPlus className="h-5 w-5 text-yellow-300"/>
-                <h2 className="text-xl font-bold text-yellow-300">Team Editors</h2>
-            </div>
+        <Collapsible icon={<UserPlus className="h-5 w-5 text-yellow-300"/>} title="Team Editors">
             <p className="mb-4 text-sm text-gray-500">
                 Allow other Twitch users to edit your team. Enter their Twitch username.
                 {isOwner && " Managers can also add and remove other editors."}
@@ -182,6 +179,6 @@ export default function EditorManager({username, isOwner}: { username: string; i
                     ))}
                 </ul>
             )}
-        </div>
+        </Collapsible>
     );
 }

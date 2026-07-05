@@ -5,6 +5,7 @@ import {SoullinkState} from "@/app/lib/types/SoullinkState";
 import {Suspense, useEffect, useState} from "react";
 import TeamEditor from "@/app/components/TeamEditor";
 import GraveyardEditor from "@/app/components/GraveyardEditor";
+import BadgesEditor from "@/app/components/BadgesEditor";
 import EditorManager from "@/app/components/EditorManager";
 import LabelsEditor, {LabelSection} from "@/app/components/LabelsEditor";
 import SoullinkSettingsEditor from "@/app/components/SoullinkSettingsEditor";
@@ -184,6 +185,7 @@ function HomeInner({username}: { username: string }) {
                         </div>
                     </div>
                 )}
+                {canEdit && <BadgesEditor apiUrl={apiUrl} field="badges" badges={stats.badges} label="Edit Badges"/>}
                 {canEdit && (
                     <LabelsEditor
                         apiUrl={apiUrl}

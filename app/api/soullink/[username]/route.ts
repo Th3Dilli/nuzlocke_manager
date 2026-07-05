@@ -2,10 +2,12 @@ import {getSessionUser} from "@/app/lib/session";
 import {getStats, setStats} from "@/app/lib/soullinkStats";
 import {canEditTeam} from "@/app/lib/editors";
 import {POKEMON} from "@/app/lib/pokemon";
+import {BADGES} from "@/app/lib/badges";
 import {MAX_GRAVEYARD, normalizeColor, normalizeLabel, normalizeShowLabel, TEAM_SIZE} from "@/app/lib/types/NuzlockeState";
 import {SoullinkState} from "@/app/lib/types/SoullinkState";
 
 const validIds = new Set(POKEMON.map(p => p.id));
+const validBadgeIds = new Set(BADGES.map(b => b.id));
 
 const LABEL_FIELDS = [
     ["showSoullink1Label", "soullink1Label"],
@@ -54,11 +56,27 @@ function parseGraveyard(rawGraveyard: unknown): number[] | { error: string } {
     return graveyard;
 }
 
-// Update either team's roster and/or graveyard for a user's soullink page. The
-// page owner and any editor the owner has granted may write to it. The body
-// may contain any of `team1`, `team2`, `graveyard1`, `graveyard2`. Omitted
-// fields are left unchanged. setStats persists to the DB and pushes the
-// change to any live SSE subscribers (page + overlay).
+function parseBadges(rawBadges: unknown): number[] | { error: string } {
+    if (!Array.isArray(rawBadges)) {
+        return {error: "Invalid badges"};
+    }
+    const ids = new Set<number>();
+    for (const value of rawBadges) {
+        const id = Number(value);
+        if (!Number.isInteger(id) || !validBadgeIds.has(id)) {
+            return {error: `Invalid badge id: ${value}`};
+        }
+        ids.add(id);
+    }
+    return Array.from(ids).sort((a, b) => a - b);
+}
+
+// Update either team's roster, graveyard, and/or the shared badges for a
+// user's soullink page. The page owner and any editor the owner has granted
+// may write to it. The body may contain any of `team1`, `team2`,
+// `graveyard1`, `graveyard2`, `badges`. Omitted fields are left unchanged.
+// setStats persists to the DB and pushes the change to any live SSE
+// subscribers (page + overlay).
 export async function POST(
     request: Request,
     {params}: { params: Promise<{ username: string }> }
@@ -81,9 +99,10 @@ export async function POST(
     }
 
     const fields = ["team1", "team2", "graveyard1", "graveyard2"] as const;
+    const hasBadges = "badges" in body;
     const hasLabels = LABEL_FIELDS.some(([show, text]) => show in body || text in body);
     const hasSettings = SETTINGS_FIELDS.some(field => field in body);
-    if (!fields.some(f => f in body) && !hasLabels && !hasSettings) {
+    if (!fields.some(f => f in body) && !hasBadges && !hasLabels && !hasSettings) {
         return new Response("Nothing to update", {status: 400});
     }
 
@@ -110,6 +129,12 @@ export async function POST(
             if (!Array.isArray(result)) return new Response(result.error, {status: 400});
             update[field] = result;
         }
+    }
+
+    if (hasBadges) {
+        const result = parseBadges(body.badges);
+        if (!Array.isArray(result)) return new Response(result.error, {status: 400});
+        update.badges = result;
     }
 
     for (const [showKey, textKey] of LABEL_FIELDS) {
