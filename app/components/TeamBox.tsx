@@ -60,7 +60,7 @@ export function TeamBoxV({team, className, label = "Team", color = "#eab308", te
     );
 }
 
-export function BadgesV({badges, className, label = "Badges", color = "#eab308", textColor}: {
+export function BadgesV({badges, className, label, color = "#eab308", textColor}: {
     badges: number[];
     className?: string;
     label?: string;

@@ -51,7 +51,7 @@ function OverlayInner({username}: { username: string }) {
             return (<div className="flex flex-1 flex-row gap-2">
                 <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-1`}/>
                 <div className="flex-1">
-                    <BadgesV badges={state.badges} label={""} textColor={state.textColor} className="h-102 w-42"/>
+                    <BadgesV badges={state.badges} label={state.showBadgesLabel ? state.badgesLabel : undefined} textColor={state.textColor} className="h-102 w-42"/>
                 </div>
             </div>)
         } else if (camMode === "4") {
