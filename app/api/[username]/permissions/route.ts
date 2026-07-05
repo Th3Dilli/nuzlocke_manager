@@ -17,7 +17,7 @@ export async function GET(
     const isOwner = sessionUser.username === username;
     return Response.json({
         isOwner,
-        canEdit: canEditTeam(username, sessionUser.username),
-        canManageEditors: canManageEditors(username, sessionUser.username),
+        canEdit: canEditTeam(username, sessionUser),
+        canManageEditors: canManageEditors(username, sessionUser),
     });
 }

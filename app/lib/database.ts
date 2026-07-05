@@ -88,14 +88,14 @@ database.exec(`
 
     CREATE TABLE IF NOT EXISTS team_editors
     (
-        owner      TEXT    NOT NULL,
-        editor     TEXT    NOT NULL,
-        can_manage INTEGER NOT NULL DEFAULT 0,
-        created_at TEXT    NOT NULL,
+        owner       TEXT    NOT NULL,
+        editor      TEXT    NOT NULL,
+        editor_name TEXT,
+        can_manage  INTEGER NOT NULL DEFAULT 0,
+        created_at  TEXT    NOT NULL,
         PRIMARY KEY (owner, editor)
     );
 `)
-
 
 
 export const upsertUser = database.prepare<{ twitch_id: string; username: string; profile_image_url: string; now: string }>(`
@@ -273,9 +273,9 @@ export const selectSoullinkStmt = database.prepare(`SELECT *
                                                     FROM soullink
                                                     WHERE user = ?`);
 
-export const insertTeamEditor = database.prepare<{ owner: string; editor: string; can_manage: number; created_at: string }>(`
-    INSERT INTO team_editors (owner, editor, can_manage, created_at)
-    VALUES (@owner, @editor, @can_manage, @created_at)
+export const insertTeamEditor = database.prepare<{ owner: string; editor: string; editor_name: string; can_manage: number; created_at: string }>(`
+    INSERT INTO team_editors (owner, editor, editor_name, can_manage, created_at)
+    VALUES (@owner, @editor, @editor_name, @can_manage, @created_at)
     ON CONFLICT(owner, editor) DO NOTHING
 `);
 
@@ -289,10 +289,13 @@ export const updateTeamEditorRole = database.prepare<{ owner: string; editor: st
     WHERE owner = @owner AND editor = @editor
 `);
 
-export const selectTeamEditors = database.prepare<[string]>(`SELECT editor, can_manage
+export const selectTeamEditors = database.prepare<[string]>(`SELECT team_editors.editor                                                AS editor,
+                                                                     team_editors.can_manage                                            AS can_manage,
+                                                                     COALESCE(users.username, team_editors.editor_name, team_editors.editor) AS editor_name
                                                             FROM team_editors
+                                                                     LEFT JOIN users ON users.twitch_id = team_editors.editor
                                                             WHERE owner = ?
-                                                            ORDER BY editor`);
+                                                            ORDER BY editor_name`);
 
 export const selectTeamEditor = database.prepare<[string, string]>(`SELECT 1
                                                                    FROM team_editors

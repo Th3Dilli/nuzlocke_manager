@@ -1,12 +1,18 @@
 import {getSessionUser} from "@/app/lib/session";
 import {addTeamEditor, canManageEditors, getTeamEditors, isTeamEditorManager, removeTeamEditor, setTeamEditorRole} from "@/app/lib/editors";
+import {resolveTwitchIdByLogin} from "@/app/lib/twitch";
 
-// Twitch usernames are 4-25 chars: letters, digits and underscores. We store
-// the lowercase login so a grant matches the user's session username.
+// Twitch usernames are 4-25 chars: letters, digits and underscores.
 function normalizeUsername(value: unknown): string | null {
     if (typeof value !== "string") return null;
     const name = value.trim().toLowerCase();
     return /^[a-z0-9_]{4,25}$/.test(name) ? name : null;
+}
+
+function normalizeEditorId(value: unknown): string | null {
+    if (typeof value !== "string") return null;
+    const id = value.trim();
+    return /^[0-9]+$/.test(id) ? id : null;
 }
 
 // The page owner may always manage editors; an editor granted "manage"
@@ -21,7 +27,7 @@ async function requireManageAccess(username: string): Promise<
         return {ok: false, response: new Response("Unauthorized", {status: 401})};
     }
     const isOwner = sessionUser.username === username;
-    if (!isOwner && !canManageEditors(username, sessionUser.username)) {
+    if (!isOwner && !canManageEditors(username, sessionUser)) {
         return {ok: false, response: new Response("Forbidden", {status: 403})};
     }
     return {ok: true, isOwner};
@@ -52,17 +58,29 @@ export async function POST(
         return new Response("Bad Request", {status: 400});
     }
 
-    const editor = normalizeUsername(body.editor);
-    if (!editor) {
+    const login = normalizeUsername(body.editor);
+    if (!login) {
         return new Response("Invalid Twitch username", {status: 400});
     }
-    if (editor === username) {
+    if (login === username) {
         return new Response("You already own this page", {status: 400});
+    }
+
+    // Resolved (rather than taken from our own users table) so an owner can
+    // grant access to someone who has never logged into this site yet.
+    let editorId: string | null;
+    try {
+        editorId = await resolveTwitchIdByLogin(login);
+    } catch {
+        return new Response("Failed to look up Twitch user", {status: 502});
+    }
+    if (!editorId) {
+        return new Response("No such Twitch user", {status: 400});
     }
 
     // Only the owner may grant manage permission while adding an editor.
     const canManage = auth.isOwner && body.canManage === true;
-    addTeamEditor(username, editor, canManage);
+    addTeamEditor(username, editorId, login, canManage);
     return Response.json({editors: getTeamEditors(username)});
 }
 
@@ -87,12 +105,12 @@ export async function PATCH(
         return new Response("Bad Request", {status: 400});
     }
 
-    const editor = normalizeUsername(body.editor);
-    if (!editor) {
-        return new Response("Invalid Twitch username", {status: 400});
+    const editorId = normalizeEditorId(body.editorId);
+    if (!editorId) {
+        return new Response("Invalid editor", {status: 400});
     }
 
-    setTeamEditorRole(username, editor, body.canManage === true);
+    setTeamEditorRole(username, editorId, body.canManage === true);
     return Response.json({editors: getTeamEditors(username)});
 }
 
@@ -111,17 +129,17 @@ export async function DELETE(
         return new Response("Bad Request", {status: 400});
     }
 
-    const editor = normalizeUsername(body.editor);
-    if (!editor) {
-        return new Response("Invalid Twitch username", {status: 400});
+    const editorId = normalizeEditorId(body.editorId);
+    if (!editorId) {
+        return new Response("Invalid editor", {status: 400});
     }
 
     // A manager may remove regular editors, but only the owner may remove
     // another manager.
-    if (!auth.isOwner && isTeamEditorManager(username, editor)) {
+    if (!auth.isOwner && isTeamEditorManager(username, editorId)) {
         return new Response("Only the owner can remove a manager", {status: 403});
     }
 
-    removeTeamEditor(username, editor);
+    removeTeamEditor(username, editorId);
     return Response.json({editors: getTeamEditors(username)});
 }

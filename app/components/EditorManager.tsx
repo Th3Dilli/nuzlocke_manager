@@ -3,7 +3,7 @@
 import {FormEvent, useEffect, useState} from "react";
 import {Plus, Shield, UserPlus, X} from "lucide-react";
 
-type Editor = { editor: string; canManage: boolean };
+type Editor = { editorId: string; editorName: string; canManage: boolean };
 
 // Owner-only panel to grant/revoke team-edit access to other Twitch users.
 // A manager-editor (canManage) can also use this panel, but with reduced
@@ -57,13 +57,13 @@ export default function EditorManager({username, isOwner}: { username: string; i
         }
     }
 
-    async function removeEditor(editor: string) {
+    async function removeEditor(editorId: string) {
         setError(null);
         try {
             const res = await fetch(`/api/${username}/editors`, {
                 method: "DELETE",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({editor}),
+                body: JSON.stringify({editorId}),
             });
             if (res.ok) {
                 const data: { editors: Editor[] } = await res.json();
@@ -76,13 +76,13 @@ export default function EditorManager({username, isOwner}: { username: string; i
         }
     }
 
-    async function setManage(editor: string, canManage: boolean) {
+    async function setManage(editorId: string, canManage: boolean) {
         setError(null);
         try {
             const res = await fetch(`/api/${username}/editors`, {
                 method: "PATCH",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({editor, canManage}),
+                body: JSON.stringify({editorId, canManage}),
             });
             if (res.ok) {
                 const data: { editors: Editor[] } = await res.json();
@@ -144,13 +144,13 @@ export default function EditorManager({username, isOwner}: { username: string; i
                 <p className="text-sm text-gray-600">No editors yet.</p>
             ) : (
                 <ul className="flex flex-col gap-2">
-                    {editors.map(({editor, canManage}) => (
+                    {editors.map(({editorId, editorName, canManage}) => (
                         <li
-                            key={editor}
+                            key={editorId}
                             className="flex items-center justify-between rounded-md border border-yellow-700 bg-neutral-800 px-3 py-2"
                         >
                             <div className="flex items-center gap-2">
-                                <span className="text-gray-200">{editor}</span>
+                                <span className="text-gray-200">{editorName}</span>
                                 {!isOwner && canManage && (
                                     <span className="flex items-center gap-1 text-xs font-semibold bg-yellow-600/20 text-yellow-400 px-2 py-0.5 rounded-full">
                                         <Shield className="h-3 w-3"/> Manager
@@ -163,16 +163,16 @@ export default function EditorManager({username, isOwner}: { username: string; i
                                         <input
                                             type="checkbox"
                                             checked={canManage}
-                                            onChange={e => setManage(editor, e.target.checked)}
+                                            onChange={e => setManage(editorId, e.target.checked)}
                                             className="h-3.5 w-3.5 rounded border-yellow-600 bg-neutral-900 accent-yellow-600"
                                         />
                                         Manager
                                     </label>
                                 )}
                                 <button
-                                    onClick={() => removeEditor(editor)}
+                                    onClick={() => removeEditor(editorId)}
                                     disabled={!isOwner && canManage}
-                                    title={!isOwner && canManage ? "Only the owner can remove a manager" : `Remove ${editor}`}
+                                    title={!isOwner && canManage ? "Only the owner can remove a manager" : `Remove ${editorName}`}
                                     className="inline-flex cursor-pointer items-center gap-1 text-xs text-gray-400 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-40"
                                 >
                                     <X className="h-4 w-4"/> Remove

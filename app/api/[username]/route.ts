@@ -40,7 +40,7 @@ export async function POST(
     if (!sessionUser) {
         return new Response("Unauthorized", {status: 401});
     }
-    if (!canEditTeam(username, sessionUser.username)) {
+    if (!canEditTeam(username, sessionUser)) {
         return new Response("Forbidden", {status: 403});
     }
 

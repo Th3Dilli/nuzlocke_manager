@@ -64,7 +64,7 @@ export default async function Home() {
 
     let editingFor: User[] = []
     if (user) {
-        editingFor = getEditingFor(user.username)
+        editingFor = getEditingFor(user.twitch_id)
             .map(owner => getUserByUsername(owner))
             .filter((owner): owner is User => owner !== null)
     }
