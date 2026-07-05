@@ -130,7 +130,7 @@ export const selectUserByUsername = database.prepare<[string]>(`SELECT *
                                                       FROM users
                                                       WHERE username = ?`)
 
-export const selectUsers = database.prepare(`SELECT twitch_id, username, role, nuzlocke_enabled, profile_image_url, created_at, updated_at
+export const selectUsers = database.prepare(`SELECT twitch_id, username, role, nuzlocke_enabled, soullink_enabled, profile_image_url, created_at, updated_at
                                                       FROM users`)
 
 export const getUserToken = database.prepare(`SELECT username, api_token
