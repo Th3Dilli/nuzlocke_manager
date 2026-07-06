@@ -3,7 +3,14 @@ import {getStats, setStats} from "@/app/lib/soullinkStats";
 import {canEditTeam} from "@/app/lib/editors";
 import {POKEMON} from "@/app/lib/pokemon";
 import {BADGES} from "@/app/lib/badges";
-import {MAX_GRAVEYARD, normalizeColor, normalizeLabel, normalizeShowLabel, TEAM_SIZE} from "@/app/lib/types/NuzlockeState";
+import {
+    MAX_GRAVEYARD,
+    normalizeColor,
+    normalizeLabel,
+    normalizeMainAspectRatio,
+    normalizeShowLabel,
+    TEAM_SIZE
+} from "@/app/lib/types/NuzlockeState";
 import {SoullinkState} from "@/app/lib/types/SoullinkState";
 
 const validIds = new Set(POKEMON.map(p => p.id));
@@ -21,7 +28,8 @@ const LABEL_FIELDS = [
     ["showBadgesLabel", "badgesLabel"],
 ] as const;
 
-const SETTINGS_FIELDS = ["frameBorderColor", "teamColor", "graveyardColor", "textColor"] as const;
+const COLOR_SETTINGS_FIELDS = ["frameBorderColor", "teamColor", "graveyardColor", "textColor"] as const;
+const SETTINGS_FIELDS = ["mainAspectRatio", ...COLOR_SETTINGS_FIELDS] as const;
 
 function parseTeam(rawTeam: unknown): number[] | { error: string } {
     if (!Array.isArray(rawTeam) || rawTeam.length > TEAM_SIZE) {
@@ -143,7 +151,10 @@ export async function POST(
         if (textKey in body) update[textKey] = normalizeLabel(body[textKey], current[textKey]);
     }
 
-    for (const field of SETTINGS_FIELDS) {
+    if ("mainAspectRatio" in body) {
+        update.mainAspectRatio = normalizeMainAspectRatio(body.mainAspectRatio, current.mainAspectRatio);
+    }
+    for (const field of COLOR_SETTINGS_FIELDS) {
         if (field in body) update[field] = normalizeColor(body[field], current[field]);
     }
 

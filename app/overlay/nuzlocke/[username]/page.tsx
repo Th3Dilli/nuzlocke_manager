@@ -85,7 +85,7 @@ function OverlayInner({username}: { username: string }) {
         <div className="flex h-[1080px] w-[1920px] gap-2 p-2 overlay">
 
             <div className={`flex flex-col gap-2 `} style={{width: `${state.mainWidth}px`}}>
-                <Frame label={state.showNuzlockeLabel ? state.nuzlockeLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`aspect-4/3`} />
+                <Frame label={state.showNuzlockeLabel ? state.nuzlockeLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`aspect-${state.mainAspectRatio}`} />
 
                 <Graveyard label={state.showGraveyardLabel ? state.graveyardLabel : undefined} pokemon={state.graveyard}
                            color={state.graveyardColor} textColor={state.textColor} className="flex-1">

@@ -43,7 +43,10 @@ function OverlayInner({username}: { username: string }) {
             Loading...
         </div>
     )
-
+    let height = "h-126";
+    if(stats.mainAspectRatio === "5/3" ){
+        height = "h-103";
+    }
     return (
         <div className="h-[1080px] w-[1920px] gap-2 overlay">
             <div className="flex flex-col  w-full h-full">
@@ -52,29 +55,31 @@ function OverlayInner({username}: { username: string }) {
                         <Frame label={stats.showSoullink1Label ? stats.soullink1Label : undefined}
                                color={stats.frameBorderColor}
                                textColor={stats.textColor}
-                               className="aspect-4/3 flex-1"/>
-                        <div className="w-34">
+                               className={`aspect-${stats.mainAspectRatio} flex-1`}/>
+                        <div className="w-32">
                             <TeamBoxV label={stats.showTeam1Label ? stats.team1Label : ""}
                                       team={stats.team1}
                                       color={stats.teamColor}
-                                      textColor={stats.textColor} className="h-123"/>
+                                      textColor={stats.textColor} className={`${height}`}/>
                         </div>
                     </div>
 
                     <div className="w-74 px-8">
-                        <BadgesV badges={stats.badges} label={stats.showBadgesLabel ? stats.badgesLabel : undefined} textColor={stats.textColor} className="h-123 flex-auto"/>
+                        <BadgesV badges={stats.badges} label={stats.showBadgesLabel ? stats.badgesLabel : undefined} textColor={stats.textColor} className={`${height} flex-auto`}/>
                     </div>
+                    {/*<div className="w-2 ">*/}
+                    {/*</div>*/}
 
                     <div className="flex-1 flex flex-row-reverse gap-2">
                         <Frame label={stats.showSoullink2Label ? stats.soullink2Label : undefined}
                                color={stats.frameBorderColor}
                                textColor={stats.textColor}
-                               className="aspect-4/3 flex-1"/>
-                        <div className="w-34">
+                               className={`aspect-${stats.mainAspectRatio} flex-1`}/>
+                        <div className="w-32">
                             <TeamBoxV label={stats.showTeam2Label ? stats.team2Label : ""}
                                       team={stats.team2}
                                       color={stats.teamColor}
-                                      textColor={stats.textColor} className="h-123"/>
+                                      textColor={stats.textColor} className={`${height}`}/>
                         </div>
                     </div>
                 </div>

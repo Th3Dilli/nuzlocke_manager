@@ -4,7 +4,14 @@ import {useMemo, useState} from "react";
 import {AlertTriangle, Check, X} from "lucide-react";
 import {Pokeball} from "@/app/components/TeamBox";
 import Collapsible from "@/app/components/Collapsible";
-import {CamMode, DEFAULT_SETTINGS, MAX_MAIN_WIDTH, MIN_MAIN_WIDTH, NuzlockeSettings} from "@/app/lib/types/NuzlockeState";
+import {
+    CamMode,
+    DEFAULT_SETTINGS,
+    MainAspectRatio,
+    MAX_MAIN_WIDTH,
+    MIN_MAIN_WIDTH,
+    NuzlockeSettings
+} from "@/app/lib/types/NuzlockeState";
 
 const CAM_MODE_OPTIONS: { value: CamMode; label: string }[] = [
     {value: "1", label: "Full width right"},
@@ -14,8 +21,14 @@ const CAM_MODE_OPTIONS: { value: CamMode; label: string }[] = [
     {value: "5", label: "Left half"},
 ];
 
+const MAIN_ASPECT_RATIO_OPTIONS: { value: string; label: string }[] = [
+    {value: "4/3", label: "Nintendo DS (4/3)"},
+    {value: "5/3", label: "Nintendo 3DS (5/3)"},
+];
+
 function settingsEqual(a: NuzlockeSettings, b: NuzlockeSettings): boolean {
     return a.mainWidth === b.mainWidth
+        && a.mainAspectRatio === b.mainAspectRatio
         && a.camMode === b.camMode
         && a.frameBorderColor === b.frameBorderColor
         && a.teamColor === b.teamColor
@@ -154,6 +167,21 @@ export default function OverlaySettingsEditor({apiUrl, values: remoteValues}: {
                         onChange={e => update("mainWidth", Number(e.target.value))}
                         className="mt-2 w-full cursor-pointer accent-yellow-500"
                     />
+                </div>
+
+                <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">
+                    <label className="block text-sm font-medium text-gray-200">
+                        Main screen aspect ratio
+                    </label>
+                    <select
+                        value={values.mainAspectRatio}
+                        onChange={e => update("mainAspectRatio", e.target.value as MainAspectRatio)}
+                        className="mt-2 w-full rounded-md border border-yellow-600 bg-neutral-900 px-2 py-2 text-sm text-gray-200 outline-none focus:border-yellow-500"
+                    >
+                        {MAIN_ASPECT_RATIO_OPTIONS.map(({value, label}) => (
+                            <option key={value} value={value}>{label}</option>
+                        ))}
+                    </select>
                 </div>
 
                 <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">

@@ -218,6 +218,7 @@ function HomeInner({username}: { username: string }) {
                     <SoullinkSettingsEditor
                         apiUrl={apiUrl}
                         values={{
+                            mainAspectRatio: stats.mainAspectRatio,
                             frameBorderColor: stats.frameBorderColor,
                             teamColor: stats.teamColor,
                             graveyardColor: stats.graveyardColor,

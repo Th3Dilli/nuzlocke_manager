@@ -1,4 +1,11 @@
-import {emptyTeam, normalizeColor, normalizeLabel, normalizeShowLabel} from "@/app/lib/types/NuzlockeState";
+import {
+    emptyTeam,
+    MainAspectRatio,
+    normalizeColor,
+    normalizeLabel,
+    normalizeMainAspectRatio,
+    normalizeShowLabel
+} from "@/app/lib/types/NuzlockeState";
 
 // Per-section label settings: whether the overlay shows a title tab for that
 // section, and what custom text it displays. One pair per side (1/2) for the
@@ -75,6 +82,7 @@ export function normalizeSoullinkLabels(input: unknown, fallback: SoullinkLabels
 
 // Overlay border/text colors, shared across both sides.
 export type SoullinkSettings = {
+    mainAspectRatio: MainAspectRatio;
     frameBorderColor: string;
     teamColor: string;
     graveyardColor: string;
@@ -82,6 +90,7 @@ export type SoullinkSettings = {
 };
 
 export const DEFAULT_SOULLINK_SETTINGS: SoullinkSettings = {
+    mainAspectRatio: "4/3",
     frameBorderColor: "#f87171",
     teamColor: "#eab308",
     graveyardColor: "#eab308",
@@ -93,6 +102,7 @@ export const DEFAULT_SOULLINK_SETTINGS: SoullinkSettings = {
 export function normalizeSoullinkSettings(input: unknown, fallback: SoullinkSettings = DEFAULT_SOULLINK_SETTINGS): SoullinkSettings {
     const source = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
     return {
+        mainAspectRatio: normalizeMainAspectRatio(source.mainAspectRatio, fallback.mainAspectRatio),
         frameBorderColor: normalizeColor(source.frameBorderColor, fallback.frameBorderColor),
         teamColor: normalizeColor(source.teamColor, fallback.teamColor),
         graveyardColor: normalizeColor(source.graveyardColor, fallback.graveyardColor),

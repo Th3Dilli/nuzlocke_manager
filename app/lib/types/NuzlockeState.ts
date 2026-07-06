@@ -41,8 +41,15 @@ const CAM_MODE_SET: ReadonlySet<string> = new Set(CAM_MODES);
 export const MIN_MAIN_WIDTH = 1100;
 export const MAX_MAIN_WIDTH = 1420;
 
+// Aspect ratio of the main screen frame (the nuzlocke/soullink capture frame).
+export type MainAspectRatio = "4/3" | "5/3";
+
+export const MAIN_ASPECT_RATIOS: readonly MainAspectRatio[] = ["4/3", "5/3"];
+const MAIN_ASPECT_RATIO_SET: ReadonlySet<string> = new Set(MAIN_ASPECT_RATIOS);
+
 export type NuzlockeSettings = {
     mainWidth: number;
+    mainAspectRatio: MainAspectRatio;
     camMode: CamMode;
     frameBorderColor: string;
     teamColor: string;
@@ -52,6 +59,7 @@ export type NuzlockeSettings = {
 
 export const DEFAULT_SETTINGS: NuzlockeSettings = {
     mainWidth: 1200,
+    mainAspectRatio: "4/3",
     camMode: "1",
     frameBorderColor: "#f87171",
     teamColor: "#eab308",
@@ -75,12 +83,17 @@ export function normalizeCamMode(input: unknown, fallback: CamMode): CamMode {
     return typeof input === "string" && CAM_MODE_SET.has(input) ? (input as CamMode) : fallback;
 }
 
+export function normalizeMainAspectRatio(input: unknown, fallback: MainAspectRatio): MainAspectRatio {
+    return typeof input === "string" && MAIN_ASPECT_RATIO_SET.has(input) ? (input as MainAspectRatio) : fallback;
+}
+
 // Coerce arbitrary input (e.g. parsed JSON) into a full set of overlay layout
 // settings, falling back field-by-field to defaults for anything missing/invalid.
 export function normalizeSettings(input: unknown, fallback: NuzlockeSettings = DEFAULT_SETTINGS): NuzlockeSettings {
     const source = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
     return {
         mainWidth: normalizeMainWidth(source.mainWidth, fallback.mainWidth),
+        mainAspectRatio: normalizeMainAspectRatio(source.mainAspectRatio, fallback.mainAspectRatio),
         camMode: normalizeCamMode(source.camMode, fallback.camMode),
         frameBorderColor: normalizeColor(source.frameBorderColor, fallback.frameBorderColor),
         teamColor: normalizeColor(source.teamColor, fallback.teamColor),
@@ -196,6 +209,7 @@ export function statsEqual(a: NuzlockeState, b: NuzlockeState): boolean {
         && a.showBadgesLabel === b.showBadgesLabel
         && a.badgesLabel === b.badgesLabel
         && a.mainWidth === b.mainWidth
+        && a.mainAspectRatio === b.mainAspectRatio
         && a.camMode === b.camMode
         && a.frameBorderColor === b.frameBorderColor
         && a.teamColor === b.teamColor

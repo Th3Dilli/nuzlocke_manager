@@ -7,6 +7,7 @@ import {
     normalizeColor,
     normalizeGraveyard,
     normalizeLabel,
+    normalizeMainAspectRatio,
     normalizeMainWidth,
     normalizeShowLabel,
     normalizeTeam,
@@ -69,6 +70,7 @@ type NuzlockeRow = {
     show_badges_label: number;
     badges_label: string;
     main_width: number;
+    main_aspect_ratio: string;
     cam_mode: string;
     frame_border_color: string;
     team_color: string;
@@ -95,6 +97,7 @@ function loadStat(user: string): NuzlockeState {
             showBadgesLabel: normalizeShowLabel(!!row.show_badges_label, DEFAULT_LABELS.showBadgesLabel),
             badgesLabel: normalizeLabel(row.badges_label, DEFAULT_LABELS.badgesLabel),
             mainWidth: normalizeMainWidth(row.main_width, DEFAULT_SETTINGS.mainWidth),
+            mainAspectRatio: normalizeMainAspectRatio(row.main_aspect_ratio, DEFAULT_SETTINGS.mainAspectRatio),
             camMode: normalizeCamMode(row.cam_mode, DEFAULT_SETTINGS.camMode),
             frameBorderColor: normalizeColor(row.frame_border_color, DEFAULT_SETTINGS.frameBorderColor),
             teamColor: normalizeColor(row.team_color, DEFAULT_SETTINGS.teamColor),
@@ -138,6 +141,7 @@ export function setStats(user: string, s: NuzlockeState) {
         userStat.showBadgesLabel = normalizeShowLabel(s.showBadgesLabel, userStat.showBadgesLabel);
         userStat.badgesLabel = normalizeLabel(s.badgesLabel, userStat.badgesLabel);
         userStat.mainWidth = normalizeMainWidth(s.mainWidth, userStat.mainWidth);
+        userStat.mainAspectRatio = normalizeMainAspectRatio(s.mainAspectRatio, userStat.mainAspectRatio);
         userStat.camMode = normalizeCamMode(s.camMode, userStat.camMode);
         userStat.frameBorderColor = normalizeColor(s.frameBorderColor, userStat.frameBorderColor);
         userStat.teamColor = normalizeColor(s.teamColor, userStat.teamColor);
@@ -160,6 +164,7 @@ export function setStats(user: string, s: NuzlockeState) {
             show_badges_label: userStat.showBadgesLabel ? 1 : 0,
             badges_label: userStat.badgesLabel,
             main_width: userStat.mainWidth,
+            main_aspect_ratio: userStat.mainAspectRatio,
             cam_mode: userStat.camMode,
             frame_border_color: userStat.frameBorderColor,
             team_color: userStat.teamColor,

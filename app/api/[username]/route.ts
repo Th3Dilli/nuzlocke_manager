@@ -8,6 +8,7 @@ import {
     normalizeCamMode,
     normalizeColor,
     normalizeLabel,
+    normalizeMainAspectRatio,
     normalizeMainWidth,
     normalizeShowLabel,
     TEAM_SIZE
@@ -24,7 +25,7 @@ const LABEL_FIELDS = [
     ["showBadgesLabel", "badgesLabel"],
 ] as const;
 
-const SETTINGS_FIELDS = ["mainWidth", "camMode", "frameBorderColor", "teamColor", "graveyardColor", "textColor"] as const;
+const SETTINGS_FIELDS = ["mainWidth", "mainAspectRatio", "camMode", "frameBorderColor", "teamColor", "graveyardColor", "textColor"] as const;
 
 // Update the team, graveyard, and/or label settings for a user's stats page.
 // The page owner and any editor the owner has granted may write to it. The
@@ -140,6 +141,7 @@ export async function POST(
 
     const settings = {
         mainWidth: normalizeMainWidth(body.mainWidth, current.mainWidth),
+        mainAspectRatio: normalizeMainAspectRatio(body.mainAspectRatio, current.mainAspectRatio),
         camMode: normalizeCamMode(body.camMode, current.camMode),
         frameBorderColor: normalizeColor(body.frameBorderColor, current.frameBorderColor),
         teamColor: normalizeColor(body.teamColor, current.teamColor),

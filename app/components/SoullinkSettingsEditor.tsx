@@ -4,10 +4,17 @@ import {useMemo, useState} from "react";
 import {AlertTriangle, Check, X} from "lucide-react";
 import {Pokeball} from "@/app/components/TeamBox";
 import Collapsible from "@/app/components/Collapsible";
+import {MainAspectRatio} from "@/app/lib/types/NuzlockeState";
 import {DEFAULT_SOULLINK_SETTINGS, SoullinkSettings} from "@/app/lib/types/SoullinkState";
 
+const MAIN_ASPECT_RATIO_OPTIONS: { value: string; label: string }[] = [
+    {value: "4/3", label: "Nintendo DS (4/3)"},
+    {value: "5/3", label: "Nintendo 3DS (5/3)"},
+];
+
 function settingsEqual(a: SoullinkSettings, b: SoullinkSettings): boolean {
-    return a.frameBorderColor === b.frameBorderColor
+    return a.mainAspectRatio === b.mainAspectRatio
+        && a.frameBorderColor === b.frameBorderColor
         && a.teamColor === b.teamColor
         && a.graveyardColor === b.graveyardColor
         && a.textColor === b.textColor;
@@ -53,7 +60,13 @@ export default function SoullinkSettingsEditor({apiUrl, values: remoteValues}: {
     }
 
     function resetColors() {
-        setValues(DEFAULT_SOULLINK_SETTINGS);
+        setValues(prev => ({
+            ...prev,
+            frameBorderColor: DEFAULT_SOULLINK_SETTINGS.frameBorderColor,
+            teamColor: DEFAULT_SOULLINK_SETTINGS.teamColor,
+            graveyardColor: DEFAULT_SOULLINK_SETTINGS.graveyardColor,
+            textColor: DEFAULT_SOULLINK_SETTINGS.textColor,
+        }));
         setSaved(false);
         setError(null);
     }
@@ -124,6 +137,21 @@ export default function SoullinkSettingsEditor({apiUrl, values: remoteValues}: {
             )}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">
+                    <label className="block text-sm font-medium text-gray-200">
+                        Main screen aspect ratio
+                    </label>
+                    <select
+                        value={values.mainAspectRatio}
+                        onChange={e => update("mainAspectRatio", e.target.value as MainAspectRatio)}
+                        className="mt-2 w-full rounded-md border border-yellow-600 bg-neutral-900 px-2 py-2 text-sm text-gray-200 outline-none focus:border-yellow-500"
+                    >
+                        {MAIN_ASPECT_RATIO_OPTIONS.map(({value, label}) => (
+                            <option key={value} value={value}>{label}</option>
+                        ))}
+                    </select>
+                </div>
+
                 <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">
                     <label className="flex items-center justify-between text-sm font-medium text-gray-200">
                         Frame border color

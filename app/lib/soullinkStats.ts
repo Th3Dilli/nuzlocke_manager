@@ -1,4 +1,12 @@
-import {normalizeBadges, normalizeColor, normalizeGraveyard, normalizeLabel, normalizeShowLabel, normalizeTeam} from "@/app/lib/types/NuzlockeState";
+import {
+    normalizeBadges,
+    normalizeColor,
+    normalizeGraveyard,
+    normalizeLabel,
+    normalizeMainAspectRatio,
+    normalizeShowLabel,
+    normalizeTeam
+} from "@/app/lib/types/NuzlockeState";
 import {DEFAULT_SOULLINK_LABELS, DEFAULT_SOULLINK_SETTINGS, emptySoullinkState, SoullinkState} from "@/app/lib/types/SoullinkState";
 import {getSoullinkEnabledUsers, selectSoullinkStmt, upsertSoullinkStmt} from "@/app/lib/database";
 import {User} from "@/app/lib/users";
@@ -57,6 +65,7 @@ type SoullinkRow = {
     graveyard2_label: string;
     show_badges_label: number;
     badges_label: string;
+    main_aspect_ratio: string;
     frame_border_color: string;
     team_color: string;
     graveyard_color: string;
@@ -91,6 +100,7 @@ function loadStat(user: string): SoullinkState {
             graveyard2Label: normalizeLabel(row.graveyard2_label, DEFAULT_SOULLINK_LABELS.graveyard2Label),
             showBadgesLabel: normalizeShowLabel(!!row.show_badges_label, DEFAULT_SOULLINK_LABELS.showBadgesLabel),
             badgesLabel: normalizeLabel(row.badges_label, DEFAULT_SOULLINK_LABELS.badgesLabel),
+            mainAspectRatio: normalizeMainAspectRatio(row.main_aspect_ratio, DEFAULT_SOULLINK_SETTINGS.mainAspectRatio),
             frameBorderColor: normalizeColor(row.frame_border_color, DEFAULT_SOULLINK_SETTINGS.frameBorderColor),
             teamColor: normalizeColor(row.team_color, DEFAULT_SOULLINK_SETTINGS.teamColor),
             graveyardColor: normalizeColor(row.graveyard_color, DEFAULT_SOULLINK_SETTINGS.graveyardColor),
@@ -137,6 +147,7 @@ export function setStats(user: string, s: Partial<Omit<SoullinkState, "user">>) 
             if (s[textKey] !== undefined) userStat[textKey] = normalizeLabel(s[textKey], userStat[textKey]);
         }
 
+        if (s.mainAspectRatio !== undefined) userStat.mainAspectRatio = normalizeMainAspectRatio(s.mainAspectRatio, userStat.mainAspectRatio);
         if (s.frameBorderColor !== undefined) userStat.frameBorderColor = normalizeColor(s.frameBorderColor, userStat.frameBorderColor);
         if (s.teamColor !== undefined) userStat.teamColor = normalizeColor(s.teamColor, userStat.teamColor);
         if (s.graveyardColor !== undefined) userStat.graveyardColor = normalizeColor(s.graveyardColor, userStat.graveyardColor);
@@ -167,6 +178,7 @@ export function setStats(user: string, s: Partial<Omit<SoullinkState, "user">>) 
             graveyard2_label: userStat.graveyard2Label,
             show_badges_label: userStat.showBadgesLabel ? 1 : 0,
             badges_label: userStat.badgesLabel,
+            main_aspect_ratio: userStat.mainAspectRatio,
             frame_border_color: userStat.frameBorderColor,
             team_color: userStat.teamColor,
             graveyard_color: userStat.graveyardColor,

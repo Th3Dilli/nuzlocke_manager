@@ -157,6 +157,7 @@ function HomeInner({username}: { username: string }) {
                         apiUrl={`/api/${username}`}
                         values={{
                             mainWidth: stats.mainWidth,
+                            mainAspectRatio: stats.mainAspectRatio,
                             camMode: stats.camMode,
                             frameBorderColor: stats.frameBorderColor,
                             teamColor: stats.teamColor,
