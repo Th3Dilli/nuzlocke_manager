@@ -1,8 +1,14 @@
 "use client";
 
 import {SoullinkState} from "@/app/lib/types/SoullinkState";
-import {ReactNode, Suspense, use, useEffect, useState} from "react";
+import {MainAspectRatio} from "@/app/lib/types/NuzlockeState";
+import {Suspense, use, useEffect, useState} from "react";
 import {BadgesV, Graveyard, TeamBoxV, TitleTab} from "@/app/components/TeamBox";
+
+const ASPECT_RATIO_CLASS: Record<MainAspectRatio, string> = {
+    "4/3": "aspect-4/3",
+    "5/3": "aspect-5/3",
+};
 
 
 function OverlayInner({username}: { username: string }) {
@@ -55,7 +61,7 @@ function OverlayInner({username}: { username: string }) {
                         <Frame label={stats.showSoullink1Label ? stats.soullink1Label : undefined}
                                color={stats.frameBorderColor}
                                textColor={stats.textColor}
-                               className={`aspect-${stats.mainAspectRatio} flex-1`}/>
+                               className={`${ASPECT_RATIO_CLASS[stats.mainAspectRatio]} flex-1`}/>
                         <div className="w-32">
                             <TeamBoxV label={stats.showTeam1Label ? stats.team1Label : ""}
                                       team={stats.team1}
@@ -74,7 +80,7 @@ function OverlayInner({username}: { username: string }) {
                         <Frame label={stats.showSoullink2Label ? stats.soullink2Label : undefined}
                                color={stats.frameBorderColor}
                                textColor={stats.textColor}
-                               className={`aspect-${stats.mainAspectRatio} flex-1`}/>
+                               className={`${ASPECT_RATIO_CLASS[stats.mainAspectRatio]} flex-1`}/>
                         <div className="w-32">
                             <TeamBoxV label={stats.showTeam2Label ? stats.team2Label : ""}
                                       team={stats.team2}

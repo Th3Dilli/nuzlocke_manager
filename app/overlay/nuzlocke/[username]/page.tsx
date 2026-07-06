@@ -1,8 +1,13 @@
 "use client";
 
-import {NuzlockeState} from "@/app/lib/types/NuzlockeState";
-import {Component, ReactNode, Suspense, use, useEffect, useState} from "react";
-import TeamBox, {BadgesV, Graveyard, Pokeball, TitleTab} from "@/app/components/TeamBox";
+import {MainAspectRatio, NuzlockeState} from "@/app/lib/types/NuzlockeState";
+import {Suspense, use, useEffect, useState} from "react";
+import TeamBox, {BadgesV, Graveyard, TitleTab} from "@/app/components/TeamBox";
+
+const ASPECT_RATIO_CLASS: Record<MainAspectRatio, string> = {
+    "4/3": "aspect-4/3",
+    "5/3": "aspect-5/3",
+};
 
 function OverlayInner({username}: { username: string }) {
 
@@ -85,7 +90,7 @@ function OverlayInner({username}: { username: string }) {
         <div className="flex h-[1080px] w-[1920px] gap-2 p-2 overlay">
 
             <div className={`flex flex-col gap-2 `} style={{width: `${state.mainWidth}px`}}>
-                <Frame label={state.showNuzlockeLabel ? state.nuzlockeLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`aspect-${state.mainAspectRatio}`} />
+                <Frame label={state.showNuzlockeLabel ? state.nuzlockeLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={ASPECT_RATIO_CLASS[state.mainAspectRatio]} />
 
                 <Graveyard label={state.showGraveyardLabel ? state.graveyardLabel : undefined} pokemon={state.graveyard}
                            color={state.graveyardColor} textColor={state.textColor} className="flex-1">
