@@ -205,7 +205,7 @@ function EncounterRow({row, player1Name, player2Name, onChange, onRemove}: {
 }) {
     return (
         <tr className="align-top">
-            <td className="px-2 py-1">
+            <td className="border-b border-neutral-700 px-2 py-1 pb-3">
                 <input
                     type="text"
                     value={row.route}
@@ -215,13 +215,13 @@ function EncounterRow({row, player1Name, player2Name, onChange, onRemove}: {
                     className="w-32 rounded-md border border-yellow-600 bg-neutral-900 px-2 py-2 text-sm text-gray-200 outline-none focus:border-yellow-500"
                 />
             </td>
-            <td className="px-2 py-1">
+            <td className="border-b border-neutral-700 px-2 py-1 pb-3">
                 <PokemonCell id={row.pokemon1} onChange={id => onChange({pokemon1: id})}/>
             </td>
-            <td className="px-2 py-1">
+            <td className="border-b border-neutral-700 px-2 py-1 pb-3">
                 <PokemonCell id={row.pokemon2} onChange={id => onChange({pokemon2: id})}/>
             </td>
-            <td className="px-2 py-1">
+            <td className="border-b border-neutral-700 px-2 py-1 pb-3">
                 <select
                     value={row.action}
                     onChange={e => onChange({action: e.target.value as EncounterAction})}
@@ -232,7 +232,7 @@ function EncounterRow({row, player1Name, player2Name, onChange, onRemove}: {
                     ))}
                 </select>
             </td>
-            <td className="px-2 py-1">
+            <td className="border-b border-neutral-700 px-2 py-1 pb-3">
                 <select
                     value={row.lostDueToPlayer}
                     disabled={row.action === "caught"}
@@ -244,7 +244,7 @@ function EncounterRow({row, player1Name, player2Name, onChange, onRemove}: {
                     <option value="player2">{player2Name || "Player 2"}</option>
                 </select>
             </td>
-            <td className="px-2 py-1">
+            <td className="border-b border-neutral-700 px-2 py-1 pb-3">
                 <button
                     onClick={onRemove}
                     title="Remove"

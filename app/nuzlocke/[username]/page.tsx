@@ -28,20 +28,20 @@ function EncountersTable({encounters, borderColor}: { encounters: NuzlockeEncoun
     if (encounters.length === 0) return null;
     return (
         <div className="w-full overflow-x-auto bg-neutral-800/50 rounded-2xl border-[5px]" style={{borderColor: borderColor}}>
-            <table className="w-full min-w-[480px] border-separate border-spacing-y-1 text-sm">
+            <table className="w-full text-base">
                 <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-yellow-600">
-                    <th className="px-2 font-semibold">Route</th>
-                    <th className="px-2 font-semibold">Pokémon</th>
-                    <th className="px-2 font-semibold">Action</th>
+                <tr className="text-left text-base uppercase tracking-wider text-yellow-300 bgdark m-4">
+                    <th className="border-b-2 border-yellow-600/60 px-2 pt-2 pb-2 font-bold">Route</th>
+                    <th className="border-b-2 border-yellow-600/60 px-2 pt-2 pb-2 font-bold">Pokémon</th>
+                    <th className="border-b-2 border-yellow-600/60 px-2 pt-2 pb-2 font-bold">Action</th>
                 </tr>
                 </thead>
                 <tbody>
                 {encounters.map((row, i) => (
-                    <tr key={i} className="bg-neutral-900/50">
-                        <td className="rounded-l-md px-2 py-1.5">{row.route || "—"}</td>
-                        <td className="px-2 py-1.5"><EncounterPokemon id={row.pokemon}/></td>
-                        <td className="rounded-r-md px-2 py-1.5">{ACTION_LABEL[row.action]}</td>
+                    <tr key={i} className={i % 2 === 0 ? "bg-neutral-900/50" : "bg-neutral-800/30"}>
+                        <td className="border-b border-yellow-600/60 px-2 py-1.5">{row.route || "—"}</td>
+                        <td className="border-b border-yellow-600/60 px-2 py-1.5"><EncounterPokemon id={row.pokemon}/></td>
+                        <td className="border-b border-yellow-600/60 px-2 py-1.5">{ACTION_LABEL[row.action]}</td>
                     </tr>
                 ))}
                 </tbody>
@@ -128,14 +128,16 @@ function HomeInner({username}: { username: string }) {
                     <p>{stats.user}</p>
                 </a>
 
-                <div className="flex w-full justify-center items-center gap-2">
+                <div className="flex w-full flex-wrap justify-center items-center gap-2">
                     <TeamBox team={stats.team} label={stats.showTeamLabel ? stats.teamLabel : ""} color={stats.teamColor} textColor={stats.textColor} className="w-full max-w-md"/>
-                    <Graveyard label={stats.showGraveyardLabel ? stats.graveyardLabel : undefined} pokemon={stats.graveyard} color={stats.graveyardColor} textColor={stats.textColor} className="w-full flex-1 min-h-20"/>
+                    <Graveyard label={stats.showGraveyardLabel ? stats.graveyardLabel : undefined} pokemon={stats.graveyard} color={stats.graveyardColor} textColor={stats.textColor} className="w-full flex-1 min-w-50 min-h-20"/>
                 </div>
 
                 {stats.badgesEnabled && (
                     <BadgesV badges={stats.badges} label={stats.showBadgesLabel ? stats.badgesLabel : undefined} textColor={stats.textColor} className="h-auto min-h-20 w-full"/>
                 )}
+                <BadgesV badges={stats.badges} label={stats.showBadgesLabel ? stats.badgesLabel : undefined} textColor={stats.textColor} className="h-auto min-h-20 w-full"/>
+
 
                 <EncountersTable encounters={stats.encounters} borderColor={stats.teamColor}/>
             </main>

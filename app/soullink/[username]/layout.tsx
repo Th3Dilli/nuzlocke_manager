@@ -2,7 +2,7 @@ import {Metadata} from "next";
 import Header from "@/app/components/Header";
 
 export const metadata: Metadata = {
-    title: "Soullink Thing",
+    title: "Soullink Stats",
 };
 
 export default function SiteLayout({children}: { children: React.ReactNode }) {
