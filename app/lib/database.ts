@@ -17,60 +17,22 @@ log("INFO", `Database: ${dbPath}`);
 database.exec(`
     CREATE TABLE IF NOT EXISTS nuzlocke
     (
-        user                 TEXT PRIMARY KEY,
-        team                 TEXT    NOT NULL DEFAULT '[]',
-        graveyard            TEXT    NOT NULL DEFAULT '[]',
-        badges               TEXT    NOT NULL DEFAULT '[]',
-        show_nuzlocke_label  INTEGER NOT NULL DEFAULT 1,
-        nuzlocke_label       TEXT    NOT NULL DEFAULT 'Nuzlocke',
-        show_trainer_label   INTEGER NOT NULL DEFAULT 1,
-        trainer_label        TEXT    NOT NULL DEFAULT 'Trainer',
-        show_team_label      INTEGER NOT NULL DEFAULT 1,
-        team_label           TEXT    NOT NULL DEFAULT 'Team',
-        show_graveyard_label INTEGER NOT NULL DEFAULT 1,
-        graveyard_label      TEXT    NOT NULL DEFAULT 'Graveyard',
-        show_badges_label    INTEGER NOT NULL DEFAULT 1,
-        badges_label         TEXT    NOT NULL DEFAULT 'Badges',
-        main_width           INTEGER NOT NULL DEFAULT 1200,
-        main_aspect_ratio    TEXT    NOT NULL DEFAULT '4/3',
-        cam_mode             TEXT    NOT NULL DEFAULT '1',
-        frame_border_color   TEXT    NOT NULL DEFAULT '#f87171',
-        team_color           TEXT    NOT NULL DEFAULT '#eab308',
-        graveyard_color      TEXT    NOT NULL DEFAULT '#eab308',
-        text_color           TEXT    NOT NULL DEFAULT '#fde047'
+        user      TEXT PRIMARY KEY,
+        team      TEXT NOT NULL DEFAULT '[]',
+        graveyard TEXT NOT NULL DEFAULT '[]',
+        badges    TEXT NOT NULL DEFAULT '[]',
+        settings  TEXT NOT NULL DEFAULT '{}'
     );
 
     CREATE TABLE IF NOT EXISTS soullink
     (
-        user                   TEXT PRIMARY KEY,
-        team1                  TEXT    NOT NULL DEFAULT '[]',
-        team2                  TEXT    NOT NULL DEFAULT '[]',
-        graveyard1             TEXT    NOT NULL DEFAULT '[]',
-        graveyard2             TEXT    NOT NULL DEFAULT '[]',
-        badges                 TEXT    NOT NULL DEFAULT '[]',
-        show_soullink1_label   INTEGER NOT NULL DEFAULT 1,
-        soullink1_label        TEXT    NOT NULL DEFAULT 'Soul Link 1',
-        show_soullink2_label   INTEGER NOT NULL DEFAULT 1,
-        soullink2_label        TEXT    NOT NULL DEFAULT 'Soul Link 2',
-        show_trainer1_label    INTEGER NOT NULL DEFAULT 1,
-        trainer1_label         TEXT    NOT NULL DEFAULT 'Trainer 1',
-        show_trainer2_label    INTEGER NOT NULL DEFAULT 1,
-        trainer2_label         TEXT    NOT NULL DEFAULT 'Trainer 2',
-        show_team1_label       INTEGER NOT NULL DEFAULT 1,
-        team1_label            TEXT    NOT NULL DEFAULT 'Team 1',
-        show_team2_label       INTEGER NOT NULL DEFAULT 1,
-        team2_label            TEXT    NOT NULL DEFAULT 'Team 2',
-        show_graveyard1_label  INTEGER NOT NULL DEFAULT 1,
-        graveyard1_label       TEXT    NOT NULL DEFAULT 'Graveyard 1',
-        show_graveyard2_label  INTEGER NOT NULL DEFAULT 1,
-        graveyard2_label       TEXT    NOT NULL DEFAULT 'Graveyard 2',
-        show_badges_label      INTEGER NOT NULL DEFAULT 1,
-        badges_label           TEXT    NOT NULL DEFAULT 'Badges',
-        main_aspect_ratio      TEXT    NOT NULL DEFAULT '4/3',
-        frame_border_color     TEXT    NOT NULL DEFAULT '#f87171',
-        team_color             TEXT    NOT NULL DEFAULT '#eab308',
-        graveyard_color        TEXT    NOT NULL DEFAULT '#eab308',
-        text_color             TEXT    NOT NULL DEFAULT '#fde047'
+        user       TEXT PRIMARY KEY,
+        team1      TEXT NOT NULL DEFAULT '[]',
+        team2      TEXT NOT NULL DEFAULT '[]',
+        graveyard1 TEXT NOT NULL DEFAULT '[]',
+        graveyard2 TEXT NOT NULL DEFAULT '[]',
+        badges     TEXT NOT NULL DEFAULT '[]',
+        settings   TEXT NOT NULL DEFAULT '{}'
     );
 
     CREATE TABLE IF NOT EXISTS users
@@ -104,7 +66,6 @@ database.exec(`
         PRIMARY KEY (owner, editor)
     );
 `)
-
 
 export const upsertUser = database.prepare<{ twitch_id: string; username: string; profile_image_url: string; now: string }>(`
     INSERT INTO users (twitch_id, username, role, nuzlocke_enabled, soullink_enabled, api_token, profile_image_url, created_at, updated_at)
@@ -170,52 +131,14 @@ export const upsertStmt = database.prepare<{
     team: string;
     graveyard: string;
     badges: string;
-    show_nuzlocke_label: number;
-    nuzlocke_label: string;
-    show_trainer_label: number;
-    trainer_label: string;
-    show_team_label: number;
-    team_label: string;
-    show_graveyard_label: number;
-    graveyard_label: string;
-    show_badges_label: number;
-    badges_label: string;
-    main_width: number;
-    main_aspect_ratio: string;
-    cam_mode: string;
-    frame_border_color: string;
-    team_color: string;
-    graveyard_color: string;
-    text_color: string;
+    settings: string;
 }>(`
-    INSERT INTO nuzlocke (user, team, graveyard, badges, show_nuzlocke_label, nuzlocke_label, show_trainer_label,
-                           trainer_label, show_team_label, team_label, show_graveyard_label, graveyard_label,
-                           show_badges_label, badges_label,
-                           main_width, main_aspect_ratio, cam_mode, frame_border_color, team_color, graveyard_color, text_color)
-    VALUES (@user, @team, @graveyard, @badges, @show_nuzlocke_label, @nuzlocke_label, @show_trainer_label,
-            @trainer_label, @show_team_label, @team_label, @show_graveyard_label, @graveyard_label,
-            @show_badges_label, @badges_label,
-            @main_width, @main_aspect_ratio, @cam_mode, @frame_border_color, @team_color, @graveyard_color, @text_color)
-    ON CONFLICT(user) DO UPDATE SET team                 = excluded.team,
-                                    graveyard            = excluded.graveyard,
-                                    badges               = excluded.badges,
-                                    show_nuzlocke_label  = excluded.show_nuzlocke_label,
-                                    nuzlocke_label       = excluded.nuzlocke_label,
-                                    show_trainer_label   = excluded.show_trainer_label,
-                                    trainer_label        = excluded.trainer_label,
-                                    show_team_label      = excluded.show_team_label,
-                                    team_label           = excluded.team_label,
-                                    show_graveyard_label = excluded.show_graveyard_label,
-                                    graveyard_label      = excluded.graveyard_label,
-                                    show_badges_label    = excluded.show_badges_label,
-                                    badges_label         = excluded.badges_label,
-                                    main_width           = excluded.main_width,
-                                    main_aspect_ratio    = excluded.main_aspect_ratio,
-                                    cam_mode             = excluded.cam_mode,
-                                    frame_border_color   = excluded.frame_border_color,
-                                    team_color           = excluded.team_color,
-                                    graveyard_color      = excluded.graveyard_color,
-                                    text_color           = excluded.text_color
+    INSERT INTO nuzlocke (user, team, graveyard, badges, settings)
+    VALUES (@user, @team, @graveyard, @badges, @settings)
+    ON CONFLICT(user) DO UPDATE SET team      = excluded.team,
+                                    graveyard = excluded.graveyard,
+                                    badges    = excluded.badges,
+                                    settings  = excluded.settings
 `);
 
 export const selectStmt = database.prepare(`SELECT *
@@ -229,70 +152,16 @@ export const upsertSoullinkStmt = database.prepare<{
     graveyard1: string;
     graveyard2: string;
     badges: string;
-    show_soullink1_label: number;
-    soullink1_label: string;
-    show_soullink2_label: number;
-    soullink2_label: string;
-    show_trainer1_label: number;
-    trainer1_label: string;
-    show_trainer2_label: number;
-    trainer2_label: string;
-    show_team1_label: number;
-    team1_label: string;
-    show_team2_label: number;
-    team2_label: string;
-    show_graveyard1_label: number;
-    graveyard1_label: string;
-    show_graveyard2_label: number;
-    graveyard2_label: string;
-    show_badges_label: number;
-    badges_label: string;
-    main_aspect_ratio: string;
-    frame_border_color: string;
-    team_color: string;
-    graveyard_color: string;
-    text_color: string;
+    settings: string;
 }>(`
-    INSERT INTO soullink (user, team1, team2, graveyard1, graveyard2, badges, show_soullink1_label, soullink1_label,
-                           show_soullink2_label, soullink2_label, show_trainer1_label, trainer1_label,
-                           show_trainer2_label, trainer2_label, show_team1_label, team1_label,
-                           show_team2_label, team2_label, show_graveyard1_label, graveyard1_label,
-                           show_graveyard2_label, graveyard2_label, show_badges_label, badges_label,
-                           main_aspect_ratio, frame_border_color, team_color, graveyard_color, text_color)
-    VALUES (@user, @team1, @team2, @graveyard1, @graveyard2, @badges, @show_soullink1_label, @soullink1_label,
-            @show_soullink2_label, @soullink2_label, @show_trainer1_label, @trainer1_label,
-            @show_trainer2_label, @trainer2_label, @show_team1_label, @team1_label,
-            @show_team2_label, @team2_label, @show_graveyard1_label, @graveyard1_label,
-            @show_graveyard2_label, @graveyard2_label, @show_badges_label, @badges_label,
-            @main_aspect_ratio, @frame_border_color, @team_color, @graveyard_color, @text_color)
-    ON CONFLICT(user) DO UPDATE SET team1                 = excluded.team1,
-                                     team2                 = excluded.team2,
-                                     graveyard1            = excluded.graveyard1,
-                                     graveyard2            = excluded.graveyard2,
-                                     badges                = excluded.badges,
-                                     show_soullink1_label  = excluded.show_soullink1_label,
-                                     soullink1_label       = excluded.soullink1_label,
-                                     show_soullink2_label  = excluded.show_soullink2_label,
-                                     soullink2_label       = excluded.soullink2_label,
-                                     show_trainer1_label   = excluded.show_trainer1_label,
-                                     trainer1_label        = excluded.trainer1_label,
-                                     show_trainer2_label   = excluded.show_trainer2_label,
-                                     trainer2_label        = excluded.trainer2_label,
-                                     show_team1_label      = excluded.show_team1_label,
-                                     team1_label           = excluded.team1_label,
-                                     show_team2_label      = excluded.show_team2_label,
-                                     team2_label           = excluded.team2_label,
-                                     show_graveyard1_label = excluded.show_graveyard1_label,
-                                     graveyard1_label      = excluded.graveyard1_label,
-                                     show_graveyard2_label = excluded.show_graveyard2_label,
-                                     graveyard2_label      = excluded.graveyard2_label,
-                                     show_badges_label     = excluded.show_badges_label,
-                                     badges_label          = excluded.badges_label,
-                                     main_aspect_ratio     = excluded.main_aspect_ratio,
-                                     frame_border_color    = excluded.frame_border_color,
-                                     team_color            = excluded.team_color,
-                                     graveyard_color       = excluded.graveyard_color,
-                                     text_color            = excluded.text_color
+    INSERT INTO soullink (user, team1, team2, graveyard1, graveyard2, badges, settings)
+    VALUES (@user, @team1, @team2, @graveyard1, @graveyard2, @badges, @settings)
+    ON CONFLICT(user) DO UPDATE SET team1      = excluded.team1,
+                                     team2      = excluded.team2,
+                                     graveyard1 = excluded.graveyard1,
+                                     graveyard2 = excluded.graveyard2,
+                                     badges     = excluded.badges,
+                                     settings   = excluded.settings
 `);
 
 export const selectSoullinkStmt = database.prepare(`SELECT *

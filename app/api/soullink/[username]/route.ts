@@ -29,7 +29,7 @@ const LABEL_FIELDS = [
 ] as const;
 
 const COLOR_SETTINGS_FIELDS = ["frameBorderColor", "teamColor", "graveyardColor", "textColor"] as const;
-const SETTINGS_FIELDS = ["mainAspectRatio", ...COLOR_SETTINGS_FIELDS] as const;
+const SETTINGS_FIELDS = ["mainAspectRatio", "badgesEnabled", ...COLOR_SETTINGS_FIELDS] as const;
 
 function parseTeam(rawTeam: unknown): number[] | { error: string } {
     if (!Array.isArray(rawTeam) || rawTeam.length > TEAM_SIZE) {
@@ -153,6 +153,9 @@ export async function POST(
 
     if ("mainAspectRatio" in body) {
         update.mainAspectRatio = normalizeMainAspectRatio(body.mainAspectRatio, current.mainAspectRatio);
+    }
+    if ("badgesEnabled" in body) {
+        update.badgesEnabled = normalizeShowLabel(body.badgesEnabled, current.badgesEnabled);
     }
     for (const field of COLOR_SETTINGS_FIELDS) {
         if (field in body) update[field] = normalizeColor(body[field], current[field]);

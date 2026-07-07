@@ -25,7 +25,7 @@ const LABEL_FIELDS = [
     ["showBadgesLabel", "badgesLabel"],
 ] as const;
 
-const SETTINGS_FIELDS = ["mainWidth", "mainAspectRatio", "camMode", "frameBorderColor", "teamColor", "graveyardColor", "textColor"] as const;
+const SETTINGS_FIELDS = ["mainWidth", "mainAspectRatio", "camMode", "frameBorderColor", "teamColor", "graveyardColor", "textColor", "badgesEnabled"] as const;
 
 // Update the team, graveyard, and/or label settings for a user's stats page.
 // The page owner and any editor the owner has granted may write to it. The
@@ -147,6 +147,7 @@ export async function POST(
         teamColor: normalizeColor(body.teamColor, current.teamColor),
         graveyardColor: normalizeColor(body.graveyardColor, current.graveyardColor),
         textColor: normalizeColor(body.textColor, current.textColor),
+        badgesEnabled: normalizeShowLabel(body.badgesEnabled, current.badgesEnabled),
     };
 
     setStats(username, {user: username, team, graveyard, badges, ...labels, ...settings});

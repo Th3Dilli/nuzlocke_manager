@@ -17,7 +17,8 @@ function settingsEqual(a: SoullinkSettings, b: SoullinkSettings): boolean {
         && a.frameBorderColor === b.frameBorderColor
         && a.teamColor === b.teamColor
         && a.graveyardColor === b.graveyardColor
-        && a.textColor === b.textColor;
+        && a.textColor === b.textColor
+        && a.badgesEnabled === b.badgesEnabled;
 }
 
 // Editor for the soullink overlay's border/text colors, shared across both sides.
@@ -150,6 +151,18 @@ export default function SoullinkSettingsEditor({apiUrl, values: remoteValues}: {
                             <option key={value} value={value}>{label}</option>
                         ))}
                     </select>
+                </div>
+
+                <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-200">
+                        <input
+                            type="checkbox"
+                            checked={values.badgesEnabled}
+                            onChange={e => update("badgesEnabled", e.target.checked)}
+                            className="h-4 w-4 cursor-pointer accent-yellow-500"
+                        />
+                        Show badges
+                    </label>
                 </div>
 
                 <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">

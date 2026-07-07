@@ -163,6 +163,7 @@ function HomeInner({username}: { username: string }) {
                             teamColor: stats.teamColor,
                             graveyardColor: stats.graveyardColor,
                             textColor: stats.textColor,
+                            badgesEnabled: stats.badgesEnabled,
                         }}
                     />
                 )}

@@ -87,6 +87,9 @@ export type SoullinkSettings = {
     teamColor: string;
     graveyardColor: string;
     textColor: string;
+    // Whether the badges section is shown at all in the overlay (separate from
+    // showBadgesLabel/badgesLabel, which only control its title tab).
+    badgesEnabled: boolean;
 };
 
 export const DEFAULT_SOULLINK_SETTINGS: SoullinkSettings = {
@@ -95,6 +98,7 @@ export const DEFAULT_SOULLINK_SETTINGS: SoullinkSettings = {
     teamColor: "#eab308",
     graveyardColor: "#eab308",
     textColor: "#fde047",
+    badgesEnabled: true,
 };
 
 // Coerce arbitrary input (e.g. parsed JSON) into a full set of overlay color
@@ -107,6 +111,7 @@ export function normalizeSoullinkSettings(input: unknown, fallback: SoullinkSett
         teamColor: normalizeColor(source.teamColor, fallback.teamColor),
         graveyardColor: normalizeColor(source.graveyardColor, fallback.graveyardColor),
         textColor: normalizeColor(source.textColor, fallback.textColor),
+        badgesEnabled: normalizeShowLabel(source.badgesEnabled, fallback.badgesEnabled),
     };
 }
 

@@ -71,7 +71,7 @@ function OverlayInner({username}: { username: string }) {
                     </div>
 
                     <div className="w-74 px-8">
-                        <BadgesV badges={stats.badges} label={stats.showBadgesLabel ? stats.badgesLabel : undefined} textColor={stats.textColor} className={`${height} flex-auto`}/>
+                        {stats.badgesEnabled && <BadgesV badges={stats.badges} label={stats.showBadgesLabel ? stats.badgesLabel : undefined} textColor={stats.textColor} className={`${height} flex-auto`}/>}
                     </div>
                     {/*<div className="w-2 ">*/}
                     {/*</div>*/}

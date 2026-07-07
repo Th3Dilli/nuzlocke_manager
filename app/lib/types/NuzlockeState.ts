@@ -55,6 +55,9 @@ export type NuzlockeSettings = {
     teamColor: string;
     graveyardColor: string;
     textColor: string;
+    // Whether the badges section is shown at all in the overlay (separate from
+    // showBadgesLabel/badgesLabel, which only control its title tab).
+    badgesEnabled: boolean;
 };
 
 export const DEFAULT_SETTINGS: NuzlockeSettings = {
@@ -65,6 +68,7 @@ export const DEFAULT_SETTINGS: NuzlockeSettings = {
     teamColor: "#eab308",
     graveyardColor: "#eab308",
     textColor: "#fde047",
+    badgesEnabled: true,
 };
 
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
@@ -99,6 +103,7 @@ export function normalizeSettings(input: unknown, fallback: NuzlockeSettings = D
         teamColor: normalizeColor(source.teamColor, fallback.teamColor),
         graveyardColor: normalizeColor(source.graveyardColor, fallback.graveyardColor),
         textColor: normalizeColor(source.textColor, fallback.textColor),
+        badgesEnabled: normalizeShowLabel(source.badgesEnabled, fallback.badgesEnabled),
     };
 }
 
@@ -214,5 +219,6 @@ export function statsEqual(a: NuzlockeState, b: NuzlockeState): boolean {
         && a.frameBorderColor === b.frameBorderColor
         && a.teamColor === b.teamColor
         && a.graveyardColor === b.graveyardColor
-        && a.textColor === b.textColor;
+        && a.textColor === b.textColor
+        && a.badgesEnabled === b.badgesEnabled;
 }

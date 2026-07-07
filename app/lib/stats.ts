@@ -3,13 +3,9 @@ import {
     DEFAULT_SETTINGS,
     emptyTeam,
     normalizeBadges,
-    normalizeCamMode,
-    normalizeColor,
     normalizeGraveyard,
-    normalizeLabel,
-    normalizeMainAspectRatio,
-    normalizeMainWidth,
-    normalizeShowLabel,
+    normalizeLabels,
+    normalizeSettings,
     normalizeTeam,
     NuzlockeState
 } from "@/app/lib/types/NuzlockeState";
@@ -59,50 +55,20 @@ type NuzlockeRow = {
     team: string;
     graveyard: string;
     badges: string;
-    show_nuzlocke_label: number;
-    nuzlocke_label: string;
-    show_trainer_label: number;
-    trainer_label: string;
-    show_team_label: number;
-    team_label: string;
-    show_graveyard_label: number;
-    graveyard_label: string;
-    show_badges_label: number;
-    badges_label: string;
-    main_width: number;
-    main_aspect_ratio: string;
-    cam_mode: string;
-    frame_border_color: string;
-    team_color: string;
-    graveyard_color: string;
-    text_color: string;
+    settings: string;
 };
 
 function loadStat(user: string): NuzlockeState {
     const row = selectStmt.get(user) as NuzlockeRow | undefined;
     if (row) {
+        const settings = safeParse(row.settings);
         return {
             user: row.user,
             team: normalizeTeam(safeParse(row.team)),
             graveyard: normalizeGraveyard(safeParse(row.graveyard)),
             badges: normalizeBadges(safeParse(row.badges)),
-            showNuzlockeLabel: normalizeShowLabel(!!row.show_nuzlocke_label, DEFAULT_LABELS.showNuzlockeLabel),
-            nuzlockeLabel: normalizeLabel(row.nuzlocke_label, DEFAULT_LABELS.nuzlockeLabel),
-            showTrainerLabel: normalizeShowLabel(!!row.show_trainer_label, DEFAULT_LABELS.showTrainerLabel),
-            trainerLabel: normalizeLabel(row.trainer_label, DEFAULT_LABELS.trainerLabel),
-            showTeamLabel: normalizeShowLabel(!!row.show_team_label, DEFAULT_LABELS.showTeamLabel),
-            teamLabel: normalizeLabel(row.team_label, DEFAULT_LABELS.teamLabel),
-            showGraveyardLabel: normalizeShowLabel(!!row.show_graveyard_label, DEFAULT_LABELS.showGraveyardLabel),
-            graveyardLabel: normalizeLabel(row.graveyard_label, DEFAULT_LABELS.graveyardLabel),
-            showBadgesLabel: normalizeShowLabel(!!row.show_badges_label, DEFAULT_LABELS.showBadgesLabel),
-            badgesLabel: normalizeLabel(row.badges_label, DEFAULT_LABELS.badgesLabel),
-            mainWidth: normalizeMainWidth(row.main_width, DEFAULT_SETTINGS.mainWidth),
-            mainAspectRatio: normalizeMainAspectRatio(row.main_aspect_ratio, DEFAULT_SETTINGS.mainAspectRatio),
-            camMode: normalizeCamMode(row.cam_mode, DEFAULT_SETTINGS.camMode),
-            frameBorderColor: normalizeColor(row.frame_border_color, DEFAULT_SETTINGS.frameBorderColor),
-            teamColor: normalizeColor(row.team_color, DEFAULT_SETTINGS.teamColor),
-            graveyardColor: normalizeColor(row.graveyard_color, DEFAULT_SETTINGS.graveyardColor),
-            textColor: normalizeColor(row.text_color, DEFAULT_SETTINGS.textColor),
+            ...normalizeLabels(settings),
+            ...normalizeSettings(settings),
         };
     }
     return {user: user, team: emptyTeam(), graveyard: [], badges: [], ...DEFAULT_LABELS, ...DEFAULT_SETTINGS};
@@ -130,46 +96,15 @@ export function setStats(user: string, s: NuzlockeState) {
         userStat.team = normalizeTeam(s.team);
         userStat.graveyard = normalizeGraveyard(s.graveyard);
         userStat.badges = normalizeBadges(s.badges);
-        userStat.showNuzlockeLabel = normalizeShowLabel(s.showNuzlockeLabel, userStat.showNuzlockeLabel);
-        userStat.nuzlockeLabel = normalizeLabel(s.nuzlockeLabel, userStat.nuzlockeLabel);
-        userStat.showTrainerLabel = normalizeShowLabel(s.showTrainerLabel, userStat.showTrainerLabel);
-        userStat.trainerLabel = normalizeLabel(s.trainerLabel, userStat.trainerLabel);
-        userStat.showTeamLabel = normalizeShowLabel(s.showTeamLabel, userStat.showTeamLabel);
-        userStat.teamLabel = normalizeLabel(s.teamLabel, userStat.teamLabel);
-        userStat.showGraveyardLabel = normalizeShowLabel(s.showGraveyardLabel, userStat.showGraveyardLabel);
-        userStat.graveyardLabel = normalizeLabel(s.graveyardLabel, userStat.graveyardLabel);
-        userStat.showBadgesLabel = normalizeShowLabel(s.showBadgesLabel, userStat.showBadgesLabel);
-        userStat.badgesLabel = normalizeLabel(s.badgesLabel, userStat.badgesLabel);
-        userStat.mainWidth = normalizeMainWidth(s.mainWidth, userStat.mainWidth);
-        userStat.mainAspectRatio = normalizeMainAspectRatio(s.mainAspectRatio, userStat.mainAspectRatio);
-        userStat.camMode = normalizeCamMode(s.camMode, userStat.camMode);
-        userStat.frameBorderColor = normalizeColor(s.frameBorderColor, userStat.frameBorderColor);
-        userStat.teamColor = normalizeColor(s.teamColor, userStat.teamColor);
-        userStat.graveyardColor = normalizeColor(s.graveyardColor, userStat.graveyardColor);
-        userStat.textColor = normalizeColor(s.textColor, userStat.textColor);
+        Object.assign(userStat, normalizeLabels(s, userStat));
+        Object.assign(userStat, normalizeSettings(s, userStat));
 
         upsertStmt.run({
             user,
             team: JSON.stringify(userStat.team),
             graveyard: JSON.stringify(userStat.graveyard),
             badges: JSON.stringify(userStat.badges),
-            show_nuzlocke_label: userStat.showNuzlockeLabel ? 1 : 0,
-            nuzlocke_label: userStat.nuzlockeLabel,
-            show_trainer_label: userStat.showTrainerLabel ? 1 : 0,
-            trainer_label: userStat.trainerLabel,
-            show_team_label: userStat.showTeamLabel ? 1 : 0,
-            team_label: userStat.teamLabel,
-            show_graveyard_label: userStat.showGraveyardLabel ? 1 : 0,
-            graveyard_label: userStat.graveyardLabel,
-            show_badges_label: userStat.showBadgesLabel ? 1 : 0,
-            badges_label: userStat.badgesLabel,
-            main_width: userStat.mainWidth,
-            main_aspect_ratio: userStat.mainAspectRatio,
-            cam_mode: userStat.camMode,
-            frame_border_color: userStat.frameBorderColor,
-            team_color: userStat.teamColor,
-            graveyard_color: userStat.graveyardColor,
-            text_color: userStat.textColor,
+            settings: JSON.stringify({...normalizeLabels(userStat), ...normalizeSettings(userStat)}),
         });
 
         subscribers.get(user)?.forEach(cb => cb(userStat));
