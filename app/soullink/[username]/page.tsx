@@ -1,7 +1,7 @@
 "use client";
 
 import {use} from "react";
-import {SoullinkEncounter, SoullinkState} from "@/app/lib/types/SoullinkState";
+import {PublicSoullinkState, SoullinkEncounter} from "@/app/lib/types/SoullinkState";
 import {Suspense, useEffect, useState} from "react";
 import TeamBox, {BadgesV, Graveyard} from "@/app/components/TeamBox";
 import {DEFAULT_LANGUAGE, POKEMON, pokemonName} from "@/app/lib/pokemon";
@@ -95,7 +95,7 @@ function TeamColumn({label, playerName, team, teamLabel, graveyard, graveyardLab
 }
 
 function HomeInner({username}: { username: string }) {
-    const [stats, setStats] = useState<SoullinkState | undefined>();
+    const [stats, setStats] = useState<PublicSoullinkState | undefined>();
     const [notFound, setNotFound] = useState(false);
 
     useEffect(() => {
@@ -111,7 +111,7 @@ function HomeInner({username}: { username: string }) {
             es.onmessage = (e) => {
                 if ('data' in e) {
                     try {
-                        const stat = JSON.parse(e.data) as SoullinkState;
+                        const stat = JSON.parse(e.data) as PublicSoullinkState;
                         console.log(stat);
                         setStats(stat);
                     } catch (err) {

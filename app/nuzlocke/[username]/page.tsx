@@ -1,7 +1,7 @@
 "use client";
 
 import {use} from "react";
-import {NuzlockeEncounter, NuzlockeState} from "@/app/lib/types/NuzlockeState";
+import {NuzlockeEncounter, PublicNuzlockeState} from "@/app/lib/types/NuzlockeState";
 import {Suspense, useEffect, useState} from "react";
 import TeamBox, {BadgesV, Graveyard} from "@/app/components/TeamBox";
 import {DEFAULT_LANGUAGE, POKEMON, pokemonName} from "@/app/lib/pokemon";
@@ -51,7 +51,7 @@ function EncountersTable({encounters, borderColor}: { encounters: NuzlockeEncoun
 }
 
 function HomeInner({username}: { username: string }) {
-    const [stats, setStats] = useState<NuzlockeState | undefined>();
+    const [stats, setStats] = useState<PublicNuzlockeState | undefined>();
     const [notFound, setNotFound] = useState(false);
 
     useEffect(() => {
@@ -67,7 +67,7 @@ function HomeInner({username}: { username: string }) {
             es.onmessage = (e) => {
                 if ('data' in e) {
                     try {
-                        const stat = JSON.parse(e.data) as NuzlockeState;
+                        const stat = JSON.parse(e.data) as PublicNuzlockeState;
                         setStats(stat);
                     } catch (err) {
                         console.error("Failed to parse SSE data", err);

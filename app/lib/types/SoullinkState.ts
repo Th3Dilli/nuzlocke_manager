@@ -223,3 +223,47 @@ export function emptySoullinkState(user: string): SoullinkState {
         ...DEFAULT_SOULLINK_SETTINGS,
     };
 }
+
+// What the public soullink page actually renders: rosters/graveyards/badges/
+// encounters, the team & graveyard title tabs, the shared box colors, and the
+// player names. Excludes owner/editor-only concerns (frame + trainer-cam
+// labels, aspect ratio, frame border color) that only the overlay uses.
+export type PublicSoullinkState = Pick<SoullinkState,
+    | "team1" | "team2"
+    | "graveyard1" | "graveyard2"
+    | "badges"
+    | "encounters"
+    | "showTeam1Label" | "team1Label"
+    | "showTeam2Label" | "team2Label"
+    | "showGraveyard1Label" | "graveyard1Label"
+    | "showGraveyard2Label" | "graveyard2Label"
+    | "showBadgesLabel" | "badgesLabel"
+    | "teamColor" | "graveyardColor" | "textColor"
+    | "player1Name" | "player2Name"
+>;
+
+export function toPublicSoullinkState(s: SoullinkState): PublicSoullinkState {
+    return {
+        team1: s.team1,
+        team2: s.team2,
+        graveyard1: s.graveyard1,
+        graveyard2: s.graveyard2,
+        badges: s.badges,
+        encounters: s.encounters,
+        showTeam1Label: s.showTeam1Label,
+        team1Label: s.team1Label,
+        showTeam2Label: s.showTeam2Label,
+        team2Label: s.team2Label,
+        showGraveyard1Label: s.showGraveyard1Label,
+        graveyard1Label: s.graveyard1Label,
+        showGraveyard2Label: s.showGraveyard2Label,
+        graveyard2Label: s.graveyard2Label,
+        showBadgesLabel: s.showBadgesLabel,
+        badgesLabel: s.badgesLabel,
+        teamColor: s.teamColor,
+        graveyardColor: s.graveyardColor,
+        textColor: s.textColor,
+        player1Name: s.player1Name,
+        player2Name: s.player2Name,
+    };
+}

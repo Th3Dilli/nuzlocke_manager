@@ -183,6 +183,41 @@ export type NuzlockeState = NuzlockeLabels & NuzlockeSettings & {
     encounters: NuzlockeEncounter[];
 };
 
+// What the public nuzlocke page actually renders: the twitch username,
+// team/graveyard/badges/encounters, the team & graveyard title tabs, whether
+// badges show, and the shared box colors. Excludes owner/editor-only
+// concerns (nuzlocke/trainer labels, overlay width/aspect ratio/cam mode,
+// frame border color) that only the overlay uses.
+export type PublicNuzlockeState = Pick<NuzlockeState,
+    | "user"
+    | "team" | "graveyard" | "badges" | "encounters"
+    | "showTeamLabel" | "teamLabel"
+    | "showGraveyardLabel" | "graveyardLabel"
+    | "showBadgesLabel" | "badgesLabel"
+    | "badgesEnabled"
+    | "teamColor" | "graveyardColor" | "textColor"
+>;
+
+export function toPublicNuzlockeState(s: NuzlockeState): PublicNuzlockeState {
+    return {
+        user: s.user,
+        team: s.team,
+        graveyard: s.graveyard,
+        badges: s.badges,
+        encounters: s.encounters,
+        showTeamLabel: s.showTeamLabel,
+        teamLabel: s.teamLabel,
+        showGraveyardLabel: s.showGraveyardLabel,
+        graveyardLabel: s.graveyardLabel,
+        showBadgesLabel: s.showBadgesLabel,
+        badgesLabel: s.badgesLabel,
+        badgesEnabled: s.badgesEnabled,
+        teamColor: s.teamColor,
+        graveyardColor: s.graveyardColor,
+        textColor: s.textColor,
+    };
+}
+
 const MAX_LABEL_LENGTH = 40;
 
 // Coerce arbitrary input into a valid label string: trims, caps length, and
