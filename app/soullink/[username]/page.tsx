@@ -75,7 +75,7 @@ function TeamColumn({label, playerName, team, teamLabel, graveyard, graveyardLab
     textColor?: string;
 }) {
     return (
-        <div className="flex flex-1 flex-col items-center gap-2">
+        <div className="flex flex-1 flex-col items-center gap-4">
             <h2 className="text-lg font-bold text-yellow-300">{label}</h2>
             {playerName && (
                 <a href={`https://twitch.tv/${playerName}`}

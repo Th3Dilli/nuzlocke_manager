@@ -128,7 +128,7 @@ function HomeInner({username}: { username: string }) {
                     <p>{stats.user}</p>
                 </a>
 
-                <div className="flex w-full flex-wrap justify-center items-center gap-2">
+                <div className="flex w-full flex-wrap justify-center items-center gap-4">
                     <TeamBox team={stats.team} label={stats.showTeamLabel ? stats.teamLabel : ""} color={stats.teamColor} textColor={stats.textColor} className="w-full max-w-md"/>
                     <Graveyard label={stats.showGraveyardLabel ? stats.graveyardLabel : undefined} pokemon={stats.graveyard} color={stats.graveyardColor} textColor={stats.textColor} className="w-full flex-1 min-w-50 min-h-20"/>
                 </div>
