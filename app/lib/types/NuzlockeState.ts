@@ -107,6 +107,69 @@ export function normalizeSettings(input: unknown, fallback: NuzlockeSettings = D
     };
 }
 
+// How a route encounter was resolved. Shared between the single-player
+// nuzlocke encounter log and the soullink one (which adds a second Pokémon
+// and a `lostDueToPlayer` field per row).
+export type EncounterAction = "caught" | "dead" | "not_caught";
+
+export const ENCOUNTER_ACTIONS: readonly EncounterAction[] = ["caught", "dead", "not_caught"];
+const ENCOUNTER_ACTION_SET: ReadonlySet<string> = new Set(ENCOUNTER_ACTIONS);
+
+export const MAX_ENCOUNTERS = 200;
+const MAX_ROUTE_LENGTH = 40;
+
+// Coerce arbitrary input into a valid route name: trims and caps length. Kept
+// as-is when empty (not replaced by a fallback) so a row can have no route yet.
+export function normalizeRoute(input: unknown, fallback = ""): string {
+    if (typeof input !== "string") return fallback;
+    return input.trim().slice(0, MAX_ROUTE_LENGTH);
+}
+
+export function normalizeEncounterAction(input: unknown, fallback: EncounterAction = "caught"): EncounterAction {
+    return typeof input === "string" && ENCOUNTER_ACTION_SET.has(input) ? (input as EncounterAction) : fallback;
+}
+
+export function normalizePokemonId(input: unknown): number {
+    const id = Number(input);
+    return Number.isInteger(id) && id > 0 ? id : 0;
+}
+
+// One row in the per-route encounter log for a single-player nuzlocke run.
+export type NuzlockeEncounter = {
+    route: string;
+    // Pokémon id, or 0 if unset.
+    pokemon: number;
+    action: EncounterAction;
+};
+
+// Coerce a single arbitrary object into a valid encounter row, or null if it
+// isn't shaped like one. The Pokémon id isn't checked against the catalog
+// (that's the API route's job); this just guarantees the shape is safe to store.
+export function normalizeEncounter(input: unknown): NuzlockeEncounter | null {
+    if (!input || typeof input !== "object") return null;
+    const source = input as Record<string, unknown>;
+    return {
+        route: normalizeRoute(source.route),
+        pokemon: normalizePokemonId(source.pokemon),
+        action: normalizeEncounterAction(source.action),
+    };
+}
+
+// Coerce arbitrary input (e.g. parsed JSON) into a valid encounter list,
+// dropping anything malformed and capping at MAX_ENCOUNTERS.
+export function normalizeEncounters(input: unknown): NuzlockeEncounter[] {
+    if (!Array.isArray(input)) return [];
+    const out: NuzlockeEncounter[] = [];
+    for (const raw of input) {
+        const encounter = normalizeEncounter(raw);
+        if (encounter) {
+            out.push(encounter);
+            if (out.length >= MAX_ENCOUNTERS) break;
+        }
+    }
+    return out;
+}
+
 export type NuzlockeState = NuzlockeLabels & NuzlockeSettings & {
     user: string;
     // Always length TEAM_SIZE. Each entry is a Pokémon id, or 0 for an empty slot.
@@ -116,6 +179,8 @@ export type NuzlockeState = NuzlockeLabels & NuzlockeSettings & {
     graveyard: number[];
     // Ids of earned gym badges (see app/lib/badges.json), ascending, no duplicates.
     badges: number[];
+    // Per-route encounter log, in the order routes were entered.
+    encounters: NuzlockeEncounter[];
 };
 
 const MAX_LABEL_LENGTH = 40;

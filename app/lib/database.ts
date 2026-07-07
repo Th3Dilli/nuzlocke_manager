@@ -17,11 +17,12 @@ log("INFO", `Database: ${dbPath}`);
 database.exec(`
     CREATE TABLE IF NOT EXISTS nuzlocke
     (
-        user      TEXT PRIMARY KEY,
-        team      TEXT NOT NULL DEFAULT '[]',
-        graveyard TEXT NOT NULL DEFAULT '[]',
-        badges    TEXT NOT NULL DEFAULT '[]',
-        settings  TEXT NOT NULL DEFAULT '{}'
+        user       TEXT PRIMARY KEY,
+        team       TEXT NOT NULL DEFAULT '[]',
+        graveyard  TEXT NOT NULL DEFAULT '[]',
+        badges     TEXT NOT NULL DEFAULT '[]',
+        settings   TEXT NOT NULL DEFAULT '{}',
+        encounters TEXT NOT NULL DEFAULT '[]'
     );
 
     CREATE TABLE IF NOT EXISTS soullink
@@ -70,11 +71,13 @@ database.exec(`
 `)
 
 // CREATE TABLE IF NOT EXISTS is a no-op on a database that already has the
-// `soullink` table from before the `encounters` column existed, so add it
-// here for databases that were provisioned with the older schema.
-const soullinkColumns = database.prepare("PRAGMA table_info(soullink)").all() as Array<{ name: string }>;
-if (!soullinkColumns.some(c => c.name === "encounters")) {
-    database.exec("ALTER TABLE soullink ADD COLUMN encounters TEXT NOT NULL DEFAULT '[]'");
+// `nuzlocke`/`soullink` tables from before the `encounters` column existed,
+// so add it here for databases that were provisioned with the older schema.
+for (const table of ["nuzlocke", "soullink"]) {
+    const columns = database.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
+    if (!columns.some(c => c.name === "encounters")) {
+        database.exec(`ALTER TABLE ${table} ADD COLUMN encounters TEXT NOT NULL DEFAULT '[]'`);
+    }
 }
 
 export const upsertUser = database.prepare<{ twitch_id: string; username: string; profile_image_url: string; now: string }>(`
@@ -158,13 +161,15 @@ export const upsertStmt = database.prepare<{
     graveyard: string;
     badges: string;
     settings: string;
+    encounters: string;
 }>(`
-    INSERT INTO nuzlocke (user, team, graveyard, badges, settings)
-    VALUES (@user, @team, @graveyard, @badges, @settings)
-    ON CONFLICT(user) DO UPDATE SET team      = excluded.team,
-                                    graveyard = excluded.graveyard,
-                                    badges    = excluded.badges,
-                                    settings  = excluded.settings
+    INSERT INTO nuzlocke (user, team, graveyard, badges, settings, encounters)
+    VALUES (@user, @team, @graveyard, @badges, @settings, @encounters)
+    ON CONFLICT(user) DO UPDATE SET team       = excluded.team,
+                                    graveyard  = excluded.graveyard,
+                                    badges     = excluded.badges,
+                                    settings   = excluded.settings,
+                                    encounters = excluded.encounters
 `);
 
 export const selectStmt = database.prepare(`SELECT *

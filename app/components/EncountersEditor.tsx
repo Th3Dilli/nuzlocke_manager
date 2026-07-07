@@ -6,7 +6,8 @@ import {DEFAULT_LANGUAGE, POKEMON, pokemonName} from "@/app/lib/pokemon";
 import {AlertTriangle, Check, Plus, Search, X} from "lucide-react";
 import {Pokeball} from "@/app/components/TeamBox";
 import Collapsible from "@/app/components/Collapsible";
-import {EncounterAction, LostDueToPlayer, MAX_ENCOUNTERS, SoullinkEncounter} from "@/app/lib/types/SoullinkState";
+import {EncounterAction, MAX_ENCOUNTERS} from "@/app/lib/types/NuzlockeState";
+import {LostDueToPlayer, SoullinkEncounter} from "@/app/lib/types/SoullinkState";
 
 const MAX_SUGGESTIONS = 8;
 
@@ -68,7 +69,7 @@ export default function EncountersEditor({apiUrl, encounters: remoteEncounters, 
             if (i !== index) return row;
             const next = {...row, ...patch};
             // Only meaningful when the encounter resulted in a death.
-            if (next.action !== "dead") next.lostDueToPlayer = "none";
+            if (next.action === "caught") next.lostDueToPlayer = "none";
             return next;
         }));
         setSaved(false);
@@ -258,8 +259,9 @@ function EncounterRow({row, player1Name, player2Name, onChange, onRemove}: {
 
 // Compact Pokémon picker for a single table cell: shows the current pick (or
 // a placeholder) and opens a search dropdown to change it. Choosing "Clear"
-// resets the slot to 0 (unset).
-function PokemonCell({id, onChange}: { id: number; onChange: (id: number) => void }) {
+// resets the slot to 0 (unset). Exported for reuse by the single-player
+// nuzlocke encounters editor.
+export function PokemonCell({id, onChange}: { id: number; onChange: (id: number) => void }) {
     const [query, setQuery] = useState("");
     const [open, setOpen] = useState(false);
     const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);

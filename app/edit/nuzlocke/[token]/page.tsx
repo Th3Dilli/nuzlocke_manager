@@ -9,6 +9,7 @@ import BadgesEditor from "@/app/components/BadgesEditor";
 import EditorManager from "@/app/components/EditorManager";
 import LabelsEditor, {LabelSection} from "@/app/components/LabelsEditor";
 import OverlaySettingsEditor from "@/app/components/OverlaySettingsEditor";
+import NuzlockeEncountersEditor from "@/app/components/NuzlockeEncountersEditor";
 
 type NuzlockeLabelKey = "showNuzlockeLabel" | "nuzlockeLabel" | "showTrainerLabel" | "trainerLabel"
     | "showTeamLabel" | "teamLabel" | "showGraveyardLabel" | "graveyardLabel" | "showBadgesLabel" | "badgesLabel";
@@ -128,6 +129,7 @@ function HomeInner({token}: { token: string }) {
                         <TeamEditor apiUrl={apiUrl} field="team" team={stats.team} label="Edit Team"/>
                         <GraveyardEditor apiUrl={apiUrl} field="graveyard" graveyard={stats.graveyard} label="Edit Graveyard"/>
                         <BadgesEditor apiUrl={apiUrl} field="badges" badges={stats.badges} label="Edit Badges"/>
+                        <NuzlockeEncountersEditor apiUrl={apiUrl} encounters={stats.encounters}/>
                         <LabelsEditor
                             apiUrl={apiUrl}
                             sections={LABEL_SECTIONS}

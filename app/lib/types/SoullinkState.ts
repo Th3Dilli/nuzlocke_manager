@@ -1,9 +1,14 @@
 import {
     emptyTeam,
+    EncounterAction,
     MainAspectRatio,
+    MAX_ENCOUNTERS,
     normalizeColor,
+    normalizeEncounterAction,
     normalizeLabel,
     normalizeMainAspectRatio,
+    normalizePokemonId,
+    normalizeRoute,
     normalizeShowLabel
 } from "@/app/lib/types/NuzlockeState";
 
@@ -134,11 +139,9 @@ export function normalizeSoullinkSettings(input: unknown, fallback: SoullinkSett
 }
 
 // One row in the per-route encounter log: what was encountered on a given
-// route for each side, and how it was resolved.
-export type EncounterAction = "caught" | "dead" | "not_caught";
-
-export const ENCOUNTER_ACTIONS: readonly EncounterAction[] = ["caught", "dead", "not_caught"];
-const ENCOUNTER_ACTION_SET: ReadonlySet<string> = new Set(ENCOUNTER_ACTIONS);
+// route for each side, and how it was resolved. `EncounterAction` and its
+// helpers are shared with the single-player nuzlocke encounter log; see
+// NuzlockeState.ts.
 
 // Which side's Pokémon caused the loss under the soul-link death rule (both
 // partners must release/box when either one's linked Pokémon dies). "none"
@@ -157,25 +160,8 @@ export type SoullinkEncounter = {
     lostDueToPlayer: LostDueToPlayer;
 };
 
-export const MAX_ENCOUNTERS = 200;
-const MAX_ROUTE_LENGTH = 40;
-
-export function normalizeRoute(input: unknown, fallback = ""): string {
-    if (typeof input !== "string") return fallback;
-    return input.trim().slice(0, MAX_ROUTE_LENGTH);
-}
-
-export function normalizeEncounterAction(input: unknown, fallback: EncounterAction = "caught"): EncounterAction {
-    return typeof input === "string" && ENCOUNTER_ACTION_SET.has(input) ? (input as EncounterAction) : fallback;
-}
-
 export function normalizeLostDueToPlayer(input: unknown, fallback: LostDueToPlayer = "none"): LostDueToPlayer {
     return typeof input === "string" && LOST_DUE_TO_PLAYER_SET.has(input) ? (input as LostDueToPlayer) : fallback;
-}
-
-function normalizePokemonId(input: unknown): number {
-    const id = Number(input);
-    return Number.isInteger(id) && id > 0 ? id : 0;
 }
 
 // Coerce a single arbitrary object into a valid encounter row, or null if it

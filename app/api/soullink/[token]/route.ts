@@ -5,21 +5,21 @@ import {getUserBySoullinkToken} from "@/app/lib/users";
 import {POKEMON} from "@/app/lib/pokemon";
 import {BADGES} from "@/app/lib/badges";
 import {
+    EncounterAction,
+    ENCOUNTER_ACTIONS,
+    MAX_ENCOUNTERS,
     MAX_GRAVEYARD,
     normalizeColor,
     normalizeLabel,
     normalizeMainAspectRatio,
+    normalizeRoute,
     normalizeShowLabel,
     TEAM_SIZE
 } from "@/app/lib/types/NuzlockeState";
 import {
-    EncounterAction,
-    ENCOUNTER_ACTIONS,
     LostDueToPlayer,
     LOST_DUE_TO_PLAYER_OPTIONS,
-    MAX_ENCOUNTERS,
     normalizePlayerName,
-    normalizeRoute,
     SoullinkEncounter,
     SoullinkState
 } from "@/app/lib/types/SoullinkState";

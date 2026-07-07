@@ -112,6 +112,7 @@ function HomeInner({username}: { username: string }) {
                 if ('data' in e) {
                     try {
                         const stat = JSON.parse(e.data) as SoullinkState;
+                        console.log(stat);
                         setStats(stat);
                     } catch (err) {
                         console.error("Failed to parse SSE data", err);

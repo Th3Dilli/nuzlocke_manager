@@ -20,6 +20,7 @@ function OverlayInner({token}: { token: string }) {
         es.onmessage = (e) => {
             if ('data' in e) {
                 const stat = JSON.parse(e.data) as SoullinkState;
+                console.log(stat);
                 setStats(stat);
             } else {
                 setNotFound(true);

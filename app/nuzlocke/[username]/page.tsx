@@ -1,9 +1,54 @@
 "use client";
 
 import {use} from "react";
-import {NuzlockeState} from "@/app/lib/types/NuzlockeState";
+import {NuzlockeEncounter, NuzlockeState} from "@/app/lib/types/NuzlockeState";
 import {Suspense, useEffect, useState} from "react";
 import TeamBox, {BadgesV, Graveyard} from "@/app/components/TeamBox";
+import {DEFAULT_LANGUAGE, POKEMON, pokemonName} from "@/app/lib/pokemon";
+
+const ACTION_LABEL: Record<NuzlockeEncounter["action"], string> = {
+    caught: "Caught",
+    dead: "Dead",
+    not_caught: "Not Caught",
+};
+
+function EncounterPokemon({id}: { id: number }) {
+    if (!id) return <span className="text-gray-600">—</span>;
+    const pokemon = POKEMON.find(p => p.id === id);
+    return (
+        <span className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="h-8 w-8 [image-rendering:pixelated]" src={`/showdown/${id}.gif`} alt={pokemon ? pokemonName(pokemon, DEFAULT_LANGUAGE) : String(id)}/>
+            <span className="capitalize">{pokemon ? pokemonName(pokemon, DEFAULT_LANGUAGE) : id}</span>
+        </span>
+    );
+}
+
+function EncountersTable({encounters, borderColor}: { encounters: NuzlockeEncounter[]; borderColor?: string }) {
+    if (encounters.length === 0) return null;
+    return (
+        <div className="w-full overflow-x-auto bg-neutral-800/50 rounded-2xl border-[5px]" style={{borderColor: borderColor}}>
+            <table className="w-full min-w-[480px] border-separate border-spacing-y-1 text-sm">
+                <thead>
+                <tr className="text-left text-xs uppercase tracking-wide text-yellow-600">
+                    <th className="px-2 font-semibold">Route</th>
+                    <th className="px-2 font-semibold">Pokémon</th>
+                    <th className="px-2 font-semibold">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {encounters.map((row, i) => (
+                    <tr key={i} className="bg-neutral-900/50">
+                        <td className="rounded-l-md px-2 py-1.5">{row.route || "—"}</td>
+                        <td className="px-2 py-1.5"><EncounterPokemon id={row.pokemon}/></td>
+                        <td className="rounded-r-md px-2 py-1.5">{ACTION_LABEL[row.action]}</td>
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+        </div>
+    );
+}
 
 function HomeInner({username}: { username: string }) {
     const [stats, setStats] = useState<NuzlockeState | undefined>();
@@ -91,6 +136,8 @@ function HomeInner({username}: { username: string }) {
                 {stats.badgesEnabled && (
                     <BadgesV badges={stats.badges} label={stats.showBadgesLabel ? stats.badgesLabel : undefined} textColor={stats.textColor} className="h-auto min-h-20 w-full"/>
                 )}
+
+                <EncountersTable encounters={stats.encounters} borderColor={stats.teamColor}/>
             </main>
         </div>
     );

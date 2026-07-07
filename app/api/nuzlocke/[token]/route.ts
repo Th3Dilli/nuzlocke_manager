@@ -5,18 +5,24 @@ import {getUserByNuzlockeToken} from "@/app/lib/users";
 import {POKEMON} from "@/app/lib/pokemon";
 import {BADGES} from "@/app/lib/badges";
 import {
+    EncounterAction,
+    ENCOUNTER_ACTIONS,
+    MAX_ENCOUNTERS,
     MAX_GRAVEYARD,
     normalizeCamMode,
     normalizeColor,
     normalizeLabel,
     normalizeMainAspectRatio,
     normalizeMainWidth,
+    normalizeRoute,
     normalizeShowLabel,
+    NuzlockeEncounter,
     TEAM_SIZE
 } from "@/app/lib/types/NuzlockeState";
 
 const validIds = new Set(POKEMON.map(p => p.id));
 const validBadgeIds = new Set(BADGES.map(b => b.id));
+const validActions: ReadonlySet<string> = new Set(ENCOUNTER_ACTIONS);
 
 const LABEL_FIELDS = [
     ["showNuzlockeLabel", "nuzlockeLabel"],
@@ -65,9 +71,10 @@ export async function POST(
     const hasTeam = "team" in body;
     const hasGraveyard = "graveyard" in body;
     const hasBadges = "badges" in body;
+    const hasEncounters = "encounters" in body;
     const hasLabels = LABEL_FIELDS.some(([show, text]) => show in body || text in body);
     const hasSettings = SETTINGS_FIELDS.some(field => field in body);
-    if (!hasTeam && !hasGraveyard && !hasBadges && !hasLabels && !hasSettings) {
+    if (!hasTeam && !hasGraveyard && !hasBadges && !hasEncounters && !hasLabels && !hasSettings) {
         return new Response("Nothing to update", {status: 400});
     }
 
@@ -132,6 +139,41 @@ export async function POST(
         badges = Array.from(ids).sort((a, b) => a - b);
     }
 
+    let encounters: NuzlockeEncounter[] = current.encounters;
+    if (hasEncounters) {
+        const rawEncounters = body.encounters;
+        if (!Array.isArray(rawEncounters) || rawEncounters.length > MAX_ENCOUNTERS) {
+            return new Response("Invalid encounters", {status: 400});
+        }
+        encounters = [];
+        for (let i = 0; i < rawEncounters.length; i++) {
+            const raw = rawEncounters[i];
+            if (!raw || typeof raw !== "object") {
+                return new Response(`Invalid encounter at row ${i + 1}`, {status: 400});
+            }
+            const source = raw as Record<string, unknown>;
+
+            let pokemon = 0;
+            if (source.pokemon !== undefined && source.pokemon !== null && source.pokemon !== "" && source.pokemon !== 0) {
+                const id = Number(source.pokemon);
+                if (!Number.isInteger(id) || !validIds.has(id)) {
+                    return new Response(`Invalid pokemon id at row ${i + 1}`, {status: 400});
+                }
+                pokemon = id;
+            }
+
+            if (typeof source.action !== "string" || !validActions.has(source.action)) {
+                return new Response(`Invalid action at row ${i + 1}`, {status: 400});
+            }
+
+            encounters.push({
+                route: normalizeRoute(source.route),
+                pokemon,
+                action: source.action as EncounterAction,
+            });
+        }
+    }
+
     const labels = {
         showNuzlockeLabel: normalizeShowLabel(body.showNuzlockeLabel, current.showNuzlockeLabel),
         nuzlockeLabel: normalizeLabel(body.nuzlockeLabel, current.nuzlockeLabel),
@@ -156,6 +198,6 @@ export async function POST(
         badgesEnabled: normalizeShowLabel(body.badgesEnabled, current.badgesEnabled),
     };
 
-    setStats(username, {user: username, team, graveyard, badges, ...labels, ...settings});
+    setStats(username, {user: username, team, graveyard, badges, encounters, ...labels, ...settings});
     return Response.json({ok: true});
 }
