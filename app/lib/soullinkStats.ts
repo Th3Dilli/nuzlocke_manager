@@ -9,6 +9,7 @@ import {
 } from "@/app/lib/types/NuzlockeState";
 import {
     emptySoullinkState,
+    normalizePlayerName,
     normalizeSoullinkLabels,
     normalizeSoullinkSettings,
     SoullinkState
@@ -116,6 +117,8 @@ export function setStats(user: string, s: Partial<Omit<SoullinkState, "user">>) 
         if (s.teamColor !== undefined) userStat.teamColor = normalizeColor(s.teamColor, userStat.teamColor);
         if (s.graveyardColor !== undefined) userStat.graveyardColor = normalizeColor(s.graveyardColor, userStat.graveyardColor);
         if (s.textColor !== undefined) userStat.textColor = normalizeColor(s.textColor, userStat.textColor);
+        if (s.player1Name !== undefined) userStat.player1Name = normalizePlayerName(s.player1Name, userStat.player1Name);
+        if (s.player2Name !== undefined) userStat.player2Name = normalizePlayerName(s.player2Name, userStat.player2Name);
 
         upsertSoullinkStmt.run({
             user,

@@ -90,6 +90,10 @@ export type SoullinkSettings = {
     // Whether the badges section is shown at all in the overlay (separate from
     // showBadgesLabel/badgesLabel, which only control its title tab).
     badgesEnabled: boolean;
+    // Optional Twitch usernames identifying each side's player. When set, the
+    // public page shows/links this instead of the generic "Team 1"/"Team 2".
+    player1Name: string;
+    player2Name: string;
 };
 
 export const DEFAULT_SOULLINK_SETTINGS: SoullinkSettings = {
@@ -99,7 +103,19 @@ export const DEFAULT_SOULLINK_SETTINGS: SoullinkSettings = {
     graveyardColor: "#eab308",
     textColor: "#fde047",
     badgesEnabled: true,
+    player1Name: "",
+    player2Name: "",
 };
+
+export const MAX_PLAYER_NAME_LENGTH = 25; // Twitch usernames are capped at 25 characters.
+
+// Coerce arbitrary input into a valid player name: trims and caps length.
+// Unlike normalizeLabel, an empty result is kept as-is (not replaced by the
+// fallback) so the field can be cleared back to "unset".
+export function normalizePlayerName(input: unknown, fallback: string): string {
+    if (typeof input !== "string") return fallback;
+    return input.trim().slice(0, MAX_PLAYER_NAME_LENGTH);
+}
 
 // Coerce arbitrary input (e.g. parsed JSON) into a full set of overlay color
 // settings, falling back field-by-field to defaults for anything missing/invalid.
@@ -112,6 +128,8 @@ export function normalizeSoullinkSettings(input: unknown, fallback: SoullinkSett
         graveyardColor: normalizeColor(source.graveyardColor, fallback.graveyardColor),
         textColor: normalizeColor(source.textColor, fallback.textColor),
         badgesEnabled: normalizeShowLabel(source.badgesEnabled, fallback.badgesEnabled),
+        player1Name: normalizePlayerName(source.player1Name, fallback.player1Name),
+        player2Name: normalizePlayerName(source.player2Name, fallback.player2Name),
     };
 }
 

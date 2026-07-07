@@ -12,7 +12,7 @@ import {
     normalizeShowLabel,
     TEAM_SIZE
 } from "@/app/lib/types/NuzlockeState";
-import {SoullinkState} from "@/app/lib/types/SoullinkState";
+import {normalizePlayerName, SoullinkState} from "@/app/lib/types/SoullinkState";
 
 const validIds = new Set(POKEMON.map(p => p.id));
 const validBadgeIds = new Set(BADGES.map(b => b.id));
@@ -30,7 +30,8 @@ const LABEL_FIELDS = [
 ] as const;
 
 const COLOR_SETTINGS_FIELDS = ["frameBorderColor", "teamColor", "graveyardColor", "textColor"] as const;
-const SETTINGS_FIELDS = ["mainAspectRatio", "badgesEnabled", ...COLOR_SETTINGS_FIELDS] as const;
+const PLAYER_NAME_FIELDS = ["player1Name", "player2Name"] as const;
+const SETTINGS_FIELDS = ["mainAspectRatio", "badgesEnabled", ...COLOR_SETTINGS_FIELDS, ...PLAYER_NAME_FIELDS] as const;
 
 function parseTeam(rawTeam: unknown): number[] | { error: string } {
     if (!Array.isArray(rawTeam) || rawTeam.length > TEAM_SIZE) {
@@ -165,6 +166,9 @@ export async function POST(
     }
     for (const field of COLOR_SETTINGS_FIELDS) {
         if (field in body) update[field] = normalizeColor(body[field], current[field]);
+    }
+    for (const field of PLAYER_NAME_FIELDS) {
+        if (field in body) update[field] = normalizePlayerName(body[field], current[field]);
     }
 
     setStats(username, update);

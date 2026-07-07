@@ -133,12 +133,12 @@ function HomeInner({token}: { token: string }) {
                 {canEdit ? <div>
                         <div className="flex flex-col gap-4 md:flex-row">
                             <div className="flex-1">
-                                <TeamEditor apiUrl={apiUrl} field="team1" team={stats.team1} label="Edit Team 1"/>
-                                <GraveyardEditor apiUrl={apiUrl} field="graveyard1" graveyard={stats.graveyard1} label="Edit Graveyard 1"/>
+                                <TeamEditor apiUrl={apiUrl} field="team1" team={stats.team1} label={`Edit Team ${stats.player1Name || "1"}`}/>
+                                <GraveyardEditor apiUrl={apiUrl} field="graveyard1" graveyard={stats.graveyard1} label={`Edit Graveyard ${stats.player1Name || "1"}`}/>
                             </div>
                             <div className="flex-1">
-                                <TeamEditor apiUrl={apiUrl} field="team2" team={stats.team2} label="Edit Team 2"/>
-                                <GraveyardEditor apiUrl={apiUrl} field="graveyard2" graveyard={stats.graveyard2} label="Edit Graveyard 2"/>
+                                <TeamEditor apiUrl={apiUrl} field="team2" team={stats.team2} label={`Edit Team ${stats.player2Name || "2"}`}/>
+                                <GraveyardEditor apiUrl={apiUrl} field="graveyard2" graveyard={stats.graveyard2} label={`Edit Graveyard ${stats.player2Name || "2"}`}/>
                             </div>
                         </div>
                         <BadgesEditor apiUrl={apiUrl} field="badges" badges={stats.badges} label="Edit Badges"/>
@@ -175,6 +175,8 @@ function HomeInner({token}: { token: string }) {
                                 graveyardColor: stats.graveyardColor,
                                 textColor: stats.textColor,
                                 badgesEnabled: stats.badgesEnabled,
+                                player1Name: stats.player1Name,
+                                player2Name: stats.player2Name,
                             }}
                         />
                     </div>

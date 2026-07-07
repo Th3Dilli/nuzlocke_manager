@@ -5,7 +5,7 @@ import {AlertTriangle, Check, X} from "lucide-react";
 import {Pokeball} from "@/app/components/TeamBox";
 import Collapsible from "@/app/components/Collapsible";
 import {MainAspectRatio} from "@/app/lib/types/NuzlockeState";
-import {DEFAULT_SOULLINK_SETTINGS, SoullinkSettings} from "@/app/lib/types/SoullinkState";
+import {DEFAULT_SOULLINK_SETTINGS, MAX_PLAYER_NAME_LENGTH, SoullinkSettings} from "@/app/lib/types/SoullinkState";
 
 const MAIN_ASPECT_RATIO_OPTIONS: { value: string; label: string }[] = [
     {value: "4/3", label: "Nintendo DS (4/3)"},
@@ -18,7 +18,9 @@ function settingsEqual(a: SoullinkSettings, b: SoullinkSettings): boolean {
         && a.teamColor === b.teamColor
         && a.graveyardColor === b.graveyardColor
         && a.textColor === b.textColor
-        && a.badgesEnabled === b.badgesEnabled;
+        && a.badgesEnabled === b.badgesEnabled
+        && a.player1Name === b.player1Name
+        && a.player2Name === b.player2Name;
 }
 
 // Editor for the soullink overlay's border/text colors, shared across both sides.
@@ -138,6 +140,34 @@ export default function SoullinkSettingsEditor({apiUrl, values: remoteValues}: {
             )}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">
+                    <label className="block text-sm font-medium text-gray-200">
+                        Player 1 Twitch username
+                    </label>
+                    <input
+                        type="text"
+                        value={values.player1Name}
+                        onChange={e => update("player1Name", e.target.value)}
+                        placeholder="e.g. player1twitch"
+                        maxLength={MAX_PLAYER_NAME_LENGTH}
+                        className="mt-2 w-full rounded-md border border-yellow-600 bg-neutral-900 px-2 py-2 text-sm text-gray-200 outline-none focus:border-yellow-500"
+                    />
+                </div>
+
+                <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">
+                    <label className="block text-sm font-medium text-gray-200">
+                        Player 2 Twitch username
+                    </label>
+                    <input
+                        type="text"
+                        value={values.player2Name}
+                        onChange={e => update("player2Name", e.target.value)}
+                        placeholder="e.g. player2twitch"
+                        maxLength={MAX_PLAYER_NAME_LENGTH}
+                        className="mt-2 w-full rounded-md border border-yellow-600 bg-neutral-900 px-2 py-2 text-sm text-gray-200 outline-none focus:border-yellow-500"
+                    />
+                </div>
+
                 <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">
                     <label className="block text-sm font-medium text-gray-200">
                         Main screen aspect ratio
