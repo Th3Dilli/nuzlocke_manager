@@ -30,7 +30,6 @@ function EncountersTable({encounters, player1Name, player2Name, borderColor}: {
     player2Name?: string;
     borderColor?: string;
 }) {
-    if (encounters.length === 0) return null;
     return (
         <div className="w-full overflow-x-auto bg-neutral-800/50 rounded-2xl border-[5px]" style={{borderColor: borderColor}}>
             <table className="w-full min-w-[640px] text-base">
@@ -44,7 +43,7 @@ function EncountersTable({encounters, player1Name, player2Name, borderColor}: {
                 </tr>
                 </thead>
                 <tbody>
-                {encounters.map((row, i) => (
+                {encounters.length > 0 && encounters.map((row, i) => (
                     <tr key={i} className={i % 2 === 0 ? "bg-neutral-900/50" : "bg-neutral-800/30"}>
                         <td className="border-b border-yellow-600/60 px-2 py-1.5">{row.route || "—"}</td>
                         <td className="border-b border-yellow-600/60 px-2 py-1.5"><EncounterPokemon id={row.pokemon1}/></td>
