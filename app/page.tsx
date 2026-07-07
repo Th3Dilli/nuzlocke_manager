@@ -252,38 +252,44 @@ export default async function Home() {
                                                 <p className="text-gray-100 font-medium">{owner.username}</p>
                                             </div>
                                             {owner.nuzlocke_enabled === 1 || owner.soullink_enabled === 1 ? (
-                                                <div className="flex flex-col gap-1 text-sm">
+                                                <div className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
                                                     {owner.nuzlocke_enabled === 1 && owner.nuzlocke_token && (
-                                                        <>
+                                                        <div className="flex flex-col gap-1 rounded-md border border-yellow-700/30 p-2">
+                                                            <div className="mb-0.5 flex items-center gap-1.5 text-xs font-semibold text-gray-400">
+                                                                <Gamepad2 size={12}/> Nuzlocke
+                                                            </div>
                                                             <a href={`${baseUrl}/edit/nuzlocke/${owner.nuzlocke_token}`}
                                                                className="flex items-center gap-1.5 text-yellow-600 hover:underline">
-                                                                <Gamepad2 size={14}/> Nuzlocke Page
+                                                                <ExternalLink size={14}/> Edit Page
                                                             </a>
                                                             <a href={`${baseUrl}/overlay/nuzlocke/${owner.nuzlocke_token}`}
                                                                className="flex items-center gap-1.5 text-yellow-600 hover:underline">
-                                                                <Monitor size={14}/> Nuzlocke Overlay
+                                                                <Monitor size={14}/> Overlay
                                                             </a>
                                                             <a href={`${baseUrl}/nuzlocke/${owner.username}`}
                                                                className="flex items-center gap-1.5 text-yellow-600 hover:underline">
-                                                                <ExternalLink size={14}/> Public Nuzlocke Page
+                                                                <ExternalLink size={14}/> Public Page
                                                             </a>
-                                                        </>
+                                                        </div>
                                                     )}
                                                     {owner.soullink_enabled === 1 && owner.soullink_token && (
-                                                        <>
+                                                        <div className="flex flex-col gap-1 rounded-md border border-yellow-700/30 p-2">
+                                                            <div className="mb-0.5 flex items-center gap-1.5 text-xs font-semibold text-gray-400">
+                                                                <Swords size={12}/> Soullink
+                                                            </div>
                                                             <a href={`${baseUrl}/edit/soullink/${owner.soullink_token}`}
                                                                className="flex items-center gap-1.5 text-yellow-600 hover:underline">
-                                                                <Swords size={14}/> Soullink Page
+                                                                <ExternalLink size={14}/> Edit Page
                                                             </a>
                                                             <a href={`${baseUrl}/overlay/soullink/${owner.soullink_token}`}
                                                                className="flex items-center gap-1.5 text-yellow-600 hover:underline">
-                                                                <Monitor size={14}/> Soullink Overlay
+                                                                <Monitor size={14}/> Overlay
                                                             </a>
                                                             <a href={`${baseUrl}/soullink/${owner.username}`}
                                                                className="flex items-center gap-1.5 text-yellow-600 hover:underline">
-                                                                <ExternalLink size={14}/> Public Soullink Page
+                                                                <ExternalLink size={14}/> Public Page
                                                             </a>
-                                                        </>
+                                                        </div>
                                                     )}
                                                 </div>
                                             ) : (
