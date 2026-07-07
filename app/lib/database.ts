@@ -32,7 +32,8 @@ database.exec(`
         graveyard1 TEXT NOT NULL DEFAULT '[]',
         graveyard2 TEXT NOT NULL DEFAULT '[]',
         badges     TEXT NOT NULL DEFAULT '[]',
-        settings   TEXT NOT NULL DEFAULT '{}'
+        settings   TEXT NOT NULL DEFAULT '{}',
+        encounters TEXT NOT NULL DEFAULT '[]'
     );
 
     CREATE TABLE IF NOT EXISTS users
@@ -67,6 +68,14 @@ database.exec(`
         PRIMARY KEY (owner, editor)
     );
 `)
+
+// CREATE TABLE IF NOT EXISTS is a no-op on a database that already has the
+// `soullink` table from before the `encounters` column existed, so add it
+// here for databases that were provisioned with the older schema.
+const soullinkColumns = database.prepare("PRAGMA table_info(soullink)").all() as Array<{ name: string }>;
+if (!soullinkColumns.some(c => c.name === "encounters")) {
+    database.exec("ALTER TABLE soullink ADD COLUMN encounters TEXT NOT NULL DEFAULT '[]'");
+}
 
 export const upsertUser = database.prepare<{ twitch_id: string; username: string; profile_image_url: string; now: string }>(`
     INSERT INTO users (twitch_id, username, role, nuzlocke_enabled, soullink_enabled, nuzlocke_token, soullink_token, profile_image_url, created_at, updated_at)
@@ -170,15 +179,17 @@ export const upsertSoullinkStmt = database.prepare<{
     graveyard2: string;
     badges: string;
     settings: string;
+    encounters: string;
 }>(`
-    INSERT INTO soullink (user, team1, team2, graveyard1, graveyard2, badges, settings)
-    VALUES (@user, @team1, @team2, @graveyard1, @graveyard2, @badges, @settings)
+    INSERT INTO soullink (user, team1, team2, graveyard1, graveyard2, badges, settings, encounters)
+    VALUES (@user, @team1, @team2, @graveyard1, @graveyard2, @badges, @settings, @encounters)
     ON CONFLICT(user) DO UPDATE SET team1      = excluded.team1,
                                      team2      = excluded.team2,
                                      graveyard1 = excluded.graveyard1,
                                      graveyard2 = excluded.graveyard2,
                                      badges     = excluded.badges,
-                                     settings   = excluded.settings
+                                     settings   = excluded.settings,
+                                     encounters = excluded.encounters
 `);
 
 export const selectSoullinkStmt = database.prepare(`SELECT *

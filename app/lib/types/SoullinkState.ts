@@ -133,6 +133,81 @@ export function normalizeSoullinkSettings(input: unknown, fallback: SoullinkSett
     };
 }
 
+// One row in the per-route encounter log: what was encountered on a given
+// route for each side, and how it was resolved.
+export type EncounterAction = "caught" | "dead" | "not_caught";
+
+export const ENCOUNTER_ACTIONS: readonly EncounterAction[] = ["caught", "dead", "not_caught"];
+const ENCOUNTER_ACTION_SET: ReadonlySet<string> = new Set(ENCOUNTER_ACTIONS);
+
+// Which side's Pokémon caused the loss under the soul-link death rule (both
+// partners must release/box when either one's linked Pokémon dies). "none"
+// when not applicable (e.g. action isn't "dead").
+export type LostDueToPlayer = "player1" | "player2" | "none";
+
+export const LOST_DUE_TO_PLAYER_OPTIONS: readonly LostDueToPlayer[] = ["player1", "player2", "none"];
+const LOST_DUE_TO_PLAYER_SET: ReadonlySet<string> = new Set(LOST_DUE_TO_PLAYER_OPTIONS);
+
+export type SoullinkEncounter = {
+    route: string;
+    // Pokémon id for each side's encounter on this route, or 0 if unset.
+    pokemon1: number;
+    pokemon2: number;
+    action: EncounterAction;
+    lostDueToPlayer: LostDueToPlayer;
+};
+
+export const MAX_ENCOUNTERS = 200;
+const MAX_ROUTE_LENGTH = 40;
+
+export function normalizeRoute(input: unknown, fallback = ""): string {
+    if (typeof input !== "string") return fallback;
+    return input.trim().slice(0, MAX_ROUTE_LENGTH);
+}
+
+export function normalizeEncounterAction(input: unknown, fallback: EncounterAction = "caught"): EncounterAction {
+    return typeof input === "string" && ENCOUNTER_ACTION_SET.has(input) ? (input as EncounterAction) : fallback;
+}
+
+export function normalizeLostDueToPlayer(input: unknown, fallback: LostDueToPlayer = "none"): LostDueToPlayer {
+    return typeof input === "string" && LOST_DUE_TO_PLAYER_SET.has(input) ? (input as LostDueToPlayer) : fallback;
+}
+
+function normalizePokemonId(input: unknown): number {
+    const id = Number(input);
+    return Number.isInteger(id) && id > 0 ? id : 0;
+}
+
+// Coerce a single arbitrary object into a valid encounter row, or null if it
+// isn't shaped like one. Ids here aren't checked against the Pokémon catalog
+// (that's the API route's job); this just guarantees the shape is safe to store.
+export function normalizeEncounter(input: unknown): SoullinkEncounter | null {
+    if (!input || typeof input !== "object") return null;
+    const source = input as Record<string, unknown>;
+    return {
+        route: normalizeRoute(source.route),
+        pokemon1: normalizePokemonId(source.pokemon1),
+        pokemon2: normalizePokemonId(source.pokemon2),
+        action: normalizeEncounterAction(source.action),
+        lostDueToPlayer: normalizeLostDueToPlayer(source.lostDueToPlayer),
+    };
+}
+
+// Coerce arbitrary input (e.g. parsed JSON) into a valid encounter list,
+// dropping anything malformed and capping at MAX_ENCOUNTERS.
+export function normalizeEncounters(input: unknown): SoullinkEncounter[] {
+    if (!Array.isArray(input)) return [];
+    const out: SoullinkEncounter[] = [];
+    for (const raw of input) {
+        const encounter = normalizeEncounter(raw);
+        if (encounter) {
+            out.push(encounter);
+            if (out.length >= MAX_ENCOUNTERS) break;
+        }
+    }
+    return out;
+}
+
 export type SoullinkState = SoullinkLabels & SoullinkSettings & {
     user: string;
     // Always length TEAM_SIZE. Each entry is a Pokémon id, or 0 for an empty slot.
@@ -145,6 +220,8 @@ export type SoullinkState = SoullinkLabels & SoullinkSettings & {
     // Ids of earned gym badges (see app/lib/badges.json), shared by both
     // trainers since a soul link run plays through the same gyms together.
     badges: number[];
+    // Per-route encounter log, in the order routes were entered.
+    encounters: SoullinkEncounter[];
 };
 
 export function emptySoullinkState(user: string): SoullinkState {
@@ -155,6 +232,7 @@ export function emptySoullinkState(user: string): SoullinkState {
         graveyard1: [],
         graveyard2: [],
         badges: [],
+        encounters: [],
         ...DEFAULT_SOULLINK_LABELS,
         ...DEFAULT_SOULLINK_SETTINGS,
     };

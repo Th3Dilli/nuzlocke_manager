@@ -12,10 +12,22 @@ import {
     normalizeShowLabel,
     TEAM_SIZE
 } from "@/app/lib/types/NuzlockeState";
-import {normalizePlayerName, SoullinkState} from "@/app/lib/types/SoullinkState";
+import {
+    EncounterAction,
+    ENCOUNTER_ACTIONS,
+    LostDueToPlayer,
+    LOST_DUE_TO_PLAYER_OPTIONS,
+    MAX_ENCOUNTERS,
+    normalizePlayerName,
+    normalizeRoute,
+    SoullinkEncounter,
+    SoullinkState
+} from "@/app/lib/types/SoullinkState";
 
 const validIds = new Set(POKEMON.map(p => p.id));
 const validBadgeIds = new Set(BADGES.map(b => b.id));
+const validActions: ReadonlySet<string> = new Set(ENCOUNTER_ACTIONS);
+const validLostDueToPlayer: ReadonlySet<string> = new Set(LOST_DUE_TO_PLAYER_OPTIONS);
 
 const LABEL_FIELDS = [
     ["showSoullink1Label", "soullink1Label"],
@@ -82,6 +94,52 @@ function parseBadges(rawBadges: unknown): number[] | { error: string } {
     return Array.from(ids).sort((a, b) => a - b);
 }
 
+function parsePokemonId(value: unknown, label: string): number | { error: string } {
+    if (value === undefined || value === null || value === "" || value === 0) {
+        return 0; // unset
+    }
+    const id = Number(value);
+    if (!Number.isInteger(id) || !validIds.has(id)) {
+        return {error: `Invalid pokemon id for ${label}`};
+    }
+    return id;
+}
+
+function parseEncounters(rawEncounters: unknown): SoullinkEncounter[] | { error: string } {
+    if (!Array.isArray(rawEncounters) || rawEncounters.length > MAX_ENCOUNTERS) {
+        return {error: "Invalid encounters"};
+    }
+    const encounters: SoullinkEncounter[] = [];
+    for (let i = 0; i < rawEncounters.length; i++) {
+        const raw = rawEncounters[i];
+        if (!raw || typeof raw !== "object") {
+            return {error: `Invalid encounter at row ${i + 1}`};
+        }
+        const source = raw as Record<string, unknown>;
+
+        const pokemon1 = parsePokemonId(source.pokemon1, `row ${i + 1} pokemon 1`);
+        if (typeof pokemon1 !== "number") return pokemon1;
+        const pokemon2 = parsePokemonId(source.pokemon2, `row ${i + 1} pokemon 2`);
+        if (typeof pokemon2 !== "number") return pokemon2;
+
+        if (typeof source.action !== "string" || !validActions.has(source.action)) {
+            return {error: `Invalid action at row ${i + 1}`};
+        }
+        if (typeof source.lostDueToPlayer !== "string" || !validLostDueToPlayer.has(source.lostDueToPlayer)) {
+            return {error: `Invalid lostDueToPlayer at row ${i + 1}`};
+        }
+
+        encounters.push({
+            route: normalizeRoute(source.route),
+            pokemon1,
+            pokemon2,
+            action: source.action as EncounterAction,
+            lostDueToPlayer: source.lostDueToPlayer as LostDueToPlayer,
+        });
+    }
+    return encounters;
+}
+
 // Update either team's roster, graveyard, and/or the shared badges for a
 // user's soullink page. The page owner and any editor the owner has granted
 // may write to it. The body may contain any of `team1`, `team2`,
@@ -116,9 +174,10 @@ export async function POST(
 
     const fields = ["team1", "team2", "graveyard1", "graveyard2"] as const;
     const hasBadges = "badges" in body;
+    const hasEncounters = "encounters" in body;
     const hasLabels = LABEL_FIELDS.some(([show, text]) => show in body || text in body);
     const hasSettings = SETTINGS_FIELDS.some(field => field in body);
-    if (!fields.some(f => f in body) && !hasBadges && !hasLabels && !hasSettings) {
+    if (!fields.some(f => f in body) && !hasBadges && !hasEncounters && !hasLabels && !hasSettings) {
         return new Response("Nothing to update", {status: 400});
     }
 
@@ -151,6 +210,12 @@ export async function POST(
         const result = parseBadges(body.badges);
         if (!Array.isArray(result)) return new Response(result.error, {status: 400});
         update.badges = result;
+    }
+
+    if (hasEncounters) {
+        const result = parseEncounters(body.encounters);
+        if (!Array.isArray(result)) return new Response(result.error, {status: 400});
+        update.encounters = result;
     }
 
     for (const [showKey, textKey] of LABEL_FIELDS) {

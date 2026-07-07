@@ -9,6 +9,7 @@ import BadgesEditor from "@/app/components/BadgesEditor";
 import EditorManager from "@/app/components/EditorManager";
 import LabelsEditor, {LabelSection} from "@/app/components/LabelsEditor";
 import SoullinkSettingsEditor from "@/app/components/SoullinkSettingsEditor";
+import EncountersEditor from "@/app/components/EncountersEditor";
 
 type SoullinkLabelKey = "showSoullink1Label" | "soullink1Label" | "showSoullink2Label" | "soullink2Label"
     | "showTrainer1Label" | "trainer1Label" | "showTrainer2Label" | "trainer2Label"
@@ -142,6 +143,12 @@ function HomeInner({token}: { token: string }) {
                             </div>
                         </div>
                         <BadgesEditor apiUrl={apiUrl} field="badges" badges={stats.badges} label="Edit Badges"/>
+                        <EncountersEditor
+                            apiUrl={apiUrl}
+                            encounters={stats.encounters}
+                            player1Name={stats.player1Name}
+                            player2Name={stats.player2Name}
+                        />
                         <LabelsEditor
                             apiUrl={apiUrl}
                             sections={LABEL_SECTIONS}
