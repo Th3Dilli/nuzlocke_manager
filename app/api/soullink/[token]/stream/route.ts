@@ -1,14 +1,25 @@
-import {getStats, subscribe, unsubscribe} from "@/app/lib/stats";
+import {getStats, subscribe, unsubscribe} from "@/app/lib/soullinkStats";
+import {getUserBySoullinkToken} from "@/app/lib/users";
 
 export async function GET(
     request: Request,
-    {params}: { params: Promise<{ username: string }> }
+    {params}: { params: Promise<{ token: string }> }
 ) {
-    const {username} = await params;
+    const {token} = await params;
+    const owner = getUserBySoullinkToken(token);
     const encoder = new TextEncoder();
 
     const stream = new ReadableStream({
         start(controller) {
+            if (!owner) {
+                controller.enqueue(
+                    encoder.encode(`event: not_found\ndata: ${JSON.stringify({error: true})}\n\n`)
+                );
+                controller.close();
+                return;
+            }
+            const username = owner.username;
+
             const send = (data: object) => {
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
             };

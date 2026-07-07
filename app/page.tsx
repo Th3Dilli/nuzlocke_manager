@@ -3,6 +3,7 @@ import {getSessionUser} from '@/app/lib/session'
 import {getEditingFor} from '@/app/lib/editors'
 import Header from "@/app/components/Header";
 import CopyKeyField from "@/app/components/CopyField";
+import RegenerateTokenButton from "@/app/components/RegenerateTokenButton";
 import {updatePageEnabled as updateNuzlockePageEnabled} from "@/app/lib/stats";
 import {updatePageEnabled as updateSoullinkPageEnabled} from "@/app/lib/soullinkStats";
 import {revalidatePath} from "next/cache";
@@ -90,7 +91,7 @@ export default async function Home() {
         return (<div className="min-h-screen page-bg">
                 <Header/>
                 <div className="flex flex-col items-center px-4 pb-12">
-                    <div className="w-full max-w-2xl space-y-6">
+                    <div className="w-full max-w-5xl space-y-6">
 
                         <div className="flex items-center gap-4 p-6 rounded-xl border border-yellow-600 bg-neutral-900/90">
                             <img
@@ -122,20 +123,30 @@ export default async function Home() {
                                     <StatusBadge enabled={user.nuzlocke_enabled === 1}/>
                                 </div>
                                 {user.nuzlocke_enabled === 1 ? (
-                                    <div>
-                                        <div className="flex flex-col gap-1 text-sm">
-                                            <a href={`${baseUrl}/nuzlocke/${user.username}`}
-                                               className="flex items-center gap-1.5 text-yellow-600 hover:underline">
-                                                <ExternalLink size={14}/> Go to Nuzlocke Page
-                                            </a>
-                                            <a href={`${baseUrl}/overlay/nuzlocke/${user.username}`}
-                                               className="flex items-center gap-1.5 text-yellow-600 hover:underline">
-                                                <Monitor size={14}/> Go to Nuzlocke Overlay
-                                            </a>
+                                    user.nuzlocke_token ? (
+                                        <div>
+                                            <div className="flex flex-col gap-1 text-sm">
+                                                <a href={`${baseUrl}/edit/nuzlocke/${user.nuzlocke_token}`}
+                                                   className="flex items-center gap-1.5 text-yellow-600 hover:underline">
+                                                    <ExternalLink size={14}/> Go to Nuzlocke Page
+                                                </a>
+                                                <a href={`${baseUrl}/overlay/nuzlocke/${user.nuzlocke_token}`}
+                                                   className="flex items-center gap-1.5 text-yellow-600 hover:underline">
+                                                    <Monitor size={14}/> Go to Nuzlocke Overlay
+                                                </a>
+                                            </div>
+                                            <CopyKeyField name="Nuzlocke Overlay OBS Browser Source:"
+                                                          url={`${baseUrl}/overlay/nuzlocke/${user.nuzlocke_token}`}/>
+                                            <div className="px-4 -mt-2">
+                                                <RegenerateTokenButton type="nuzlocke"/>
+                                            </div>
                                         </div>
-                                        <CopyKeyField name="Nuzlocke Overlay OBS Browser Source:"
-                                                      url={`${baseUrl}/overlay/nuzlocke/${user.username}`}/>
-                                    </div>
+                                    ) : (
+                                        <div className="flex items-center gap-3">
+                                            <p className="text-sm text-gray-500">No token yet.</p>
+                                            <RegenerateTokenButton type="nuzlocke"/>
+                                        </div>
+                                    )
                                 ) : (
                                     <p className="text-sm text-gray-500">Enable this page below to get your links.</p>
                                 )}
@@ -149,20 +160,30 @@ export default async function Home() {
                                     <StatusBadge enabled={user.soullink_enabled === 1}/>
                                 </div>
                                 {user.soullink_enabled === 1 ? (
-                                    <div>
-                                        <div className="flex flex-col gap-1 text-sm">
-                                            <a href={`${baseUrl}/soullink/${user.username}`}
-                                               className="flex items-center gap-1.5 text-yellow-600 hover:underline">
-                                                <ExternalLink size={14}/> Go to Soullink Page
-                                            </a>
-                                            <a href={`${baseUrl}/overlay/soullink/${user.username}`}
-                                               className="flex items-center gap-1.5 text-yellow-600 hover:underline">
-                                                <Monitor size={14}/> Go to Soullink Overlay
-                                            </a>
+                                    user.soullink_token ? (
+                                        <div>
+                                            <div className="flex flex-col gap-1 text-sm">
+                                                <a href={`${baseUrl}/edit/soullink/${user.soullink_token}`}
+                                                   className="flex items-center gap-1.5 text-yellow-600 hover:underline">
+                                                    <ExternalLink size={14}/> Go to Soullink Page
+                                                </a>
+                                                <a href={`${baseUrl}/overlay/soullink/${user.soullink_token}`}
+                                                   className="flex items-center gap-1.5 text-yellow-600 hover:underline">
+                                                    <Monitor size={14}/> Go to Soullink Overlay
+                                                </a>
+                                            </div>
+                                            <CopyKeyField name="Soullink Overlay OBS Browser Source:"
+                                                          url={`${baseUrl}/overlay/soullink/${user.soullink_token}`}/>
+                                            <div className="px-4 -mt-2">
+                                                <RegenerateTokenButton type="soullink"/>
+                                            </div>
                                         </div>
-                                        <CopyKeyField name="Soullink Overlay OBS Browser Source:"
-                                                      url={`${baseUrl}/overlay/soullink/${user.username}`}/>
-                                    </div>
+                                    ) : (
+                                        <div className="flex items-center gap-3">
+                                            <p className="text-sm text-gray-500">No token yet.</p>
+                                            <RegenerateTokenButton type="soullink"/>
+                                        </div>
+                                    )
                                 ) : (
                                     <p className="text-sm text-gray-500">Enable this page below to get your links.</p>
                                 )}
@@ -224,25 +245,25 @@ export default async function Home() {
                                             </div>
                                             {owner.nuzlocke_enabled === 1 || owner.soullink_enabled === 1 ? (
                                                 <div className="flex flex-col gap-1 text-sm">
-                                                    {owner.nuzlocke_enabled === 1 && (
+                                                    {owner.nuzlocke_enabled === 1 && owner.nuzlocke_token && (
                                                         <>
-                                                            <a href={`${baseUrl}/nuzlocke/${owner.username}`}
+                                                            <a href={`${baseUrl}/edit/nuzlocke/${owner.nuzlocke_token}`}
                                                                className="flex items-center gap-1.5 text-yellow-600 hover:underline">
                                                                 <Gamepad2 size={14}/> Nuzlocke Page
                                                             </a>
-                                                            <a href={`${baseUrl}/overlay/nuzlocke/${owner.username}`}
+                                                            <a href={`${baseUrl}/overlay/nuzlocke/${owner.nuzlocke_token}`}
                                                                className="flex items-center gap-1.5 text-yellow-600 hover:underline">
                                                                 <Monitor size={14}/> Nuzlocke Overlay
                                                             </a>
                                                         </>
                                                     )}
-                                                    {owner.soullink_enabled === 1 && (
+                                                    {owner.soullink_enabled === 1 && owner.soullink_token && (
                                                         <>
-                                                            <a href={`${baseUrl}/soullink/${owner.username}`}
+                                                            <a href={`${baseUrl}/edit/soullink/${owner.soullink_token}`}
                                                                className="flex items-center gap-1.5 text-yellow-600 hover:underline">
                                                                 <Swords size={14}/> Soullink Page
                                                             </a>
-                                                            <a href={`${baseUrl}/overlay/soullink/${owner.username}`}
+                                                            <a href={`${baseUrl}/overlay/soullink/${owner.soullink_token}`}
                                                                className="flex items-center gap-1.5 text-yellow-600 hover:underline">
                                                                 <Monitor size={14}/> Soullink Overlay
                                                             </a>

@@ -10,7 +10,7 @@ type Editor = { editorId: string; editorName: string; canManage: boolean };
 // A manager-editor (canManage) can also use this panel, but with reduced
 // privileges: they can add/remove regular editors, but cannot grant manage
 // permission or touch other managers.
-export default function EditorManager({username, isOwner}: { username: string; isOwner: boolean }) {
+export default function EditorManager({apiUrl, isOwner}: { apiUrl: string; isOwner: boolean }) {
     const [editors, setEditors] = useState<Editor[]>([]);
     const [input, setInput] = useState("");
     const [grantManage, setGrantManage] = useState(false);
@@ -19,7 +19,7 @@ export default function EditorManager({username, isOwner}: { username: string; i
 
     useEffect(() => {
         let cancelled = false;
-        fetch(`/api/${username}/editors`)
+        fetch(apiUrl)
             .then(res => (res.ok ? res.json() : {editors: []}))
             .then((data: { editors: Editor[] }) => {
                 if (!cancelled) setEditors(data.editors);
@@ -28,7 +28,7 @@ export default function EditorManager({username, isOwner}: { username: string; i
         return () => {
             cancelled = true;
         };
-    }, [username]);
+    }, [apiUrl]);
 
     async function addEditor(e: FormEvent) {
         e.preventDefault();
@@ -38,7 +38,7 @@ export default function EditorManager({username, isOwner}: { username: string; i
         setBusy(true);
         setError(null);
         try {
-            const res = await fetch(`/api/${username}/editors`, {
+            const res = await fetch(apiUrl, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({editor, canManage: isOwner && grantManage}),
@@ -61,7 +61,7 @@ export default function EditorManager({username, isOwner}: { username: string; i
     async function removeEditor(editorId: string) {
         setError(null);
         try {
-            const res = await fetch(`/api/${username}/editors`, {
+            const res = await fetch(apiUrl, {
                 method: "DELETE",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({editorId}),
@@ -80,7 +80,7 @@ export default function EditorManager({username, isOwner}: { username: string; i
     async function setManage(editorId: string, canManage: boolean) {
         setError(null);
         try {
-            const res = await fetch(`/api/${username}/editors`, {
+            const res = await fetch(apiUrl, {
                 method: "PATCH",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({editorId, canManage}),

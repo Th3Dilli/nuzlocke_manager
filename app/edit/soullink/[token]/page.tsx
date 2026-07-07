@@ -49,7 +49,7 @@ function TeamColumn({label, team, teamLabel, graveyard, graveyardLabel, teamColo
     );
 }
 
-function HomeInner({username}: { username: string }) {
+function HomeInner({token}: { token: string }) {
     const [stats, setStats] = useState<SoullinkState | undefined>();
 
     const [notFound, setNotFound] = useState(false);
@@ -57,9 +57,11 @@ function HomeInner({username}: { username: string }) {
     const [canEdit, setCanEdit] = useState(false);
     const [canManageEditors, setCanManageEditors] = useState(false);
 
+    const apiUrl = `/api/soullink/${token}`;
+
     useEffect(() => {
         let cancelled = false;
-        fetch(`/api/${username}/permissions`)
+        fetch(`${apiUrl}/permissions`)
             .then(res => res.json())
             .then((data: { isOwner: boolean; canEdit: boolean; canManageEditors: boolean }) => {
                 if (!cancelled) {
@@ -73,7 +75,7 @@ function HomeInner({username}: { username: string }) {
         return () => {
             cancelled = true;
         };
-    }, [username]);
+    }, [apiUrl]);
 
     useEffect(() => {
         let es: EventSource | null = null;
@@ -83,7 +85,7 @@ function HomeInner({username}: { username: string }) {
                 es.close();
             }
 
-            es = new EventSource(`/api/soullink/${username}/stream`);
+            es = new EventSource(`${apiUrl}/stream`);
 
             es.onmessage = (e) => {
                 if ('data' in e) {
@@ -119,7 +121,7 @@ function HomeInner({username}: { username: string }) {
                 es.close();
             }
         };
-    }, [username]);
+    }, [apiUrl]);
 
     if (notFound) {
         return (
@@ -139,16 +141,14 @@ function HomeInner({username}: { username: string }) {
         <div>Loading...</div>
     )
 
-    const apiUrl = `/api/soullink/${username}`;
-
     return (
         <div className="text-yellow-500 p-4">
             <main className="max-w-7xl mx-auto flex flex-col gap-4">
                 <div className="flex justify-center">
-                    <a href={`https://twitch.tv/${username}`}
+                    <a href={`https://twitch.tv/${stats.user}`}
                        className="flex flex-row items-center gap-2 bg-[#9146ff] hover:bg-[#7d2ff7] text-white text-sm font-bold pl-2 pr-3 py-1.5 rounded-lg transition-colors">
                         <img src="/glitch_white.svg" alt="" className="w-4 h-4"/>
-                        <p>{username}</p>
+                        <p>{stats.user}</p>
                     </a>
                 </div>
 
@@ -227,18 +227,18 @@ function HomeInner({username}: { username: string }) {
                         }}
                     />
                 )}
-                {(isOwner || canManageEditors) && <EditorManager username={username} isOwner={isOwner}/>}
+                {(isOwner || canManageEditors) && <EditorManager apiUrl={`${apiUrl}/editors`} isOwner={isOwner}/>}
             </main>
         </div>
     );
 }
 
 
-export default function UserPage({params}: { params: Promise<{ username: string }> }) {
-    const {username} = use(params);
+export default function EditPage({params}: { params: Promise<{ token: string }> }) {
+    const {token} = use(params);
     return (
         <Suspense>
-            <HomeInner key={username} username={username}/>
+            <HomeInner key={token} token={token}/>
         </Suspense>
     );
 }

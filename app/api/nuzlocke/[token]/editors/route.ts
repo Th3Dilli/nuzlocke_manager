@@ -1,5 +1,6 @@
 import {getSessionUser} from "@/app/lib/session";
 import {addTeamEditor, canManageEditors, getTeamEditors, isTeamEditorManager, removeTeamEditor, setTeamEditorRole} from "@/app/lib/editors";
+import {getUserByNuzlockeToken} from "@/app/lib/users";
 import {resolveTwitchIdByLogin} from "@/app/lib/twitch";
 
 // Twitch usernames are 4-25 chars: letters, digits and underscores.
@@ -35,19 +36,28 @@ async function requireManageAccess(username: string): Promise<
 
 export async function GET(
     _request: Request,
-    {params}: { params: Promise<{ username: string }> }
+    {params}: { params: Promise<{ token: string }> }
 ) {
-    const {username} = await params;
-    const auth = await requireManageAccess(username);
+    const {token} = await params;
+    const owner = getUserByNuzlockeToken(token);
+    if (!owner) {
+        return new Response("Not Found", {status: 404});
+    }
+    const auth = await requireManageAccess(owner.username);
     if (!auth.ok) return auth.response;
-    return Response.json({editors: getTeamEditors(username)});
+    return Response.json({editors: getTeamEditors(owner.username)});
 }
 
 export async function POST(
     request: Request,
-    {params}: { params: Promise<{ username: string }> }
+    {params}: { params: Promise<{ token: string }> }
 ) {
-    const {username} = await params;
+    const {token} = await params;
+    const owner = getUserByNuzlockeToken(token);
+    if (!owner) {
+        return new Response("Not Found", {status: 404});
+    }
+    const username = owner.username;
     const auth = await requireManageAccess(username);
     if (!auth.ok) return auth.response;
 
@@ -87,9 +97,15 @@ export async function POST(
 // Owner-only: promote/demote an existing editor's manage permission.
 export async function PATCH(
     request: Request,
-    {params}: { params: Promise<{ username: string }> }
+    {params}: { params: Promise<{ token: string }> }
 ) {
-    const {username} = await params;
+    const {token} = await params;
+    const owner = getUserByNuzlockeToken(token);
+    if (!owner) {
+        return new Response("Not Found", {status: 404});
+    }
+    const username = owner.username;
+
     const sessionUser = await getSessionUser();
     if (!sessionUser) {
         return new Response("Unauthorized", {status: 401});
@@ -116,9 +132,14 @@ export async function PATCH(
 
 export async function DELETE(
     request: Request,
-    {params}: { params: Promise<{ username: string }> }
+    {params}: { params: Promise<{ token: string }> }
 ) {
-    const {username} = await params;
+    const {token} = await params;
+    const owner = getUserByNuzlockeToken(token);
+    if (!owner) {
+        return new Response("Not Found", {status: 404});
+    }
+    const username = owner.username;
     const auth = await requireManageAccess(username);
     if (!auth.ok) return auth.response;
 

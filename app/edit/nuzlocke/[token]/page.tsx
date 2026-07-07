@@ -23,7 +23,7 @@ const LABEL_SECTIONS: LabelSection<NuzlockeLabelKey>[] = [
 ];
 
 
-function HomeInner({username}: { username: string }) {
+function HomeInner({token}: { token: string }) {
     const [stats, setStats] = useState<NuzlockeState | undefined>();
 
     const [notFound, setNotFound] = useState(false);
@@ -31,9 +31,11 @@ function HomeInner({username}: { username: string }) {
     const [canEdit, setCanEdit] = useState(false);
     const [canManageEditors, setCanManageEditors] = useState(false);
 
+    const apiUrl = `/api/nuzlocke/${token}`;
+
     useEffect(() => {
         let cancelled = false;
-        fetch(`/api/${username}/permissions`)
+        fetch(`${apiUrl}/permissions`)
             .then(res => res.json())
             .then((data: { isOwner: boolean; canEdit: boolean; canManageEditors: boolean }) => {
                 if (!cancelled) {
@@ -47,7 +49,7 @@ function HomeInner({username}: { username: string }) {
         return () => {
             cancelled = true;
         };
-    }, [username]);
+    }, [apiUrl]);
 
     useEffect(() => {
         let es: EventSource | null = null;
@@ -57,8 +59,7 @@ function HomeInner({username}: { username: string }) {
                 es.close();
             }
 
-            console.log(`Starting EventSource stream for: ${username}`);
-            es = new EventSource(`/api/${username}/stream`);
+            es = new EventSource(`${apiUrl}/stream`);
 
             es.onmessage = (e) => {
                 if ('data' in e) {
@@ -74,7 +75,7 @@ function HomeInner({username}: { username: string }) {
                 }
             };
 
-            es.addEventListener("not_found", (e) => {
+            es.addEventListener("not_found", () => {
                 setNotFound(true);
                 es?.close();
             });
@@ -90,12 +91,11 @@ function HomeInner({username}: { username: string }) {
         startStream();
 
         return () => {
-            console.log(`Cleaning up stream for: ${username}`);
             if (es) {
                 es.close();
             }
         };
-    }, [username]);
+    }, [apiUrl]);
 
     if (notFound) {
         return (
@@ -119,10 +119,10 @@ function HomeInner({username}: { username: string }) {
         <div className="text-yellow-500 p-4">
             <main className="max-w-7xl mx-auto flex flex-col gap-4">
                 <div className="flex justify-center">
-                    <a href={`https://twitch.tv/${username}`}
+                    <a href={`https://twitch.tv/${stats.user}`}
                        className="flex flex-row items-center gap-2 bg-[#9146ff] hover:bg-[#7d2ff7] text-white text-sm font-bold pl-2 pr-3 py-1.5 rounded-lg transition-colors">
                         <img src="/glitch_white.svg" alt="" className="w-4 h-4"/>
-                        <p>{username}</p>
+                        <p>{stats.user}</p>
                     </a>
                 </div>
                 <div className="flex justify-center items-center gap-2">
@@ -131,12 +131,12 @@ function HomeInner({username}: { username: string }) {
                     </Graveyard>
                 </div>
 
-                {canEdit && <TeamEditor apiUrl={`/api/${username}`} field="team" team={stats.team} label="Edit Team"/>}
-                {canEdit && <GraveyardEditor apiUrl={`/api/${username}`} field="graveyard" graveyard={stats.graveyard} label="Edit Graveyard"/>}
-                {canEdit && <BadgesEditor apiUrl={`/api/${username}`} field="badges" badges={stats.badges} label="Edit Badges"/>}
+                {canEdit && <TeamEditor apiUrl={apiUrl} field="team" team={stats.team} label="Edit Team"/>}
+                {canEdit && <GraveyardEditor apiUrl={apiUrl} field="graveyard" graveyard={stats.graveyard} label="Edit Graveyard"/>}
+                {canEdit && <BadgesEditor apiUrl={apiUrl} field="badges" badges={stats.badges} label="Edit Badges"/>}
                 {canEdit && (
                     <LabelsEditor
-                        apiUrl={`/api/${username}`}
+                        apiUrl={apiUrl}
                         sections={LABEL_SECTIONS}
                         values={{
                             showNuzlockeLabel: stats.showNuzlockeLabel,
@@ -154,7 +154,7 @@ function HomeInner({username}: { username: string }) {
                 )}
                 {canEdit && (
                     <OverlaySettingsEditor
-                        apiUrl={`/api/${username}`}
+                        apiUrl={apiUrl}
                         values={{
                             mainWidth: stats.mainWidth,
                             mainAspectRatio: stats.mainAspectRatio,
@@ -167,18 +167,18 @@ function HomeInner({username}: { username: string }) {
                         }}
                     />
                 )}
-                {(isOwner || canManageEditors) && <EditorManager username={username} isOwner={isOwner}/>}
+                {(isOwner || canManageEditors) && <EditorManager apiUrl={`${apiUrl}/editors`} isOwner={isOwner}/>}
             </main>
         </div>
     );
 }
 
 
-export default function UserPage({params}: { params: Promise<{ username: string }> }) {
-    const {username} = use(params);
+export default function EditPage({params}: { params: Promise<{ token: string }> }) {
+    const {token} = use(params);
     return (
         <Suspense>
-            <HomeInner key={username} username={username}/>
+            <HomeInner key={token} token={token}/>
         </Suspense>
     );
 }

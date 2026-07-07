@@ -9,31 +9,23 @@ import {
     normalizeTeam,
     NuzlockeState
 } from "@/app/lib/types/NuzlockeState";
-import {getUserToken, selectStmt, upsertStmt} from "@/app/lib/database";
+import {getNuzlockeEnabledUsers, selectStmt, upsertStmt} from "@/app/lib/database";
 import {User} from "@/app/lib/users";
 
 declare global {
-    var usersInst: Map<string, string> | undefined;
     var statsCacheInst: Map<string, NuzlockeState> | undefined;
 }
 
-const users = globalThis.usersInst ??= new Map<string, string>();
-(getUserToken.all() as Array<User>).forEach((user) => {
-    users.set(user.username, user.api_token);
-})
-
 const statsCache = globalThis.statsCacheInst ??= new Map<string, NuzlockeState>();
-users.keys().forEach((user) => {
-    statsCache.set(user, loadStat(user));
+(getNuzlockeEnabledUsers.all() as Array<{ username: string }>).forEach((row) => {
+    statsCache.set(row.username, loadStat(row.username));
 });
 
 export function updatePageEnabled(user: User) {
     if (user.nuzlocke_enabled) {
         statsCache.set(user.username, loadStat(user.username));
-        users.set(user.username, user.api_token);
     } else {
         statsCache.delete(user.username);
-        users.delete(user.username);
     }
 }
 
@@ -74,10 +66,6 @@ function loadStat(user: string): NuzlockeState {
     return {user: user, team: emptyTeam(), graveyard: [], badges: [], ...DEFAULT_LABELS, ...DEFAULT_SETTINGS};
 }
 
-export function updateUserToken(username: string, api_token: string) {
-    users.set(username, api_token);
-}
-
 export function subscribe(user: string, cb: (stat: NuzlockeState) => void) {
     if (!subscribers.has(user)) {
         subscribers.set(user, new Set());
@@ -115,9 +103,4 @@ export function getStats(user: string | null): NuzlockeState | null {
     if (!user) return null;
 
     return statsCache.get(user) ?? null;
-}
-
-export function isValid(user: string | null, token: string | null): boolean {
-    if (!user || !token) return false;
-    return users.get(user) === token;
 }

@@ -42,7 +42,8 @@ database.exec(`
         role              INTEGER     NOT NULL DEFAULT 0,
         nuzlocke_enabled      BOOLEAN     NOT NULL DEFAULT false,
         soullink_enabled      BOOLEAN     NOT NULL DEFAULT false,
-        api_token         TEXT                 DEFAULT NULL,
+        nuzlocke_token    TEXT UNIQUE          DEFAULT NULL,
+        soullink_token    TEXT UNIQUE          DEFAULT NULL,
         profile_image_url TEXT        NOT NULL,
         created_at        TEXT        NOT NULL,
         updated_at        TEXT        NOT NULL
@@ -68,19 +69,34 @@ database.exec(`
 `)
 
 export const upsertUser = database.prepare<{ twitch_id: string; username: string; profile_image_url: string; now: string }>(`
-    INSERT INTO users (twitch_id, username, role, nuzlocke_enabled, soullink_enabled, api_token, profile_image_url, created_at, updated_at)
-    VALUES (@twitch_id, @username, 0, false, false, NULL, @profile_image_url, @now, @now)
+    INSERT INTO users (twitch_id, username, role, nuzlocke_enabled, soullink_enabled, nuzlocke_token, soullink_token, profile_image_url, created_at, updated_at)
+    VALUES (@twitch_id, @username, 0, false, false, NULL, NULL, @profile_image_url, @now, @now)
     ON CONFLICT(twitch_id) DO UPDATE SET username   = excluded.username,
                                          updated_at = excluded.updated_at,
                                          profile_image_url = excluded.profile_image_url
 `)
 
-export const updateToken = database.prepare<{ twitch_id: string; api_token: string; now: string }>(`
+export const updateNuzlockeToken = database.prepare<{ twitch_id: string; nuzlocke_token: string; now: string }>(`
     UPDATE users
-    SET api_token  = @api_token,
-        updated_at = @now
+    SET nuzlocke_token = @nuzlocke_token,
+        updated_at     = @now
     WHERE twitch_id = @twitch_id
 `)
+
+export const updateSoullinkToken = database.prepare<{ twitch_id: string; soullink_token: string; now: string }>(`
+    UPDATE users
+    SET soullink_token = @soullink_token,
+        updated_at     = @now
+    WHERE twitch_id = @twitch_id
+`)
+
+export const selectUserByNuzlockeToken = database.prepare<[string]>(`SELECT *
+                                                                     FROM users
+                                                                     WHERE nuzlocke_token = ?`)
+
+export const selectUserBySoullinkToken = database.prepare<[string]>(`SELECT *
+                                                                     FROM users
+                                                                     WHERE soullink_token = ?`)
 
 
 export const updatePageEnabled = database.prepare<{ twitch_id: string; nuzlocke_enabled: number;soullink_enabled: number; now: string }>(`
@@ -102,8 +118,9 @@ export const selectUserByUsername = database.prepare<[string]>(`SELECT *
 export const selectUsers = database.prepare(`SELECT twitch_id, username, role, nuzlocke_enabled, soullink_enabled, profile_image_url, created_at, updated_at
                                                       FROM users`)
 
-export const getUserToken = database.prepare(`SELECT username, api_token
-                                              FROM users WHERE nuzlocke_enabled == true OR soullink_enabled == true`)
+export const getNuzlockeEnabledUsers = database.prepare(`SELECT username
+                                                         FROM users
+                                                         WHERE nuzlocke_enabled == true`)
 
 export const getSoullinkEnabledUsers = database.prepare(`SELECT username
                                                          FROM users

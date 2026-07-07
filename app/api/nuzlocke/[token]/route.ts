@@ -1,6 +1,7 @@
 import {getSessionUser} from "@/app/lib/session";
 import {getStats, setStats} from "@/app/lib/stats";
 import {canEditTeam} from "@/app/lib/editors";
+import {getUserByNuzlockeToken} from "@/app/lib/users";
 import {POKEMON} from "@/app/lib/pokemon";
 import {BADGES} from "@/app/lib/badges";
 import {
@@ -37,9 +38,14 @@ const SETTINGS_FIELDS = ["mainWidth", "mainAspectRatio", "camMode", "frameBorder
 // change to any live SSE subscribers (page + overlay).
 export async function POST(
     request: Request,
-    {params}: { params: Promise<{ username: string }> }
+    {params}: { params: Promise<{ token: string }> }
 ) {
-    const {username} = await params;
+    const {token} = await params;
+    const owner = getUserByNuzlockeToken(token);
+    if (!owner) {
+        return new Response("Not Found", {status: 404});
+    }
+    const username = owner.username;
 
     const sessionUser = await getSessionUser();
     if (!sessionUser) {

@@ -9,13 +9,13 @@ const ASPECT_RATIO_CLASS: Record<MainAspectRatio, string> = {
     "5/3": "aspect-5/3",
 };
 
-function OverlayInner({username}: { username: string }) {
+function OverlayInner({token}: { token: string }) {
 
     const [state, setState] = useState<NuzlockeState>();
     const [notFound, setNotFound] = useState(false);
 
     useEffect(() => {
-        const es = new EventSource(`/api/${username}/stream`);
+        const es = new EventSource(`/api/nuzlocke/${token}/stream`);
         es.onmessage = (e) => {
             if ('data' in e) {
                 const stat = JSON.parse(e.data) as NuzlockeState;
@@ -25,18 +25,16 @@ function OverlayInner({username}: { username: string }) {
                 return () => es.close();
             }
         };
-        es.addEventListener("not_found", (e) => {
-            //console.log("User not found event received");
+        es.addEventListener("not_found", () => {
             setNotFound(true);
             es.close();
         });
 
-        es.onerror = (e) => {
-            //console.log("Stream connection error", e);
+        es.onerror = () => {
             setNotFound(true);
         }
         return () => es.close();
-    }, [username]);
+    }, [token]);
 
     if (notFound) {
         return (
@@ -115,11 +113,11 @@ function Frame({label, className, color = "#f87171", textColor}: { label?: strin
     );
 }
 
-export default function Overlay({params}: { params: Promise<{ username: string }> }) {
-    const {username} = use(params);
+export default function Overlay({params}: { params: Promise<{ token: string }> }) {
+    const {token} = use(params);
     return (
         <Suspense>
-            <OverlayInner username={username}/>
+            <OverlayInner token={token}/>
         </Suspense>
     );
 }

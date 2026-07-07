@@ -11,12 +11,12 @@ const ASPECT_RATIO_CLASS: Record<MainAspectRatio, string> = {
 };
 
 
-function OverlayInner({username}: { username: string }) {
+function OverlayInner({token}: { token: string }) {
 
     const [stats, setStats] = useState<SoullinkState>();
     const [notFound, setNotFound] = useState(false);
     useEffect(() => {
-        const es = new EventSource(`/api/soullink/${username}/stream`);
+        const es = new EventSource(`/api/soullink/${token}/stream`);
         es.onmessage = (e) => {
             if ('data' in e) {
                 const stat = JSON.parse(e.data) as SoullinkState;
@@ -35,7 +35,7 @@ function OverlayInner({username}: { username: string }) {
             setNotFound(true);
         }
         return () => es.close();
-    }, [username]);
+    }, [token]);
 
     if (notFound) {
         return (
@@ -132,11 +132,11 @@ function Frame({label, className, color = "#f87171", textColor}: { label?: strin
     );
 }
 
-export default function Overlay({params}: { params: Promise<{ username: string }> }) {
-    const {username} = use(params);
+export default function Overlay({params}: { params: Promise<{ token: string }> }) {
+    const {token} = use(params);
     return (
         <Suspense>
-            <OverlayInner username={username}/>
+            <OverlayInner token={token}/>
         </Suspense>
     );
 }
