@@ -9,7 +9,6 @@ import BadgesEditor from "@/app/components/BadgesEditor";
 import EditorManager from "@/app/components/EditorManager";
 import LabelsEditor, {LabelSection} from "@/app/components/LabelsEditor";
 import OverlaySettingsEditor from "@/app/components/OverlaySettingsEditor";
-import TeamBox, {Graveyard} from "@/app/components/TeamBox";
 
 type NuzlockeLabelKey = "showNuzlockeLabel" | "nuzlockeLabel" | "showTrainerLabel" | "trainerLabel"
     | "showTeamLabel" | "teamLabel" | "showGraveyardLabel" | "graveyardLabel" | "showBadgesLabel" | "badgesLabel";
@@ -125,48 +124,41 @@ function HomeInner({token}: { token: string }) {
                         <p>{stats.user}</p>
                     </a>
                 </div>
-                <div className="flex justify-center items-center gap-2">
-                    <TeamBox team={stats.team} label={stats.showTeamLabel ? stats.teamLabel : ""} color={stats.teamColor} textColor={stats.textColor} className="w-full max-w-md"/>
-                    <Graveyard label={stats.showGraveyardLabel ? stats.graveyardLabel : undefined} pokemon={stats.graveyard} color={stats.graveyardColor} textColor={stats.textColor} className="w-full flex-1 min-h-20">
-                    </Graveyard>
-                </div>
-
-                {canEdit && <TeamEditor apiUrl={apiUrl} field="team" team={stats.team} label="Edit Team"/>}
-                {canEdit && <GraveyardEditor apiUrl={apiUrl} field="graveyard" graveyard={stats.graveyard} label="Edit Graveyard"/>}
-                {canEdit && <BadgesEditor apiUrl={apiUrl} field="badges" badges={stats.badges} label="Edit Badges"/>}
-                {canEdit && (
-                    <LabelsEditor
-                        apiUrl={apiUrl}
-                        sections={LABEL_SECTIONS}
-                        values={{
-                            showNuzlockeLabel: stats.showNuzlockeLabel,
-                            nuzlockeLabel: stats.nuzlockeLabel,
-                            showTrainerLabel: stats.showTrainerLabel,
-                            trainerLabel: stats.trainerLabel,
-                            showTeamLabel: stats.showTeamLabel,
-                            teamLabel: stats.teamLabel,
-                            showGraveyardLabel: stats.showGraveyardLabel,
-                            graveyardLabel: stats.graveyardLabel,
-                            showBadgesLabel: stats.showBadgesLabel,
-                            badgesLabel: stats.badgesLabel,
-                        }}
-                    />
-                )}
-                {canEdit && (
-                    <OverlaySettingsEditor
-                        apiUrl={apiUrl}
-                        values={{
-                            mainWidth: stats.mainWidth,
-                            mainAspectRatio: stats.mainAspectRatio,
-                            camMode: stats.camMode,
-                            frameBorderColor: stats.frameBorderColor,
-                            teamColor: stats.teamColor,
-                            graveyardColor: stats.graveyardColor,
-                            textColor: stats.textColor,
-                            badgesEnabled: stats.badgesEnabled,
-                        }}
-                    />
-                )}
+                {canEdit ? <div>
+                        <TeamEditor apiUrl={apiUrl} field="team" team={stats.team} label="Edit Team"/>
+                        <GraveyardEditor apiUrl={apiUrl} field="graveyard" graveyard={stats.graveyard} label="Edit Graveyard"/>
+                        <BadgesEditor apiUrl={apiUrl} field="badges" badges={stats.badges} label="Edit Badges"/>
+                        <LabelsEditor
+                            apiUrl={apiUrl}
+                            sections={LABEL_SECTIONS}
+                            values={{
+                                showNuzlockeLabel: stats.showNuzlockeLabel,
+                                nuzlockeLabel: stats.nuzlockeLabel,
+                                showTrainerLabel: stats.showTrainerLabel,
+                                trainerLabel: stats.trainerLabel,
+                                showTeamLabel: stats.showTeamLabel,
+                                teamLabel: stats.teamLabel,
+                                showGraveyardLabel: stats.showGraveyardLabel,
+                                graveyardLabel: stats.graveyardLabel,
+                                showBadgesLabel: stats.showBadgesLabel,
+                                badgesLabel: stats.badgesLabel,
+                            }}
+                        />
+                        <OverlaySettingsEditor
+                            apiUrl={apiUrl}
+                            values={{
+                                mainWidth: stats.mainWidth,
+                                mainAspectRatio: stats.mainAspectRatio,
+                                camMode: stats.camMode,
+                                frameBorderColor: stats.frameBorderColor,
+                                teamColor: stats.teamColor,
+                                graveyardColor: stats.graveyardColor,
+                                textColor: stats.textColor,
+                                badgesEnabled: stats.badgesEnabled,
+                            }}
+                        />
+                    </div>
+                    : <></>}
                 {(isOwner || canManageEditors) && <EditorManager apiUrl={`${apiUrl}/editors`} isOwner={isOwner}/>}
             </main>
         </div>

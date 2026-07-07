@@ -134,6 +134,10 @@ export default async function Home() {
                                                    className="flex items-center gap-1.5 text-yellow-600 hover:underline">
                                                     <Monitor size={14}/> Go to Nuzlocke Overlay
                                                 </a>
+                                                <a href={`${baseUrl}/nuzlocke/${user.username}`}
+                                                   className="flex items-center gap-1.5 text-yellow-600 hover:underline">
+                                                    <ExternalLink size={14}/> Public Nuzlocke Page
+                                                </a>
                                             </div>
                                             <CopyKeyField name="Nuzlocke Overlay OBS Browser Source:"
                                                           url={`${baseUrl}/overlay/nuzlocke/${user.nuzlocke_token}`}/>
@@ -170,6 +174,10 @@ export default async function Home() {
                                                 <a href={`${baseUrl}/overlay/soullink/${user.soullink_token}`}
                                                    className="flex items-center gap-1.5 text-yellow-600 hover:underline">
                                                     <Monitor size={14}/> Go to Soullink Overlay
+                                                </a>
+                                                <a href={`${baseUrl}/soullink/${user.username}`}
+                                                   className="flex items-center gap-1.5 text-yellow-600 hover:underline">
+                                                    <ExternalLink size={14}/> Public Soullink Page
                                                 </a>
                                             </div>
                                             <CopyKeyField name="Soullink Overlay OBS Browser Source:"
@@ -255,6 +263,10 @@ export default async function Home() {
                                                                className="flex items-center gap-1.5 text-yellow-600 hover:underline">
                                                                 <Monitor size={14}/> Nuzlocke Overlay
                                                             </a>
+                                                            <a href={`${baseUrl}/nuzlocke/${owner.username}`}
+                                                               className="flex items-center gap-1.5 text-yellow-600 hover:underline">
+                                                                <ExternalLink size={14}/> Public Nuzlocke Page
+                                                            </a>
                                                         </>
                                                     )}
                                                     {owner.soullink_enabled === 1 && owner.soullink_token && (
@@ -266,6 +278,10 @@ export default async function Home() {
                                                             <a href={`${baseUrl}/overlay/soullink/${owner.soullink_token}`}
                                                                className="flex items-center gap-1.5 text-yellow-600 hover:underline">
                                                                 <Monitor size={14}/> Soullink Overlay
+                                                            </a>
+                                                            <a href={`${baseUrl}/soullink/${owner.username}`}
+                                                               className="flex items-center gap-1.5 text-yellow-600 hover:underline">
+                                                                <ExternalLink size={14}/> Public Soullink Page
                                                             </a>
                                                         </>
                                                     )}
