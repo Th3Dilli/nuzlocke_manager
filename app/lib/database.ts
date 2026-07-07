@@ -70,15 +70,6 @@ database.exec(`
     );
 `)
 
-// CREATE TABLE IF NOT EXISTS is a no-op on a database that already has the
-// `nuzlocke`/`soullink` tables from before the `encounters` column existed,
-// so add it here for databases that were provisioned with the older schema.
-for (const table of ["nuzlocke", "soullink"]) {
-    const columns = database.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
-    if (!columns.some(c => c.name === "encounters")) {
-        database.exec(`ALTER TABLE ${table} ADD COLUMN encounters TEXT NOT NULL DEFAULT '[]'`);
-    }
-}
 
 export const upsertUser = database.prepare<{ twitch_id: string; username: string; profile_image_url: string; now: string }>(`
     INSERT INTO users (twitch_id, username, role, nuzlocke_enabled, soullink_enabled, nuzlocke_token, soullink_token, profile_image_url, created_at, updated_at)
