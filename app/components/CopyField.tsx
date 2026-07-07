@@ -26,7 +26,7 @@ export default function CopyKeyField({name, url}: { url: string, name: string })
                     className="w-full px-3 py-2 text-sm text-gray-200 font-mono "
                 />
 
-                <div className="absolute right-2 flex items-center gap-1 pl-2">
+                <div className="absolute right-0 top-0 bottom-0 flex items-center gap-1 rounded-r-md bg-neutral-900 pl-3 pr-2">
                     <button
                         onClick={handleCopy}
                         className="p-1.5 text-gray-400 hover:text-gray-200 cursor-pointer "
