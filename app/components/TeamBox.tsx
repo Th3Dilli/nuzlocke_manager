@@ -1,3 +1,15 @@
+import {DEFAULT_LANGUAGE, POKEMON, pokemonName} from "@/app/lib/pokemon";
+import {BADGES} from "@/app/lib/badges";
+
+function pokemonTitle(id: number): string {
+    const pokemon = POKEMON.find(p => p.id === id);
+    return pokemon ? pokemonName(pokemon, DEFAULT_LANGUAGE) : String(id);
+}
+
+function badgeTitle(id: number): string {
+    const badge = BADGES.find(b => b.id === id);
+    return badge ? `${badge.name} - ${badge.city}` : String(id);
+}
 
 export default function TeamBox({team, direction = "row", className, label = "Team", color = "#eab308", textColor}: {
     team: number[];
@@ -17,7 +29,8 @@ export default function TeamBox({team, direction = "row", className, label = "Te
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                                 src={`/showdown/${id}.gif`}
-                                alt=""
+                                alt={pokemonTitle(id)}
+                                title={pokemonTitle(id)}
                                 className="h-full [image-rendering:pixelated]"
                             />
                         ) : (
@@ -47,7 +60,8 @@ export function TeamBoxV({team, className, label = "Team", color = "#eab308", te
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                                 src={`/showdown/${id}.gif`}
-                                alt=""
+                                alt={pokemonTitle(id)}
+                                title={pokemonTitle(id)}
                                 className="h-full [image-rendering:pixelated]"
                             />
                         ) : (
@@ -76,7 +90,8 @@ export function BadgesV({badges, className, label, color = "#eab308", textColor}
                         {/*// eslint-disable-next-line @next/next/no-img-element*/}
                         <img
                             src={`/badges/${id}.png`}
-                            alt=""
+                            alt={badgeTitle(id)}
+                            title={badgeTitle(id)}
                             className="h-full [image-rendering:pixelated]"
                         />
                     </div>
@@ -101,7 +116,8 @@ export function Graveyard({label, className, pokemon, color = "#eab308", textCol
                         <img
                             key={`${id}-${i}`}
                             src={`/showdown/${id}.gif`}
-                            alt=""
+                            alt={pokemonTitle(id)}
+                            title={pokemonTitle(id)}
                             className={`h-${size} w-${size} object-contain opacity-80 [image-rendering:pixelated]`}
                         />
                     ))
