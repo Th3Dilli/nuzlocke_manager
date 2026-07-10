@@ -34,7 +34,8 @@ function settingsEqual(a: NuzlockeSettings, b: NuzlockeSettings): boolean {
         && a.teamColor === b.teamColor
         && a.graveyardColor === b.graveyardColor
         && a.textColor === b.textColor
-        && a.badgesEnabled === b.badgesEnabled;
+        && a.badgesEnabled === b.badgesEnabled
+        && a.graveyardEnabled === b.graveyardEnabled;
 }
 
 // Editor for the overlay's layout settings: the width of the main (nuzlocke +
@@ -194,6 +195,18 @@ export default function OverlaySettingsEditor({apiUrl, values: remoteValues}: {
                             className="h-4 w-4 cursor-pointer accent-yellow-500"
                         />
                         Show badges
+                    </label>
+                </div>
+
+                <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-200">
+                        <input
+                            type="checkbox"
+                            checked={values.graveyardEnabled}
+                            onChange={e => update("graveyardEnabled", e.target.checked)}
+                            className="h-4 w-4 cursor-pointer accent-yellow-500"
+                        />
+                        Show graveyard
                     </label>
                 </div>
 

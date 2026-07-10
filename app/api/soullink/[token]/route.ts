@@ -13,7 +13,7 @@ import {
     normalizeLabel,
     normalizeMainAspectRatio,
     normalizeRoute,
-    normalizeShowLabel,
+    normalizeBool,
     TEAM_SIZE
 } from "@/app/lib/types/NuzlockeState";
 import {
@@ -43,7 +43,7 @@ const LABEL_FIELDS = [
 
 const COLOR_SETTINGS_FIELDS = ["frameBorderColor", "teamColor", "graveyardColor", "textColor"] as const;
 const PLAYER_NAME_FIELDS = ["player1Name", "player2Name"] as const;
-const SETTINGS_FIELDS = ["mainAspectRatio", "badgesEnabled", ...COLOR_SETTINGS_FIELDS, ...PLAYER_NAME_FIELDS] as const;
+const SETTINGS_FIELDS = ["mainAspectRatio", "badgesEnabled", "graveyardEnabled", ...COLOR_SETTINGS_FIELDS, ...PLAYER_NAME_FIELDS] as const;
 
 function parseTeam(rawTeam: unknown): number[] | { error: string } {
     if (!Array.isArray(rawTeam) || rawTeam.length > TEAM_SIZE) {
@@ -219,7 +219,7 @@ export async function POST(
     }
 
     for (const [showKey, textKey] of LABEL_FIELDS) {
-        if (showKey in body) update[showKey] = normalizeShowLabel(body[showKey], current[showKey]);
+        if (showKey in body) update[showKey] = normalizeBool(body[showKey], current[showKey]);
         if (textKey in body) update[textKey] = normalizeLabel(body[textKey], current[textKey]);
     }
 
@@ -227,7 +227,10 @@ export async function POST(
         update.mainAspectRatio = normalizeMainAspectRatio(body.mainAspectRatio, current.mainAspectRatio);
     }
     if ("badgesEnabled" in body) {
-        update.badgesEnabled = normalizeShowLabel(body.badgesEnabled, current.badgesEnabled);
+        update.badgesEnabled = normalizeBool(body.badgesEnabled, current.badgesEnabled);
+    }
+    if ("graveyardEnabled" in body) {
+        update.graveyardEnabled = normalizeBool(body.graveyardEnabled, current.graveyardEnabled);
     }
     for (const field of COLOR_SETTINGS_FIELDS) {
         if (field in body) update[field] = normalizeColor(body[field], current[field]);

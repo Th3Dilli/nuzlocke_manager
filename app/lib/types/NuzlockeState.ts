@@ -58,6 +58,9 @@ export type NuzlockeSettings = {
     // Whether the badges section is shown at all in the overlay (separate from
     // showBadgesLabel/badgesLabel, which only control its title tab).
     badgesEnabled: boolean;
+    // Whether the graveyard section is shown at all in the overlay (separate
+    // from showGraveyardLabel/graveyardLabel, which only control its title tab).
+    graveyardEnabled: boolean;
 };
 
 export const DEFAULT_SETTINGS: NuzlockeSettings = {
@@ -69,6 +72,7 @@ export const DEFAULT_SETTINGS: NuzlockeSettings = {
     graveyardColor: "#eab308",
     textColor: "#fde047",
     badgesEnabled: true,
+    graveyardEnabled: true,
 };
 
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
@@ -103,7 +107,8 @@ export function normalizeSettings(input: unknown, fallback: NuzlockeSettings = D
         teamColor: normalizeColor(source.teamColor, fallback.teamColor),
         graveyardColor: normalizeColor(source.graveyardColor, fallback.graveyardColor),
         textColor: normalizeColor(source.textColor, fallback.textColor),
-        badgesEnabled: normalizeShowLabel(source.badgesEnabled, fallback.badgesEnabled),
+        badgesEnabled: normalizeBool(source.badgesEnabled, fallback.badgesEnabled),
+        graveyardEnabled: normalizeBool(source.graveyardEnabled, fallback.graveyardEnabled),
     };
 }
 
@@ -194,7 +199,7 @@ export type PublicNuzlockeState = Pick<NuzlockeState,
     | "showTeamLabel" | "teamLabel"
     | "showGraveyardLabel" | "graveyardLabel"
     | "showBadgesLabel" | "badgesLabel"
-    | "badgesEnabled"
+    | "badgesEnabled" | "graveyardEnabled"
     | "teamColor" | "graveyardColor" | "textColor"
 >;
 
@@ -212,6 +217,7 @@ export function toPublicNuzlockeState(s: NuzlockeState): PublicNuzlockeState {
         showBadgesLabel: s.showBadgesLabel,
         badgesLabel: s.badgesLabel,
         badgesEnabled: s.badgesEnabled,
+        graveyardEnabled: s.graveyardEnabled,
         teamColor: s.teamColor,
         graveyardColor: s.graveyardColor,
         textColor: s.textColor,
@@ -228,7 +234,7 @@ export function normalizeLabel(input: unknown, fallback: string): string {
     return trimmed || fallback;
 }
 
-export function normalizeShowLabel(input: unknown, fallback: boolean): boolean {
+export function normalizeBool(input: unknown, fallback: boolean): boolean {
     return typeof input === "boolean" ? input : fallback;
 }
 
@@ -237,15 +243,15 @@ export function normalizeShowLabel(input: unknown, fallback: boolean): boolean {
 export function normalizeLabels(input: unknown, fallback: NuzlockeLabels = DEFAULT_LABELS): NuzlockeLabels {
     const source = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
     return {
-        showNuzlockeLabel: normalizeShowLabel(source.showNuzlockeLabel, fallback.showNuzlockeLabel),
+        showNuzlockeLabel: normalizeBool(source.showNuzlockeLabel, fallback.showNuzlockeLabel),
         nuzlockeLabel: normalizeLabel(source.nuzlockeLabel, fallback.nuzlockeLabel),
-        showTrainerLabel: normalizeShowLabel(source.showTrainerLabel, fallback.showTrainerLabel),
+        showTrainerLabel: normalizeBool(source.showTrainerLabel, fallback.showTrainerLabel),
         trainerLabel: normalizeLabel(source.trainerLabel, fallback.trainerLabel),
-        showTeamLabel: normalizeShowLabel(source.showTeamLabel, fallback.showTeamLabel),
+        showTeamLabel: normalizeBool(source.showTeamLabel, fallback.showTeamLabel),
         teamLabel: normalizeLabel(source.teamLabel, fallback.teamLabel),
-        showGraveyardLabel: normalizeShowLabel(source.showGraveyardLabel, fallback.showGraveyardLabel),
+        showGraveyardLabel: normalizeBool(source.showGraveyardLabel, fallback.showGraveyardLabel),
         graveyardLabel: normalizeLabel(source.graveyardLabel, fallback.graveyardLabel),
-        showBadgesLabel: normalizeShowLabel(source.showBadgesLabel, fallback.showBadgesLabel),
+        showBadgesLabel: normalizeBool(source.showBadgesLabel, fallback.showBadgesLabel),
         badgesLabel: normalizeLabel(source.badgesLabel, fallback.badgesLabel),
     };
 }
@@ -296,29 +302,4 @@ export function normalizeBadges(input: unknown): number[] {
 
 function arraysEqual(a: number[], b: number[]): boolean {
     return a.length === b.length && a.every((v, i) => v === b[i]);
-}
-
-export function statsEqual(a: NuzlockeState, b: NuzlockeState): boolean {
-    return a.user === b.user
-        && arraysEqual(a.team, b.team)
-        && arraysEqual(a.graveyard, b.graveyard)
-        && arraysEqual(a.badges, b.badges)
-        && a.showNuzlockeLabel === b.showNuzlockeLabel
-        && a.nuzlockeLabel === b.nuzlockeLabel
-        && a.showTrainerLabel === b.showTrainerLabel
-        && a.trainerLabel === b.trainerLabel
-        && a.showTeamLabel === b.showTeamLabel
-        && a.teamLabel === b.teamLabel
-        && a.showGraveyardLabel === b.showGraveyardLabel
-        && a.graveyardLabel === b.graveyardLabel
-        && a.showBadgesLabel === b.showBadgesLabel
-        && a.badgesLabel === b.badgesLabel
-        && a.mainWidth === b.mainWidth
-        && a.mainAspectRatio === b.mainAspectRatio
-        && a.camMode === b.camMode
-        && a.frameBorderColor === b.frameBorderColor
-        && a.teamColor === b.teamColor
-        && a.graveyardColor === b.graveyardColor
-        && a.textColor === b.textColor
-        && a.badgesEnabled === b.badgesEnabled;
 }

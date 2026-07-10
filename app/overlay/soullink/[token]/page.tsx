@@ -101,8 +101,8 @@ function OverlayInner({token}: { token: string }) {
                                color={stats.frameBorderColor}
                                textColor={stats.textColor}
                                className="aspect-4/3"/>
-                        <Graveyard label={stats.showGraveyard1Label ? stats.graveyard1Label : undefined} pokemon={stats.graveyard1}
-                                   color={stats.graveyardColor} textColor={stats.textColor} size="10" className="flex-1 min-h-0"/>
+                        {stats.graveyardEnabled && <Graveyard label={stats.showGraveyard1Label ? stats.graveyard1Label : undefined} pokemon={stats.graveyard1}
+                                   color={stats.graveyardColor} textColor={stats.textColor} size="10" className="flex-1 min-h-0"/>}
                     </div>
 
                     <div className="flex-1 w-1/2 h-full flex flex-col gap-3 min-h-0">
@@ -110,8 +110,8 @@ function OverlayInner({token}: { token: string }) {
                                color={stats.frameBorderColor}
                                textColor={stats.textColor}
                                className="aspect-4/3"/>
-                        <Graveyard label={stats.showGraveyard2Label ? stats.graveyard2Label : undefined} pokemon={stats.graveyard2}
-                                   color={stats.graveyardColor} textColor={stats.textColor} size="10" className="flex-1 min-h-0"/>
+                        {stats.graveyardEnabled && <Graveyard label={stats.showGraveyard2Label ? stats.graveyard2Label : undefined} pokemon={stats.graveyard2}
+                                   color={stats.graveyardColor} textColor={stats.textColor} size="10" className="flex-1 min-h-0"/>}
                     </div>
 
                     <div className="flex-1 flex">

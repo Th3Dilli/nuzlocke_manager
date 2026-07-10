@@ -9,7 +9,7 @@ import {
     normalizeMainAspectRatio,
     normalizePokemonId,
     normalizeRoute,
-    normalizeShowLabel
+    normalizeBool
 } from "@/app/lib/types/NuzlockeState";
 
 // Per-section label settings: whether the overlay shows a title tab for that
@@ -64,23 +64,23 @@ export const DEFAULT_SOULLINK_LABELS: SoullinkLabels = {
 export function normalizeSoullinkLabels(input: unknown, fallback: SoullinkLabels = DEFAULT_SOULLINK_LABELS): SoullinkLabels {
     const source = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
     return {
-        showSoullink1Label: normalizeShowLabel(source.showSoullink1Label, fallback.showSoullink1Label),
+        showSoullink1Label: normalizeBool(source.showSoullink1Label, fallback.showSoullink1Label),
         soullink1Label: normalizeLabel(source.soullink1Label, fallback.soullink1Label),
-        showSoullink2Label: normalizeShowLabel(source.showSoullink2Label, fallback.showSoullink2Label),
+        showSoullink2Label: normalizeBool(source.showSoullink2Label, fallback.showSoullink2Label),
         soullink2Label: normalizeLabel(source.soullink2Label, fallback.soullink2Label),
-        showTrainer1Label: normalizeShowLabel(source.showTrainer1Label, fallback.showTrainer1Label),
+        showTrainer1Label: normalizeBool(source.showTrainer1Label, fallback.showTrainer1Label),
         trainer1Label: normalizeLabel(source.trainer1Label, fallback.trainer1Label),
-        showTrainer2Label: normalizeShowLabel(source.showTrainer2Label, fallback.showTrainer2Label),
+        showTrainer2Label: normalizeBool(source.showTrainer2Label, fallback.showTrainer2Label),
         trainer2Label: normalizeLabel(source.trainer2Label, fallback.trainer2Label),
-        showTeam1Label: normalizeShowLabel(source.showTeam1Label, fallback.showTeam1Label),
+        showTeam1Label: normalizeBool(source.showTeam1Label, fallback.showTeam1Label),
         team1Label: normalizeLabel(source.team1Label, fallback.team1Label),
-        showTeam2Label: normalizeShowLabel(source.showTeam2Label, fallback.showTeam2Label),
+        showTeam2Label: normalizeBool(source.showTeam2Label, fallback.showTeam2Label),
         team2Label: normalizeLabel(source.team2Label, fallback.team2Label),
-        showGraveyard1Label: normalizeShowLabel(source.showGraveyard1Label, fallback.showGraveyard1Label),
+        showGraveyard1Label: normalizeBool(source.showGraveyard1Label, fallback.showGraveyard1Label),
         graveyard1Label: normalizeLabel(source.graveyard1Label, fallback.graveyard1Label),
-        showGraveyard2Label: normalizeShowLabel(source.showGraveyard2Label, fallback.showGraveyard2Label),
+        showGraveyard2Label: normalizeBool(source.showGraveyard2Label, fallback.showGraveyard2Label),
         graveyard2Label: normalizeLabel(source.graveyard2Label, fallback.graveyard2Label),
-        showBadgesLabel: normalizeShowLabel(source.showBadgesLabel, fallback.showBadgesLabel),
+        showBadgesLabel: normalizeBool(source.showBadgesLabel, fallback.showBadgesLabel),
         badgesLabel: normalizeLabel(source.badgesLabel, fallback.badgesLabel),
     };
 }
@@ -95,6 +95,10 @@ export type SoullinkSettings = {
     // Whether the badges section is shown at all in the overlay (separate from
     // showBadgesLabel/badgesLabel, which only control its title tab).
     badgesEnabled: boolean;
+    // Whether the graveyard sections are shown at all in the overlay (separate
+    // from showGraveyard1Label/showGraveyard2Label, which only control their
+    // title tabs).
+    graveyardEnabled: boolean;
     // Optional Twitch usernames identifying each side's player. When set, the
     // public page shows/links this instead of the generic "Team 1"/"Team 2".
     player1Name: string;
@@ -108,6 +112,7 @@ export const DEFAULT_SOULLINK_SETTINGS: SoullinkSettings = {
     graveyardColor: "#eab308",
     textColor: "#fde047",
     badgesEnabled: true,
+    graveyardEnabled: true,
     player1Name: "",
     player2Name: "",
 };
@@ -132,7 +137,8 @@ export function normalizeSoullinkSettings(input: unknown, fallback: SoullinkSett
         teamColor: normalizeColor(source.teamColor, fallback.teamColor),
         graveyardColor: normalizeColor(source.graveyardColor, fallback.graveyardColor),
         textColor: normalizeColor(source.textColor, fallback.textColor),
-        badgesEnabled: normalizeShowLabel(source.badgesEnabled, fallback.badgesEnabled),
+        badgesEnabled: normalizeBool(source.badgesEnabled, fallback.badgesEnabled),
+        graveyardEnabled: normalizeBool(source.graveyardEnabled, fallback.graveyardEnabled),
         player1Name: normalizePlayerName(source.player1Name, fallback.player1Name),
         player2Name: normalizePlayerName(source.player2Name, fallback.player2Name),
     };
@@ -238,6 +244,7 @@ export type PublicSoullinkState = Pick<SoullinkState,
     | "showGraveyard1Label" | "graveyard1Label"
     | "showGraveyard2Label" | "graveyard2Label"
     | "showBadgesLabel" | "badgesLabel"
+    | "graveyardEnabled"
     | "teamColor" | "graveyardColor" | "textColor"
     | "player1Name" | "player2Name"
 >;
@@ -260,6 +267,7 @@ export function toPublicSoullinkState(s: SoullinkState): PublicSoullinkState {
         graveyard2Label: s.graveyard2Label,
         showBadgesLabel: s.showBadgesLabel,
         badgesLabel: s.badgesLabel,
+        graveyardEnabled: s.graveyardEnabled,
         teamColor: s.teamColor,
         graveyardColor: s.graveyardColor,
         textColor: s.textColor,

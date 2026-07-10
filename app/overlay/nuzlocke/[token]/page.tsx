@@ -90,9 +90,9 @@ function OverlayInner({token}: { token: string }) {
             <div className={`flex flex-col gap-2 `} style={{width: `${state.mainWidth}px`}}>
                 <Frame label={state.showNuzlockeLabel ? state.nuzlockeLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={ASPECT_RATIO_CLASS[state.mainAspectRatio]} />
 
-                <Graveyard label={state.showGraveyardLabel ? state.graveyardLabel : undefined} pokemon={state.graveyard}
+                {state.graveyardEnabled && <Graveyard label={state.showGraveyardLabel ? state.graveyardLabel : undefined} pokemon={state.graveyard}
                            color={state.graveyardColor} textColor={state.textColor} className="flex-1">
-                </Graveyard>
+                </Graveyard>}
             </div>
 
             <div className="flex flex-1 flex-col gap-4">

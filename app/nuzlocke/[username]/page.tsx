@@ -132,9 +132,9 @@ function HomeInner({username}: { username: string }) {
                     <Graveyard label={stats.showGraveyardLabel ? stats.graveyardLabel : undefined} pokemon={stats.graveyard} color={stats.graveyardColor} textColor={stats.textColor} className="w-full flex-1 min-w-50 min-h-20"/>
                 </div>
 
-                <BadgesV badges={stats.badges} label={stats.showBadgesLabel ? stats.badgesLabel : undefined} textColor={stats.textColor} className="h-auto min-h-20 w-full"/>
+                {stats.badges.length > 0 && <BadgesV badges={stats.badges} label={stats.showBadgesLabel ? stats.badgesLabel : undefined} textColor={stats.textColor} className="h-auto min-h-20 w-full"/>}
 
-                <EncountersTable encounters={stats.encounters} borderColor={stats.teamColor}/>
+                {stats.encounters.length > 0 && <EncountersTable encounters={stats.encounters} borderColor={stats.teamColor}/>}
             </main>
         </div>
     );

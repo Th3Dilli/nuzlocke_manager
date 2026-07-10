@@ -182,6 +182,7 @@ function HomeInner({token}: { token: string }) {
                                 graveyardColor: stats.graveyardColor,
                                 textColor: stats.textColor,
                                 badgesEnabled: stats.badgesEnabled,
+                                graveyardEnabled: stats.graveyardEnabled,
                                 player1Name: stats.player1Name,
                                 player2Name: stats.player2Name,
                             }}

@@ -62,16 +62,14 @@ function EncountersTable({encounters, player1Name, player2Name, borderColor}: {
     );
 }
 
-function TeamColumn({label, playerName, team, teamLabel, graveyard, graveyardLabel, teamColor, graveyardColor, textColor}: {
+function TeamColumn({label, playerName, team, teamLabel, graveyard, graveyardLabel, stats}: {
     label: string;
     playerName?: string;
     team: number[];
     teamLabel?: string;
     graveyard: number[];
     graveyardLabel?: string;
-    teamColor?: string;
-    graveyardColor?: string;
-    textColor?: string;
+    stats: PublicSoullinkState;
 }) {
     return (
         <div className="flex flex-1 flex-col items-center gap-4">
@@ -87,8 +85,8 @@ function TeamColumn({label, playerName, team, teamLabel, graveyard, graveyardLab
                 </a>
             )}
             <div className="h-5"></div>
-            <TeamBox team={team} label={teamLabel ?? ""} color={teamColor} textColor={textColor} className="w-full max-w-md"/>
-            <Graveyard label={graveyardLabel} pokemon={graveyard} color={graveyardColor} textColor={textColor} className="w-full min-h-20"/>
+            <TeamBox team={team} label={teamLabel ?? ""} color={stats.teamColor} textColor={stats.textColor} className="w-full max-w-md"/>
+            <Graveyard label={graveyardLabel} pokemon={graveyard} color={stats.graveyardColor} textColor={stats.textColor} className="w-full min-h-20"/>
         </div>
     );
 }
@@ -173,9 +171,7 @@ function HomeInner({username}: { username: string }) {
                         teamLabel={stats.showTeam1Label ? stats.team1Label : ""}
                         graveyard={stats.graveyard1}
                         graveyardLabel={stats.showGraveyard1Label ? stats.graveyard1Label : undefined}
-                        teamColor={stats.teamColor}
-                        graveyardColor={stats.graveyardColor}
-                        textColor={stats.textColor}
+                        stats={stats}
                     />
                     <TeamColumn
                         label={stats.player2Name ? `Team ${stats.player2Name}` : "Team 2"}
@@ -184,15 +180,13 @@ function HomeInner({username}: { username: string }) {
                         teamLabel={stats.showTeam2Label ? stats.team2Label : ""}
                         graveyard={stats.graveyard2}
                         graveyardLabel={stats.showGraveyard2Label ? stats.graveyard2Label : undefined}
-                        teamColor={stats.teamColor}
-                        graveyardColor={stats.graveyardColor}
-                        textColor={stats.textColor}
+                        stats={stats}
                     />
                 </div>
 
-                <BadgesV badges={stats.badges} label={stats.showBadgesLabel ? stats.badgesLabel : undefined} textColor={stats.textColor} className="h-auto min-h-20 w-full"/>
+                {stats.badges.length > 0 && <BadgesV badges={stats.badges} label={stats.showBadgesLabel ? stats.badgesLabel : undefined} textColor={stats.textColor} className="h-auto min-h-20 w-full"/>}
 
-                <EncountersTable encounters={stats.encounters} player1Name={stats.player1Name} player2Name={stats.player2Name} borderColor={stats.teamColor}/>
+                {stats.encounters.length > 0 && <EncountersTable encounters={stats.encounters} player1Name={stats.player1Name} player2Name={stats.player2Name} borderColor={stats.teamColor}/>}
             </main>
         </div>
     );

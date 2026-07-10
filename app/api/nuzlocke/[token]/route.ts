@@ -15,7 +15,7 @@ import {
     normalizeMainAspectRatio,
     normalizeMainWidth,
     normalizeRoute,
-    normalizeShowLabel,
+    normalizeBool,
     NuzlockeEncounter,
     TEAM_SIZE
 } from "@/app/lib/types/NuzlockeState";
@@ -32,7 +32,7 @@ const LABEL_FIELDS = [
     ["showBadgesLabel", "badgesLabel"],
 ] as const;
 
-const SETTINGS_FIELDS = ["mainWidth", "mainAspectRatio", "camMode", "frameBorderColor", "teamColor", "graveyardColor", "textColor", "badgesEnabled"] as const;
+const SETTINGS_FIELDS = ["mainWidth", "mainAspectRatio", "camMode", "frameBorderColor", "teamColor", "graveyardColor", "textColor", "badgesEnabled", "graveyardEnabled"] as const;
 
 // Update the team, graveyard, and/or label settings for a user's stats page.
 // The page owner and any editor the owner has granted may write to it. The
@@ -175,15 +175,15 @@ export async function POST(
     }
 
     const labels = {
-        showNuzlockeLabel: normalizeShowLabel(body.showNuzlockeLabel, current.showNuzlockeLabel),
+        showNuzlockeLabel: normalizeBool(body.showNuzlockeLabel, current.showNuzlockeLabel),
         nuzlockeLabel: normalizeLabel(body.nuzlockeLabel, current.nuzlockeLabel),
-        showTrainerLabel: normalizeShowLabel(body.showTrainerLabel, current.showTrainerLabel),
+        showTrainerLabel: normalizeBool(body.showTrainerLabel, current.showTrainerLabel),
         trainerLabel: normalizeLabel(body.trainerLabel, current.trainerLabel),
-        showTeamLabel: normalizeShowLabel(body.showTeamLabel, current.showTeamLabel),
+        showTeamLabel: normalizeBool(body.showTeamLabel, current.showTeamLabel),
         teamLabel: normalizeLabel(body.teamLabel, current.teamLabel),
-        showGraveyardLabel: normalizeShowLabel(body.showGraveyardLabel, current.showGraveyardLabel),
+        showGraveyardLabel: normalizeBool(body.showGraveyardLabel, current.showGraveyardLabel),
         graveyardLabel: normalizeLabel(body.graveyardLabel, current.graveyardLabel),
-        showBadgesLabel: normalizeShowLabel(body.showBadgesLabel, current.showBadgesLabel),
+        showBadgesLabel: normalizeBool(body.showBadgesLabel, current.showBadgesLabel),
         badgesLabel: normalizeLabel(body.badgesLabel, current.badgesLabel),
     };
 
@@ -195,7 +195,8 @@ export async function POST(
         teamColor: normalizeColor(body.teamColor, current.teamColor),
         graveyardColor: normalizeColor(body.graveyardColor, current.graveyardColor),
         textColor: normalizeColor(body.textColor, current.textColor),
-        badgesEnabled: normalizeShowLabel(body.badgesEnabled, current.badgesEnabled),
+        badgesEnabled: normalizeBool(body.badgesEnabled, current.badgesEnabled),
+        graveyardEnabled: normalizeBool(body.graveyardEnabled, current.graveyardEnabled),
     };
 
     setStats(username, {user: username, team, graveyard, badges, encounters, ...labels, ...settings});

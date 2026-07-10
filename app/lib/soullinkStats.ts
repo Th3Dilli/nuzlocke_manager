@@ -4,7 +4,7 @@ import {
     normalizeGraveyard,
     normalizeLabel,
     normalizeMainAspectRatio,
-    normalizeShowLabel,
+    normalizeBool,
     normalizeTeam
 } from "@/app/lib/types/NuzlockeState";
 import {
@@ -111,12 +111,13 @@ export function setStats(user: string, s: Partial<Omit<SoullinkState, "user">>) 
         if (s.encounters) userStat.encounters = normalizeEncounters(s.encounters);
 
         for (const [showKey, textKey] of LABEL_KEYS) {
-            if (s[showKey] !== undefined) userStat[showKey] = normalizeShowLabel(s[showKey], userStat[showKey]);
+            if (s[showKey] !== undefined) userStat[showKey] = normalizeBool(s[showKey], userStat[showKey]);
             if (s[textKey] !== undefined) userStat[textKey] = normalizeLabel(s[textKey], userStat[textKey]);
         }
 
         if (s.mainAspectRatio !== undefined) userStat.mainAspectRatio = normalizeMainAspectRatio(s.mainAspectRatio, userStat.mainAspectRatio);
-        if (s.badgesEnabled !== undefined) userStat.badgesEnabled = normalizeShowLabel(s.badgesEnabled, userStat.badgesEnabled);
+        if (s.badgesEnabled !== undefined) userStat.badgesEnabled = normalizeBool(s.badgesEnabled, userStat.badgesEnabled);
+        if (s.graveyardEnabled !== undefined) userStat.graveyardEnabled = normalizeBool(s.graveyardEnabled, userStat.graveyardEnabled);
         if (s.frameBorderColor !== undefined) userStat.frameBorderColor = normalizeColor(s.frameBorderColor, userStat.frameBorderColor);
         if (s.teamColor !== undefined) userStat.teamColor = normalizeColor(s.teamColor, userStat.teamColor);
         if (s.graveyardColor !== undefined) userStat.graveyardColor = normalizeColor(s.graveyardColor, userStat.graveyardColor);
