@@ -194,10 +194,7 @@ export default function SoullinkSettingsEditor({apiUrl, values: remoteValues}: {
                         />
                         Show badges
                     </label>
-                </div>
-
-                <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-200">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-200 pt-3">
                         <input
                             type="checkbox"
                             checked={values.graveyardEnabled}
