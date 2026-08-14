@@ -37,15 +37,15 @@ export default async function Header() {
 
     return (
         <div className="flex justify-end items-center p-4">
-            <Link href="/api/auth/twitch">
-                <button className="flex items-center gap-2 bg-violet-500 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded">
+            {/*<Link href="/api/auth/twitch">*/}
+            {/*    <button className="flex items-center gap-2 bg-violet-500 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded">*/}
 
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/glitch_white.svg" className="w-4 h-4" alt="twitch logo">
-                    </img>
-                    Login with Twitch
-                </button>
-            </Link>
+            {/*        /!* eslint-disable-next-line @next/next/no-img-element *!/*/}
+            {/*        <img src="/glitch_white.svg" className="w-4 h-4" alt="twitch logo">*/}
+            {/*        </img>*/}
+            {/*        Login with Twitch*/}
+            {/*    </button>*/}
+            {/*</Link>*/}
         </div>
     )
 }
