@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function SiteLayout({children}: { children: React.ReactNode }) {
-    return <div className="page-bg min-h-screen"><Header/>{children}</div>
+    return <div className="page-bg min-h-screen"><Header showLogin/>{children}</div>
 }
