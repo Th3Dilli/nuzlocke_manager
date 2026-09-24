@@ -82,17 +82,20 @@ export function BadgesV({badges, className, label, color = "#eab308", textColor}
     textColor?: string;
 }) {
     return (
-        <div className={`relative shrink-0 p-3 pt-2 bgdark rounded-2xl border-[5px] h-20 ${className ?? ""}`} style={{borderColor: color}}>
+        <div
+            className={`relative shrink-0 p-3 pt-2 bgdark rounded-2xl border-[5px] min-h-20 ${className ?? ""}`}
+            style={{borderColor: color}}
+        >
             {label ? <TitleTabV label={label} borderColor={color} textColor={textColor}/> : <></>}
-            <div className={`flex flex-wrap gap-2 h-full  items-center justify-center`}>
+            <div className="flex flex-wrap gap-2 h-full content-center items-center justify-center">
                 {badges.map((id, i) => (
-                    <div key={i} className="flex flex-1 aspect-square h-14 w-14 items-center justify-center">
-                        {/*// eslint-disable-next-line @next/next/no-img-element*/}
+                    <div key={i} className="flex h-14 w-14 flex-none items-center justify-center">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src={`/badges/${id}.png`}
                             alt={badgeTitle(id)}
                             title={badgeTitle(id)}
-                            className="h-full [image-rendering:pixelated]"
+                            className="h-full w-full object-contain [image-rendering:pixelated]"
                         />
                     </div>
                 ))}
