@@ -179,7 +179,7 @@ export default function OverlaySettingsEditor({apiUrl, values: remoteValues}: {
 
                 <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">
                     <label className="block text-sm font-medium text-gray-200">
-                        Side screen max width ({values.sideMaxWidth === MAX_SIDE_MAX_WIDTH ? "no limit" : `${values.sideMaxWidth} pixel`})
+                        Second screen max width ({values.sideMaxWidth === MAX_SIDE_MAX_WIDTH ? "no limit" : `${values.sideMaxWidth} pixel`})
                     </label>
                     <input
                         type="range"

@@ -1,5 +1,6 @@
 import {
     normalizeBadgeGroup,
+    normalizeCamMaxHeight,
     normalizeBadges,
     normalizeColor,
     normalizeGraveyard,
@@ -10,8 +11,10 @@ import {
 } from "@/app/lib/types/NuzlockeState";
 import {
     emptySoullinkState,
+    normalizeCamMaxWidth,
     normalizeEncounters,
     normalizePlayerName,
+    normalizeSecondScreenWidth,
     normalizeSoullinkLabels,
     normalizeSoullinkSettings,
     SoullinkState
@@ -119,6 +122,9 @@ export function setStats(user: string, s: Partial<Omit<SoullinkState, "user">>) 
         }
 
         if (s.mainAspectRatio !== undefined) userStat.mainAspectRatio = normalizeMainAspectRatio(s.mainAspectRatio, userStat.mainAspectRatio);
+        if (s.camMaxWidth !== undefined) userStat.camMaxWidth = normalizeCamMaxWidth(s.camMaxWidth, userStat.camMaxWidth);
+        if (s.camMaxHeight !== undefined) userStat.camMaxHeight = normalizeCamMaxHeight(s.camMaxHeight, userStat.camMaxHeight);
+        if (s.secondScreenWidth !== undefined) userStat.secondScreenWidth = normalizeSecondScreenWidth(s.secondScreenWidth, userStat.secondScreenWidth);
         if (s.badgesEnabled !== undefined) userStat.badgesEnabled = normalizeBool(s.badgesEnabled, userStat.badgesEnabled);
         if (s.graveyardEnabled !== undefined) userStat.graveyardEnabled = normalizeBool(s.graveyardEnabled, userStat.graveyardEnabled);
         if (s.frameBorderColor !== undefined) userStat.frameBorderColor = normalizeColor(s.frameBorderColor, userStat.frameBorderColor);

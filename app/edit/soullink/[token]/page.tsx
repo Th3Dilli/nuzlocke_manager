@@ -177,6 +177,9 @@ function HomeInner({token}: { token: string }) {
                             apiUrl={apiUrl}
                             values={{
                                 mainAspectRatio: stats.mainAspectRatio,
+                                camMaxWidth: stats.camMaxWidth,
+                                camMaxHeight: stats.camMaxHeight,
+                                secondScreenWidth: stats.secondScreenWidth,
                                 frameBorderColor: stats.frameBorderColor,
                                 teamColor: stats.teamColor,
                                 graveyardColor: stats.graveyardColor,

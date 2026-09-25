@@ -4,8 +4,16 @@ import {useMemo, useState} from "react";
 import {AlertTriangle, Check, X} from "lucide-react";
 import {Pokeball} from "@/app/components/TeamBox";
 import Collapsible from "@/app/components/Collapsible";
-import {MainAspectRatio} from "@/app/lib/types/NuzlockeState";
-import {DEFAULT_SOULLINK_SETTINGS, MAX_PLAYER_NAME_LENGTH, SoullinkSettings} from "@/app/lib/types/SoullinkState";
+import {MainAspectRatio, MAX_CAM_MAX_HEIGHT, MIN_CAM_MAX_HEIGHT} from "@/app/lib/types/NuzlockeState";
+import {
+    DEFAULT_SOULLINK_SETTINGS,
+    MAX_CAM_MAX_WIDTH,
+    MAX_PLAYER_NAME_LENGTH,
+    MAX_SECOND_SCREEN_WIDTH,
+    MIN_CAM_MAX_WIDTH,
+    MIN_SECOND_SCREEN_WIDTH,
+    SoullinkSettings
+} from "@/app/lib/types/SoullinkState";
 
 const MAIN_ASPECT_RATIO_OPTIONS: { value: string; label: string }[] = [
     {value: "4/3", label: "Nintendo DS (4/3)"},
@@ -14,6 +22,9 @@ const MAIN_ASPECT_RATIO_OPTIONS: { value: string; label: string }[] = [
 
 function settingsEqual(a: SoullinkSettings, b: SoullinkSettings): boolean {
     return a.mainAspectRatio === b.mainAspectRatio
+        && a.camMaxWidth === b.camMaxWidth
+        && a.camMaxHeight === b.camMaxHeight
+        && a.secondScreenWidth === b.secondScreenWidth
         && a.frameBorderColor === b.frameBorderColor
         && a.teamColor === b.teamColor
         && a.graveyardColor === b.graveyardColor
@@ -24,7 +35,7 @@ function settingsEqual(a: SoullinkSettings, b: SoullinkSettings): boolean {
         && a.player2Name === b.player2Name;
 }
 
-// Editor for the soullink overlay's border/text colors, shared across both sides.
+// Editor for the soullink overlay's layout sizes and border/text colors, shared across both sides.
 export default function SoullinkSettingsEditor({apiUrl, values: remoteValues}: {
     apiUrl: string;
     values: SoullinkSettings;
@@ -182,6 +193,48 @@ export default function SoullinkSettingsEditor({apiUrl, values: remoteValues}: {
                             <option key={value} value={value}>{label}</option>
                         ))}
                     </select>
+                </div>
+
+                <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">
+                    <label className="block text-sm font-medium text-gray-200">
+                        Second screen width ({values.secondScreenWidth} pixel)
+                    </label>
+                    <input
+                        type="range"
+                        min={MIN_SECOND_SCREEN_WIDTH}
+                        max={MAX_SECOND_SCREEN_WIDTH}
+                        value={values.secondScreenWidth}
+                        onChange={e => update("secondScreenWidth", Number(e.target.value))}
+                        className="mt-2 w-full cursor-pointer accent-yellow-500"
+                    />
+                </div>
+
+                <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">
+                    <label className="block text-sm font-medium text-gray-200">
+                        Camera max width ({values.camMaxWidth === MAX_CAM_MAX_WIDTH ? "no limit" : `${values.camMaxWidth} pixel`})
+                    </label>
+                    <input
+                        type="range"
+                        min={MIN_CAM_MAX_WIDTH}
+                        max={MAX_CAM_MAX_WIDTH}
+                        value={values.camMaxWidth}
+                        onChange={e => update("camMaxWidth", Number(e.target.value))}
+                        className="mt-2 w-full cursor-pointer accent-yellow-500"
+                    />
+                </div>
+
+                <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">
+                    <label className="block text-sm font-medium text-gray-200">
+                        Camera max height ({values.camMaxHeight === MAX_CAM_MAX_HEIGHT ? "no limit" : `${values.camMaxHeight} pixel`})
+                    </label>
+                    <input
+                        type="range"
+                        min={MIN_CAM_MAX_HEIGHT}
+                        max={MAX_CAM_MAX_HEIGHT}
+                        value={values.camMaxHeight}
+                        onChange={e => update("camMaxHeight", Number(e.target.value))}
+                        className="mt-2 w-full cursor-pointer accent-yellow-500"
+                    />
                 </div>
 
                 <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">

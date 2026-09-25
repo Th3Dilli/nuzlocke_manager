@@ -10,6 +10,7 @@ import {
     MAX_ENCOUNTERS,
     MAX_GRAVEYARD,
     normalizeBadgeGroup,
+    normalizeCamMaxHeight,
     normalizeColor,
     normalizeLabel,
     normalizeMainAspectRatio,
@@ -20,7 +21,9 @@ import {
 import {
     LostDueToPlayer,
     LOST_DUE_TO_PLAYER_OPTIONS,
+    normalizeCamMaxWidth,
     normalizePlayerName,
+    normalizeSecondScreenWidth,
     SoullinkEncounter,
     SoullinkState
 } from "@/app/lib/types/SoullinkState";
@@ -44,7 +47,7 @@ const LABEL_FIELDS = [
 
 const COLOR_SETTINGS_FIELDS = ["frameBorderColor", "teamColor", "graveyardColor", "textColor"] as const;
 const PLAYER_NAME_FIELDS = ["player1Name", "player2Name"] as const;
-const SETTINGS_FIELDS = ["mainAspectRatio", "badgesEnabled", "graveyardEnabled", ...COLOR_SETTINGS_FIELDS, ...PLAYER_NAME_FIELDS] as const;
+const SETTINGS_FIELDS = ["mainAspectRatio", "camMaxWidth", "camMaxHeight", "secondScreenWidth", "badgesEnabled", "graveyardEnabled", ...COLOR_SETTINGS_FIELDS, ...PLAYER_NAME_FIELDS] as const;
 
 function parseTeam(rawTeam: unknown): number[] | { error: string } {
     if (!Array.isArray(rawTeam) || rawTeam.length > TEAM_SIZE) {
@@ -230,6 +233,15 @@ export async function POST(
 
     if ("mainAspectRatio" in body) {
         update.mainAspectRatio = normalizeMainAspectRatio(body.mainAspectRatio, current.mainAspectRatio);
+    }
+    if ("camMaxWidth" in body) {
+        update.camMaxWidth = normalizeCamMaxWidth(body.camMaxWidth, current.camMaxWidth);
+    }
+    if ("camMaxHeight" in body) {
+        update.camMaxHeight = normalizeCamMaxHeight(body.camMaxHeight, current.camMaxHeight);
+    }
+    if ("secondScreenWidth" in body) {
+        update.secondScreenWidth = normalizeSecondScreenWidth(body.secondScreenWidth, current.secondScreenWidth);
     }
     if ("badgesEnabled" in body) {
         update.badgesEnabled = normalizeBool(body.badgesEnabled, current.badgesEnabled);

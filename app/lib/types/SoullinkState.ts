@@ -1,5 +1,7 @@
 import {
     emptyTeam,
+    MAX_CAM_MAX_HEIGHT,
+    normalizeCamMaxHeight,
     EncounterAction,
     MainAspectRatio,
     MAX_ENCOUNTERS,
@@ -85,9 +87,35 @@ export function normalizeSoullinkLabels(input: unknown, fallback: SoullinkLabels
     };
 }
 
-// Overlay border/text colors, shared across both sides.
+// Max width of each trainer cam frame. At the max it never limits the cam,
+// which just fills whatever the second screen leaves over; smaller values leave
+// free space between the cam and its second screen. Max height reuses the
+// nuzlocke MIN/MAX_CAM_MAX_HEIGHT range.
+export const MIN_CAM_MAX_WIDTH = 200;
+export const MAX_CAM_MAX_WIDTH = 1000;
+
+// Width (incl. border) of each second (bottom/touch) screen frame.
+export const MIN_SECOND_SCREEN_WIDTH = 300;
+export const MAX_SECOND_SCREEN_WIDTH = 700;
+
+export function normalizeCamMaxWidth(input: unknown, fallback: number): number {
+    const value = Number(input);
+    if (!Number.isFinite(value)) return fallback;
+    return Math.min(MAX_CAM_MAX_WIDTH, Math.max(MIN_CAM_MAX_WIDTH, Math.round(value)));
+}
+
+export function normalizeSecondScreenWidth(input: unknown, fallback: number): number {
+    const value = Number(input);
+    if (!Number.isFinite(value)) return fallback;
+    return Math.min(MAX_SECOND_SCREEN_WIDTH, Math.max(MIN_SECOND_SCREEN_WIDTH, Math.round(value)));
+}
+
+// Overlay layout and border/text colors, shared across both sides.
 export type SoullinkSettings = {
     mainAspectRatio: MainAspectRatio;
+    camMaxWidth: number;
+    camMaxHeight: number;
+    secondScreenWidth: number;
     frameBorderColor: string;
     teamColor: string;
     graveyardColor: string;
@@ -107,6 +135,10 @@ export type SoullinkSettings = {
 
 export const DEFAULT_SOULLINK_SETTINGS: SoullinkSettings = {
     mainAspectRatio: "4/3",
+    camMaxWidth: MAX_CAM_MAX_WIDTH,
+    camMaxHeight: MAX_CAM_MAX_HEIGHT,
+    // Matches the old layout, where the four bottom columns split 1920px evenly.
+    secondScreenWidth: 470,
     frameBorderColor: "#f87171",
     teamColor: "#eab308",
     graveyardColor: "#eab308",
@@ -133,6 +165,9 @@ export function normalizeSoullinkSettings(input: unknown, fallback: SoullinkSett
     const source = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
     return {
         mainAspectRatio: normalizeMainAspectRatio(source.mainAspectRatio, fallback.mainAspectRatio),
+        camMaxWidth: normalizeCamMaxWidth(source.camMaxWidth, fallback.camMaxWidth),
+        camMaxHeight: normalizeCamMaxHeight(source.camMaxHeight, fallback.camMaxHeight),
+        secondScreenWidth: normalizeSecondScreenWidth(source.secondScreenWidth, fallback.secondScreenWidth),
         frameBorderColor: normalizeColor(source.frameBorderColor, fallback.frameBorderColor),
         teamColor: normalizeColor(source.teamColor, fallback.teamColor),
         graveyardColor: normalizeColor(source.graveyardColor, fallback.graveyardColor),

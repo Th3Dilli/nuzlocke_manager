@@ -2,7 +2,7 @@
 
 import {SoullinkState} from "@/app/lib/types/SoullinkState";
 import {MainAspectRatio} from "@/app/lib/types/NuzlockeState";
-import {Suspense, use, useEffect, useState} from "react";
+import {CSSProperties, Suspense, use, useEffect, useState} from "react";
 import {BadgesV, Graveyard, TeamBoxV, TitleTab} from "@/app/components/TeamBox";
 
 const ASPECT_RATIO_CLASS: Record<MainAspectRatio, string> = {
@@ -90,13 +90,14 @@ function OverlayInner({token}: { token: string }) {
                         </div>
                     </div>
                 </div>
-                <div className="flex-1 flex flex-row p-2 gap-2 ">
-                    <div className="flex-1 flex w-1/2 h-full ">
+                <div className="flex-1 flex flex-row p-2 gap-2 min-h-0">
+                    <div className="flex-1 flex min-w-0">
                         <Frame label={stats.showTrainer1Label ? stats.trainer1Label : undefined} color={stats.frameBorderColor}
-                               textColor={stats.textColor} className="flex-1"/>
+                               textColor={stats.textColor} className="flex-1"
+                               style={{maxWidth: `${stats.camMaxWidth}px`, maxHeight: `${stats.camMaxHeight}px`}}/>
                     </div>
 
-                    <div className="flex-1 w-1/2 h-full flex flex-col gap-3 min-h-0">
+                    <div className="flex-none h-full flex flex-col gap-3 min-h-0" style={{width: `${stats.secondScreenWidth}px`}}>
                         <Frame
                                color={stats.frameBorderColor}
                                textColor={stats.textColor}
@@ -105,7 +106,7 @@ function OverlayInner({token}: { token: string }) {
                                    color={stats.graveyardColor} textColor={stats.textColor} size="10" className="flex-1 min-h-0"/>}
                     </div>
 
-                    <div className="flex-1 w-1/2 h-full flex flex-col gap-3 min-h-0">
+                    <div className="flex-none h-full flex flex-col gap-3 min-h-0" style={{width: `${stats.secondScreenWidth}px`}}>
                         <Frame
                                color={stats.frameBorderColor}
                                textColor={stats.textColor}
@@ -114,9 +115,10 @@ function OverlayInner({token}: { token: string }) {
                                    color={stats.graveyardColor} textColor={stats.textColor} size="10" className="flex-1 min-h-0"/>}
                     </div>
 
-                    <div className="flex-1 flex">
+                    <div className="flex-1 flex flex-row-reverse min-w-0">
                         <Frame label={stats.showTrainer2Label ? stats.trainer2Label : undefined} color={stats.frameBorderColor}
-                               textColor={stats.textColor} className="flex-1"/>
+                               textColor={stats.textColor} className="flex-1"
+                               style={{maxWidth: `${stats.camMaxWidth}px`, maxHeight: `${stats.camMaxHeight}px`}}/>
                     </div>
                 </div>
             </div>
@@ -125,9 +127,9 @@ function OverlayInner({token}: { token: string }) {
 }
 
 
-function Frame({label, className, color = "#f87171", textColor}: { label?: string; className?: string; color?: string; textColor?: string }) {
+function Frame({label, className, style, color = "#f87171", textColor}: { label?: string; className?: string; style?: CSSProperties; color?: string; textColor?: string }) {
     return (
-        <div className={`relative rounded-2xl border-12 box-content ${className ?? ""}`} style={{borderColor: color}}>
+        <div className={`relative rounded-2xl border-12 box-content ${className ?? ""}`} style={{...style, borderColor: color}}>
             {label ? <TitleTab label={label} borderColor={color} textColor={textColor}/> : <></>}
         </div>
     );
