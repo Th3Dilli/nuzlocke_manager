@@ -9,6 +9,7 @@ import {
     ENCOUNTER_ACTIONS,
     MAX_ENCOUNTERS,
     MAX_GRAVEYARD,
+    normalizeBadgeGroup,
     normalizeCamMaxHeight,
     normalizeCamMode,
     normalizeColor,
@@ -40,7 +41,7 @@ const SETTINGS_FIELDS = ["mainWidth", "sideMaxWidth", "camMaxHeight","mainAspect
 // The page owner and any editor the owner has granted may write to it. The
 // body may contain `team` (number[], length <= TEAM_SIZE, 0 = empty slot),
 // `graveyard` (number[], any length up to MAX_GRAVEYARD, valid ids only),
-// `badges` (number[], valid badge ids only), and/or any of the show*Label
+// `badges` (number[], valid badge ids only), `badgeGroup` (badge set, "" = all), and/or any of the show*Label
 // (boolean) / *Label (string) fields. Omitted
 // fields are left unchanged. setStats persists to the DB and pushes the
 // change to any live SSE subscribers (page + overlay).
@@ -73,10 +74,11 @@ export async function POST(
     const hasTeam = "team" in body;
     const hasGraveyard = "graveyard" in body;
     const hasBadges = "badges" in body;
+    const hasBadgeGroup = "badgeGroup" in body;
     const hasEncounters = "encounters" in body;
     const hasLabels = LABEL_FIELDS.some(([show, text]) => show in body || text in body);
     const hasSettings = SETTINGS_FIELDS.some(field => field in body);
-    if (!hasTeam && !hasGraveyard && !hasBadges && !hasEncounters && !hasLabels && !hasSettings) {
+    if (!hasTeam && !hasGraveyard && !hasBadges && !hasBadgeGroup && !hasEncounters && !hasLabels && !hasSettings) {
         return new Response("Nothing to update", {status: 400});
     }
 
@@ -203,6 +205,6 @@ export async function POST(
         graveyardEnabled: normalizeBool(body.graveyardEnabled, current.graveyardEnabled),
     };
 
-    setStats(username, {user: username, team, graveyard, badges, encounters, ...labels, ...settings});
+    setStats(username, {user: username, team, graveyard, badges, badgeGroup: normalizeBadgeGroup(body.badgeGroup, current.badgeGroup), encounters, ...labels, ...settings});
     return Response.json({ok: true});
 }

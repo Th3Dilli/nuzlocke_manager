@@ -184,7 +184,7 @@ function HomeInner({username}: { username: string }) {
                     />
                 </div>
 
-                {stats.badges.length > 0 && <BadgesV badges={stats.badges} label={stats.showBadgesLabel ? stats.badgesLabel : undefined} textColor={stats.textColor} className="h-auto min-h-20 w-full"/>}
+                {(stats.badges.length > 0 || stats.badgeGroup) && <BadgesV badges={stats.badges} group={stats.badgeGroup} label={stats.showBadgesLabel ? stats.badgesLabel : undefined} textColor={stats.textColor} className="h-auto min-h-20 w-full"/>}
 
                 {stats.encounters.length > 0 && <EncountersTable encounters={stats.encounters} player1Name={stats.player1Name} player2Name={stats.player2Name} borderColor={stats.teamColor}/>}
             </main>

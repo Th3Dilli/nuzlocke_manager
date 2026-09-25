@@ -9,6 +9,7 @@ import {
     ENCOUNTER_ACTIONS,
     MAX_ENCOUNTERS,
     MAX_GRAVEYARD,
+    normalizeBadgeGroup,
     normalizeColor,
     normalizeLabel,
     normalizeMainAspectRatio,
@@ -143,7 +144,7 @@ function parseEncounters(rawEncounters: unknown): SoullinkEncounter[] | { error:
 // Update either team's roster, graveyard, and/or the shared badges for a
 // user's soullink page. The page owner and any editor the owner has granted
 // may write to it. The body may contain any of `team1`, `team2`,
-// `graveyard1`, `graveyard2`, `badges`. Omitted fields are left unchanged.
+// `graveyard1`, `graveyard2`, `badges`, `badgeGroup` (badge set, "" = all). Omitted fields are left unchanged.
 // setStats persists to the DB and pushes the change to any live SSE
 // subscribers (page + overlay).
 export async function POST(
@@ -174,10 +175,11 @@ export async function POST(
 
     const fields = ["team1", "team2", "graveyard1", "graveyard2"] as const;
     const hasBadges = "badges" in body;
+    const hasBadgeGroup = "badgeGroup" in body;
     const hasEncounters = "encounters" in body;
     const hasLabels = LABEL_FIELDS.some(([show, text]) => show in body || text in body);
     const hasSettings = SETTINGS_FIELDS.some(field => field in body);
-    if (!fields.some(f => f in body) && !hasBadges && !hasEncounters && !hasLabels && !hasSettings) {
+    if (!fields.some(f => f in body) && !hasBadges && !hasBadgeGroup && !hasEncounters && !hasLabels && !hasSettings) {
         return new Response("Nothing to update", {status: 400});
     }
 
@@ -210,6 +212,9 @@ export async function POST(
         const result = parseBadges(body.badges);
         if (!Array.isArray(result)) return new Response(result.error, {status: 400});
         update.badges = result;
+    }
+    if (hasBadgeGroup) {
+        update.badgeGroup = normalizeBadgeGroup(body.badgeGroup, current.badgeGroup);
     }
 
     if (hasEncounters) {

@@ -54,14 +54,14 @@ function OverlayInner({token}: { token: string }) {
             return (<div className="flex flex-1 flex-row gap-2" style={{maxHeight: `${state.camMaxHeight}px`}}>
                 <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-1`}/>
                 <div className="flex-1">
-                    {state.badgesEnabled && <BadgesV badges={state.badges} label={state.showBadgesLabel ? state.badgesLabel : undefined} textColor={state.textColor} className="h-102 w-42"/>}
+                    {state.badgesEnabled && <BadgesV badges={state.badges} group={state.badgeGroup} label={state.showBadgesLabel ? state.badgesLabel : undefined} textColor={state.textColor} className="w-42 pt-5 self-start"/>}
                 </div>
             </div>)
         } else if (camMode === "4") {
             return (<div className="flex flex-1 flex-row gap-2" style={{maxHeight: `${state.camMaxHeight}px`}}>
                 <div className="flex-1 flex">
                     <div className="flex-1"></div>
-                    {state.badgesEnabled ? <BadgesV badges={state.badges} label={state.showBadgesLabel ? state.badgesLabel : undefined} textColor={state.textColor} className="h-102 w-42"/> : <div className="h-102 w-42"></div>}
+                    {state.badgesEnabled ? <BadgesV badges={state.badges} group={state.badgeGroup} label={state.showBadgesLabel ? state.badgesLabel : undefined} textColor={state.textColor} className="w-42 pt-5 self-start"/> : <div className="w-42"></div>}
                 </div>
                 <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-1`}/>
             </div>)
@@ -69,16 +69,16 @@ function OverlayInner({token}: { token: string }) {
             return (<div className="flex flex-1 flex-row gap-2" style={{maxHeight: `${state.camMaxHeight}px`}}>
                 <div className="flex-none w-1/4"></div>
                 <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-auto w-1/2`}/>
-                {state.badgesEnabled ? <BadgesV badges={state.badges} label={state.showBadgesLabel ? state.badgesLabel : undefined} textColor={state.textColor} className="h-102 w-1/4 flex-auto"/> : <div className="h-102 w-40"></div>}
+                {state.badgesEnabled ? <BadgesV badges={state.badges} group={state.badgeGroup} label={state.showBadgesLabel ? state.badgesLabel : undefined} textColor={state.textColor} className="w-1/4 flex-auto pt-5 self-start"/> : <div className="w-40"></div>}
             </div>)
         } else if (camMode === "2") {
             return (<div className="flex flex-1 flex-row gap-2" style={{maxHeight: `${state.camMaxHeight}px`}}>
                 <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-auto w-1/2`}/>
-                {state.badgesEnabled && <BadgesV badges={state.badges} label={state.showBadgesLabel ? state.badgesLabel : undefined} textColor={state.textColor} className="h-102 w-40"/>}
+                {state.badgesEnabled && <BadgesV badges={state.badges} group={state.badgeGroup} label={state.showBadgesLabel ? state.badgesLabel : undefined} textColor={state.textColor} className="w-40 pt-5 self-start"/>}
             </div>)
         } else if (camMode === "1") {
             return (<div className="flex flex-1 flex-row gap-2" style={{maxHeight: `${state.camMaxHeight}px`}}>
-                {state.badgesEnabled && <BadgesV badges={state.badges} label={state.showBadgesLabel ? state.badgesLabel : undefined} textColor={state.textColor} className="h-102 w-40"/>}
+                {state.badgesEnabled && <BadgesV badges={state.badges} group={state.badgeGroup} label={state.showBadgesLabel ? state.badgesLabel : undefined} textColor={state.textColor} className="w-40 pt-5 self-start"/>}
                 <Frame label={state.showTrainerLabel ? state.trainerLabel : undefined} color={state.frameBorderColor} textColor={state.textColor} className={`flex-auto w-1/2`}/>
             </div>)
         }

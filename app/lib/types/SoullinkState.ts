@@ -212,6 +212,9 @@ export type SoullinkState = SoullinkLabels & SoullinkSettings & {
     // Ids of earned gym badges (see app/lib/badges.json), shared by both
     // trainers since a soul link run plays through the same gyms together.
     badges: number[];
+    // Badge set (generation) the run plays through; see NuzlockeState.badgeGroup.
+    // Stored alongside the settings, but edited (and saved) with the badges.
+    badgeGroup: string;
     // Per-route encounter log, in the order routes were entered.
     encounters: SoullinkEncounter[];
 };
@@ -224,6 +227,7 @@ export function emptySoullinkState(user: string): SoullinkState {
         graveyard1: [],
         graveyard2: [],
         badges: [],
+        badgeGroup: "",
         encounters: [],
         ...DEFAULT_SOULLINK_LABELS,
         ...DEFAULT_SOULLINK_SETTINGS,
@@ -237,7 +241,7 @@ export function emptySoullinkState(user: string): SoullinkState {
 export type PublicSoullinkState = Pick<SoullinkState,
     | "team1" | "team2"
     | "graveyard1" | "graveyard2"
-    | "badges"
+    | "badges" | "badgeGroup"
     | "encounters"
     | "showTeam1Label" | "team1Label"
     | "showTeam2Label" | "team2Label"
@@ -256,6 +260,7 @@ export function toPublicSoullinkState(s: SoullinkState): PublicSoullinkState {
         graveyard1: s.graveyard1,
         graveyard2: s.graveyard2,
         badges: s.badges,
+        badgeGroup: s.badgeGroup,
         encounters: s.encounters,
         showTeam1Label: s.showTeam1Label,
         team1Label: s.team1Label,

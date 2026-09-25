@@ -74,13 +74,18 @@ export function TeamBoxV({team, className, label = "Team", color = "#eab308", te
     );
 }
 
-export function BadgesV({badges, className, label, color = "#eab308", textColor}: {
+// Earned badges in color. With `group` set, only that set's badges are shown,
+// the not-yet-earned ones grayed out.
+export function BadgesV({badges, group, className, label, color = "#eab308", textColor}: {
     badges: number[];
+    group?: string;
     className?: string;
     label?: string;
     color?: string;
     textColor?: string;
 }) {
+    const earned = new Set(badges);
+    const shown = group ? BADGES.filter(b => b.group === group).map(b => b.id) : badges;
     return (
         <div
             className={`relative shrink-0 p-3 pt-2 bgdark rounded-2xl border-[5px] min-h-20 ${className ?? ""}`}
@@ -88,14 +93,14 @@ export function BadgesV({badges, className, label, color = "#eab308", textColor}
         >
             {label ? <TitleTabV label={label} borderColor={color} textColor={textColor}/> : <></>}
             <div className="flex flex-wrap gap-2 h-full content-center items-center justify-center">
-                {badges.map((id, i) => (
-                    <div key={i} className="flex h-14 w-14 flex-none items-center justify-center">
+                {shown.map(id => (
+                    <div key={id} className="flex h-14 w-14 flex-none items-center justify-center">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src={`/badges/${id}.png`}
                             alt={badgeTitle(id)}
                             title={badgeTitle(id)}
-                            className="h-full w-full object-contain [image-rendering:pixelated]"
+                            className={`h-full w-full object-contain [image-rendering:pixelated] ${earned.has(id) ? "" : "opacity-20 grayscale"}`}
                         />
                     </div>
                 ))}

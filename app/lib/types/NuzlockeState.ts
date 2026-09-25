@@ -1,3 +1,5 @@
+import {BADGES} from "@/app/lib/badges";
+
 export const TEAM_SIZE = 6;
 
 // Upper bound on graveyard entries to keep payloads/storage sane. The graveyard
@@ -123,6 +125,12 @@ export function normalizeMainAspectRatio(input: unknown, fallback: MainAspectRat
     return typeof input === "string" && MAIN_ASPECT_RATIO_SET.has(input) ? (input as MainAspectRatio) : fallback;
 }
 
+const BADGE_GROUP_SET: ReadonlySet<string> = new Set(BADGES.map(b => b.group));
+
+export function normalizeBadgeGroup(input: unknown, fallback: string): string {
+    return typeof input === "string" && (input === "" || BADGE_GROUP_SET.has(input)) ? input : fallback;
+}
+
 // Coerce arbitrary input (e.g. parsed JSON) into a full set of overlay layout
 // settings, falling back field-by-field to defaults for anything missing/invalid.
 export function normalizeSettings(input: unknown, fallback: NuzlockeSettings = DEFAULT_SETTINGS): NuzlockeSettings {
@@ -214,6 +222,11 @@ export type NuzlockeState = NuzlockeLabels & NuzlockeSettings & {
     graveyard: number[];
     // Ids of earned gym badges (see app/lib/badges.json), ascending, no duplicates.
     badges: number[];
+    // Badge set (generation, see Badge.group) the run plays through: the badge
+    // editor and overlay show only that set, with not-yet-earned badges grayed
+    // out. "" shows every badge in the editor and only earned ones in the overlay.
+    // Stored alongside the settings, but edited (and saved) with the badges.
+    badgeGroup: string;
     // Per-route encounter log, in the order routes were entered.
     encounters: NuzlockeEncounter[];
 };
@@ -225,7 +238,7 @@ export type NuzlockeState = NuzlockeLabels & NuzlockeSettings & {
 // frame border color) that only the overlay uses.
 export type PublicNuzlockeState = Pick<NuzlockeState,
     | "user"
-    | "team" | "graveyard" | "badges" | "encounters"
+    | "team" | "graveyard" | "badges" | "badgeGroup" | "encounters"
     | "showTeamLabel" | "teamLabel"
     | "showGraveyardLabel" | "graveyardLabel"
     | "showBadgesLabel" | "badgesLabel"
@@ -239,6 +252,7 @@ export function toPublicNuzlockeState(s: NuzlockeState): PublicNuzlockeState {
         team: s.team,
         graveyard: s.graveyard,
         badges: s.badges,
+        badgeGroup: s.badgeGroup,
         encounters: s.encounters,
         showTeamLabel: s.showTeamLabel,
         teamLabel: s.teamLabel,

@@ -128,7 +128,7 @@ function HomeInner({token}: { token: string }) {
                 {canEdit ? <div>
                         <TeamEditor apiUrl={apiUrl} field="team" team={stats.team} label="Edit Team"/>
                         <GraveyardEditor apiUrl={apiUrl} field="graveyard" graveyard={stats.graveyard} label="Edit Graveyard"/>
-                        <BadgesEditor apiUrl={apiUrl} field="badges" badges={stats.badges} label="Edit Badges"/>
+                        <BadgesEditor apiUrl={apiUrl} field="badges" badges={stats.badges} groupField="badgeGroup" group={stats.badgeGroup} label="Edit Badges"/>
                         <NuzlockeEncountersEditor apiUrl={apiUrl} encounters={stats.encounters}/>
                         <LabelsEditor
                             apiUrl={apiUrl}

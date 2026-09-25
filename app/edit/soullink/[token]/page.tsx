@@ -142,7 +142,7 @@ function HomeInner({token}: { token: string }) {
                                 <GraveyardEditor apiUrl={apiUrl} field="graveyard2" graveyard={stats.graveyard2} label={`Edit Graveyard ${stats.player2Name || "2"}`}/>
                             </div>
                         </div>
-                        <BadgesEditor apiUrl={apiUrl} field="badges" badges={stats.badges} label="Edit Badges"/>
+                        <BadgesEditor apiUrl={apiUrl} field="badges" badges={stats.badges} groupField="badgeGroup" group={stats.badgeGroup} label="Edit Badges"/>
                         <EncountersEditor
                             apiUrl={apiUrl}
                             encounters={stats.encounters}

@@ -1,4 +1,5 @@
 import {
+    normalizeBadgeGroup,
     normalizeBadges,
     normalizeColor,
     normalizeGraveyard,
@@ -69,6 +70,7 @@ function loadStat(user: string): SoullinkState {
             graveyard1: normalizeGraveyard(safeParse(row.graveyard1)),
             graveyard2: normalizeGraveyard(safeParse(row.graveyard2)),
             badges: normalizeBadges(safeParse(row.badges)),
+            badgeGroup: normalizeBadgeGroup((settings as Record<string, unknown> | null)?.badgeGroup, ""),
             encounters: normalizeEncounters(safeParse(row.encounters)),
             ...normalizeSoullinkLabels(settings),
             ...normalizeSoullinkSettings(settings),
@@ -108,6 +110,7 @@ export function setStats(user: string, s: Partial<Omit<SoullinkState, "user">>) 
         if (s.graveyard1) userStat.graveyard1 = normalizeGraveyard(s.graveyard1);
         if (s.graveyard2) userStat.graveyard2 = normalizeGraveyard(s.graveyard2);
         if (s.badges) userStat.badges = normalizeBadges(s.badges);
+        if (s.badgeGroup !== undefined) userStat.badgeGroup = normalizeBadgeGroup(s.badgeGroup, userStat.badgeGroup);
         if (s.encounters) userStat.encounters = normalizeEncounters(s.encounters);
 
         for (const [showKey, textKey] of LABEL_KEYS) {
@@ -132,7 +135,7 @@ export function setStats(user: string, s: Partial<Omit<SoullinkState, "user">>) 
             graveyard1: JSON.stringify(userStat.graveyard1),
             graveyard2: JSON.stringify(userStat.graveyard2),
             badges: JSON.stringify(userStat.badges),
-            settings: JSON.stringify({...normalizeSoullinkLabels(userStat), ...normalizeSoullinkSettings(userStat)}),
+            settings: JSON.stringify({...normalizeSoullinkLabels(userStat), ...normalizeSoullinkSettings(userStat), badgeGroup: userStat.badgeGroup}),
             encounters: JSON.stringify(userStat.encounters),
         });
 

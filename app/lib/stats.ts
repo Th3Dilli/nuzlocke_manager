@@ -2,6 +2,7 @@ import {
     DEFAULT_LABELS,
     DEFAULT_SETTINGS,
     emptyTeam,
+    normalizeBadgeGroup,
     normalizeBadges,
     normalizeEncounters,
     normalizeGraveyard,
@@ -61,12 +62,13 @@ function loadStat(user: string): NuzlockeState {
             team: normalizeTeam(safeParse(row.team)),
             graveyard: normalizeGraveyard(safeParse(row.graveyard)),
             badges: normalizeBadges(safeParse(row.badges)),
+            badgeGroup: normalizeBadgeGroup((settings as Record<string, unknown> | null)?.badgeGroup, ""),
             encounters: normalizeEncounters(safeParse(row.encounters)),
             ...normalizeLabels(settings),
             ...normalizeSettings(settings),
         };
     }
-    return {user: user, team: emptyTeam(), graveyard: [], badges: [], encounters: [], ...DEFAULT_LABELS, ...DEFAULT_SETTINGS};
+    return {user: user, team: emptyTeam(), graveyard: [], badges: [], badgeGroup: "", encounters: [], ...DEFAULT_LABELS, ...DEFAULT_SETTINGS};
 }
 
 export function subscribe(user: string, cb: (stat: NuzlockeState) => void) {
@@ -87,6 +89,7 @@ export function setStats(user: string, s: NuzlockeState) {
         userStat.team = normalizeTeam(s.team);
         userStat.graveyard = normalizeGraveyard(s.graveyard);
         userStat.badges = normalizeBadges(s.badges);
+        userStat.badgeGroup = normalizeBadgeGroup(s.badgeGroup, userStat.badgeGroup);
         userStat.encounters = normalizeEncounters(s.encounters);
         Object.assign(userStat, normalizeLabels(s, userStat));
         Object.assign(userStat, normalizeSettings(s, userStat));
@@ -96,7 +99,7 @@ export function setStats(user: string, s: NuzlockeState) {
             team: JSON.stringify(userStat.team),
             graveyard: JSON.stringify(userStat.graveyard),
             badges: JSON.stringify(userStat.badges),
-            settings: JSON.stringify({...normalizeLabels(userStat), ...normalizeSettings(userStat)}),
+            settings: JSON.stringify({...normalizeLabels(userStat), ...normalizeSettings(userStat), badgeGroup: userStat.badgeGroup}),
             encounters: JSON.stringify(userStat.encounters),
         });
 

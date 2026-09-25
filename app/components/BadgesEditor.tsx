@@ -13,16 +13,27 @@ function idsEqual(a: number[], b: number[]): boolean {
     return sa.every((v, i) => v === sb[i]);
 }
 
+type BadgeSet = { badges: number[]; badgeGroup: string };
+
+function badgesEqual(a: BadgeSet, b: BadgeSet): boolean {
+    return a.badgeGroup === b.badgeGroup && idsEqual(a.badges, b.badges);
+}
+
 // Generic badges editor: saves to `apiUrl` as `{ [field]: badges }`. Toggles
 // membership in a fixed catalog (see app/lib/badges.json) rather than
-// free-form add/remove like the team/graveyard editors.
-export default function BadgesEditor({apiUrl, field = "badges", badges: remoteBadges, label = "Edit Badges"}: {
+// free-form add/remove like the team/graveyard editors. With `groupField` set,
+// it also offers a badge set (generation) picker, saved as `{ [groupField]: group }`
+// together with the badges; when a set is picked only its badges are listed.
+export default function BadgesEditor({apiUrl, field = "badges", badges: remoteBadges, groupField, group: remoteGroup = "", label = "Edit Badges"}: {
     apiUrl: string;
     field?: string;
     badges: number[];
+    groupField?: string;
+    group?: string;
     label?: string;
 }) {
-    const [badges, setBadges] = useState<number[]>(() => [...remoteBadges]);
+    const remote = useMemo<BadgeSet>(() => ({badges: remoteBadges, badgeGroup: remoteGroup}), [remoteBadges, remoteGroup]);
+    const [badgeSet, setBadgeSet] = useState<BadgeSet>(() => ({badges: [...remoteBadges], badgeGroup: remoteGroup}));
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -30,21 +41,25 @@ export default function BadgesEditor({apiUrl, field = "badges", badges: remoteBa
     const [remoteChanged, setRemoteChanged] = useState(false);
     // The last badges we saw from the server, kept in state so we can detect a
     // new SSE update during render (React's "adjust state on a prop change").
-    const [prevRemote, setPrevRemote] = useState<number[]>(remoteBadges);
+    const [prevRemote, setPrevRemote] = useState<BadgeSet>(remote);
 
+    const {badges, badgeGroup} = badgeSet;
     const selected = useMemo(() => new Set(badges), [badges]);
-    const dirty = useMemo(() => !idsEqual(badges, remoteBadges), [remoteBadges, badges]);
-    const groups = useMemo(() => groupedBadges(), []);
+    const dirty = useMemo(() => !badgesEqual(badgeSet, remote), [badgeSet, remote]);
+    const allGroups = useMemo(() => groupedBadges(), []);
+    const groups = useMemo(() => badgeGroup ? allGroups.filter(g => g.group === badgeGroup) : allGroups, [allGroups, badgeGroup]);
+    const shownTotal = badgeGroup ? groups.reduce((n, g) => n + g.badges.length, 0) : BADGES.length;
+    const shownSelected = badgeGroup ? groups.reduce((n, g) => n + g.badges.filter(b => selected.has(b.id)).length, 0) : badges.length;
 
-    // Reconcile the draft when new badges arrive over SSE (e.g. a co-editor
+    // Reconcile the badgeSet when new badges arrive over SSE (e.g. a co-editor
     // saved). Adopt the incoming list silently when we have no pending edits;
-    // otherwise keep the draft and surface a notice so the user doesn't lose it.
-    if (!idsEqual(prevRemote, remoteBadges)) {
-        setPrevRemote(remoteBadges);
-        if (idsEqual(badges, remoteBadges)) {
+    // otherwise keep the badgeSet and surface a notice so the user doesn't lose it.
+    if (!badgesEqual(prevRemote, remote)) {
+        setPrevRemote(remote);
+        if (badgesEqual(badgeSet, remote)) {
             setRemoteChanged(false);
-        } else if (idsEqual(badges, prevRemote)) {
-            setBadges([...remoteBadges]);
+        } else if (badgesEqual(badgeSet, prevRemote)) {
+            setBadgeSet({badges: [...remote.badges], badgeGroup: remote.badgeGroup});
             setRemoteChanged(false);
         } else {
             setRemoteChanged(true);
@@ -52,13 +67,22 @@ export default function BadgesEditor({apiUrl, field = "badges", badges: remoteBa
     }
 
     function toggle(id: number) {
-        setBadges(prev => prev.includes(id) ? prev.filter(v => v !== id) : [...prev, id]);
+        setBadgeSet(prev => ({
+            ...prev,
+            badges: prev.badges.includes(id) ? prev.badges.filter(v => v !== id) : [...prev.badges, id],
+        }));
+        setSaved(false);
+        setError(null);
+    }
+
+    function selectGroup(value: string) {
+        setBadgeSet(prev => ({...prev, badgeGroup: value}));
         setSaved(false);
         setError(null);
     }
 
     function loadRemote() {
-        setBadges([...remoteBadges]);
+        setBadgeSet({badges: [...remote.badges], badgeGroup: remote.badgeGroup});
         setRemoteChanged(false);
         setSaved(false);
         setError(null);
@@ -71,7 +95,7 @@ export default function BadgesEditor({apiUrl, field = "badges", badges: remoteBa
             const res = await fetch(apiUrl, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({[field]: badges}),
+                body: JSON.stringify(groupField ? {[field]: badges, [groupField]: badgeGroup} : {[field]: badges}),
             });
             if (res.ok) {
                 setSaved(true);
@@ -89,7 +113,7 @@ export default function BadgesEditor({apiUrl, field = "badges", badges: remoteBa
     return (
         <Collapsible
             icon={<Pokeball className="h-5 w-5"/>}
-            title={<>{label} <span className="text-sm font-normal text-gray-500">{badges.length}/{BADGES.length}</span></>}
+            title={<>{label} <span className="text-sm font-normal text-gray-500">{shownSelected}/{shownTotal}</span></>}
             headerRight={
                 <>
                     {error && <span className="text-sm text-red-400">{error}</span>}
@@ -123,6 +147,24 @@ export default function BadgesEditor({apiUrl, field = "badges", badges: remoteBa
                 </div>
             )}
 
+            {groupField && (
+                <div className="mb-5 rounded-lg border border-yellow-700 bg-neutral-800 p-3 sm:max-w-sm">
+                    <label className="block text-sm font-medium text-gray-200">
+                        Badge set (unearned shown gray in the overlay)
+                    </label>
+                    <select
+                        value={badgeGroup}
+                        onChange={e => selectGroup(e.target.value)}
+                        className="mt-2 w-full rounded-md border border-yellow-600 bg-neutral-900 px-2 py-2 text-sm text-gray-200 outline-none focus:border-yellow-500"
+                    >
+                        <option value="">All badges (overlay shows only earned)</option>
+                        {allGroups.map(({group: value}) => (
+                            <option key={value} value={value}>{badgeGroupLabel(value)}</option>
+                        ))}
+                    </select>
+                </div>
+            )}
+
             <div className="flex flex-col gap-5">
                 {groups.map(({group, badges: groupBadges}) => (
                     <div key={group}>
@@ -146,7 +188,7 @@ export default function BadgesEditor({apiUrl, field = "badges", badges: remoteBa
                                         <img
                                             src={`/badges/${badge.id}.png`}
                                             alt={badge.name}
-                                            className={`h-10 w-10 object-contain ${isSelected ? "" : "opacity-40 grayscale"}`}
+                                            className={`h-10 w-10 object-contain ${isSelected ? "" : "opacity-20 grayscale"}`}
                                         />
                                         <span className={`w-full truncate text-center text-[11px] ${isSelected ? "text-yellow-200" : "text-gray-500"}`}>
                                             {badge.name}
