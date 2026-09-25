@@ -8,8 +8,12 @@ import {
     CamMode,
     DEFAULT_SETTINGS,
     MainAspectRatio,
+    MAX_CAM_MAX_HEIGHT,
     MAX_MAIN_WIDTH,
+    MAX_SIDE_MAX_WIDTH,
+    MIN_CAM_MAX_HEIGHT,
     MIN_MAIN_WIDTH,
+    MIN_SIDE_MAX_WIDTH,
     NuzlockeSettings
 } from "@/app/lib/types/NuzlockeState";
 
@@ -28,6 +32,8 @@ const MAIN_ASPECT_RATIO_OPTIONS: { value: string; label: string }[] = [
 
 function settingsEqual(a: NuzlockeSettings, b: NuzlockeSettings): boolean {
     return a.mainWidth === b.mainWidth
+        && a.sideMaxWidth === b.sideMaxWidth
+        && a.camMaxHeight === b.camMaxHeight
         && a.mainAspectRatio === b.mainAspectRatio
         && a.camMode === b.camMode
         && a.frameBorderColor === b.frameBorderColor
@@ -167,6 +173,34 @@ export default function OverlaySettingsEditor({apiUrl, values: remoteValues}: {
                         max={MAX_MAIN_WIDTH}
                         value={values.mainWidth}
                         onChange={e => update("mainWidth", Number(e.target.value))}
+                        className="mt-2 w-full cursor-pointer accent-yellow-500"
+                    />
+                </div>
+
+                <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">
+                    <label className="block text-sm font-medium text-gray-200">
+                        Side screen max width ({values.sideMaxWidth === MAX_SIDE_MAX_WIDTH ? "no limit" : `${values.sideMaxWidth} pixel`})
+                    </label>
+                    <input
+                        type="range"
+                        min={MIN_SIDE_MAX_WIDTH}
+                        max={MAX_SIDE_MAX_WIDTH}
+                        value={values.sideMaxWidth}
+                        onChange={e => update("sideMaxWidth", Number(e.target.value))}
+                        className="mt-2 w-full cursor-pointer accent-yellow-500"
+                    />
+                </div>
+
+                <div className="rounded-lg border border-yellow-700 bg-neutral-800 p-3">
+                    <label className="block text-sm font-medium text-gray-200">
+                        Camera max height ({values.camMaxHeight === MAX_CAM_MAX_HEIGHT ? "no limit" : `${values.camMaxHeight} pixel`})
+                    </label>
+                    <input
+                        type="range"
+                        min={MIN_CAM_MAX_HEIGHT}
+                        max={MAX_CAM_MAX_HEIGHT}
+                        value={values.camMaxHeight}
+                        onChange={e => update("camMaxHeight", Number(e.target.value))}
                         className="mt-2 w-full cursor-pointer accent-yellow-500"
                     />
                 </div>

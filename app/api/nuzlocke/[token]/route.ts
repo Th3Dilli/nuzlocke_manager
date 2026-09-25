@@ -9,11 +9,13 @@ import {
     ENCOUNTER_ACTIONS,
     MAX_ENCOUNTERS,
     MAX_GRAVEYARD,
+    normalizeCamMaxHeight,
     normalizeCamMode,
     normalizeColor,
     normalizeLabel,
     normalizeMainAspectRatio,
     normalizeMainWidth,
+    normalizeSideMaxWidth,
     normalizeRoute,
     normalizeBool,
     NuzlockeEncounter,
@@ -32,7 +34,7 @@ const LABEL_FIELDS = [
     ["showBadgesLabel", "badgesLabel"],
 ] as const;
 
-const SETTINGS_FIELDS = ["mainWidth", "mainAspectRatio", "camMode", "frameBorderColor", "teamColor", "graveyardColor", "textColor", "badgesEnabled", "graveyardEnabled"] as const;
+const SETTINGS_FIELDS = ["mainWidth", "sideMaxWidth", "camMaxHeight","mainAspectRatio", "camMode", "frameBorderColor", "teamColor", "graveyardColor", "textColor", "badgesEnabled", "graveyardEnabled"] as const;
 
 // Update the team, graveyard, and/or label settings for a user's stats page.
 // The page owner and any editor the owner has granted may write to it. The
@@ -189,6 +191,8 @@ export async function POST(
 
     const settings = {
         mainWidth: normalizeMainWidth(body.mainWidth, current.mainWidth),
+        sideMaxWidth: normalizeSideMaxWidth(body.sideMaxWidth, current.sideMaxWidth),
+        camMaxHeight: normalizeCamMaxHeight(body.camMaxHeight, current.camMaxHeight),
         mainAspectRatio: normalizeMainAspectRatio(body.mainAspectRatio, current.mainAspectRatio),
         camMode: normalizeCamMode(body.camMode, current.camMode),
         frameBorderColor: normalizeColor(body.frameBorderColor, current.frameBorderColor),

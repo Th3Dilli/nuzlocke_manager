@@ -150,6 +150,8 @@ function HomeInner({token}: { token: string }) {
                             apiUrl={apiUrl}
                             values={{
                                 mainWidth: stats.mainWidth,
+                                sideMaxWidth: stats.sideMaxWidth,
+                                camMaxHeight: stats.camMaxHeight,
                                 mainAspectRatio: stats.mainAspectRatio,
                                 camMode: stats.camMode,
                                 frameBorderColor: stats.frameBorderColor,

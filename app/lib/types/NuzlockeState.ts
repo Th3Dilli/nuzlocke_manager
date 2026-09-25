@@ -38,8 +38,20 @@ export type CamMode = "1" | "2" | "3" | "4" | "5";
 export const CAM_MODES: readonly CamMode[] = ["1", "2", "3", "4", "5"];
 const CAM_MODE_SET: ReadonlySet<string> = new Set(CAM_MODES);
 
-export const MIN_MAIN_WIDTH = 1100;
+export const MIN_MAIN_WIDTH = 1000;
 export const MAX_MAIN_WIDTH = 1420;
+
+// Max width of the side (cam + team) column. At the max it never limits the
+// column, which just fills whatever the main column leaves over; smaller values
+// leave free space between the two columns.
+export const MIN_SIDE_MAX_WIDTH = 300;
+export const MAX_SIDE_MAX_WIDTH = 800;
+
+// Max height of the trainer cam row. At the max it never limits the row, which
+// just fills whatever the team box and bottom frame leave over; smaller values
+// leave free space between the cam and the team box.
+export const MIN_CAM_MAX_HEIGHT = 200;
+export const MAX_CAM_MAX_HEIGHT = 1000;
 
 // Aspect ratio of the main screen frame (the nuzlocke/soullink capture frame).
 export type MainAspectRatio = "4/3" | "5/3";
@@ -49,6 +61,8 @@ const MAIN_ASPECT_RATIO_SET: ReadonlySet<string> = new Set(MAIN_ASPECT_RATIOS);
 
 export type NuzlockeSettings = {
     mainWidth: number;
+    sideMaxWidth: number;
+    camMaxHeight: number;
     mainAspectRatio: MainAspectRatio;
     camMode: CamMode;
     frameBorderColor: string;
@@ -65,6 +79,8 @@ export type NuzlockeSettings = {
 
 export const DEFAULT_SETTINGS: NuzlockeSettings = {
     mainWidth: 1200,
+    sideMaxWidth: MAX_SIDE_MAX_WIDTH,
+    camMaxHeight: MAX_CAM_MAX_HEIGHT,
     mainAspectRatio: "4/3",
     camMode: "1",
     frameBorderColor: "#f87171",
@@ -87,6 +103,18 @@ export function normalizeMainWidth(input: unknown, fallback: number): number {
     return Math.min(MAX_MAIN_WIDTH, Math.max(MIN_MAIN_WIDTH, Math.round(value)));
 }
 
+export function normalizeSideMaxWidth(input: unknown, fallback: number): number {
+    const value = Number(input);
+    if (!Number.isFinite(value)) return fallback;
+    return Math.min(MAX_SIDE_MAX_WIDTH, Math.max(MIN_SIDE_MAX_WIDTH, Math.round(value)));
+}
+
+export function normalizeCamMaxHeight(input: unknown, fallback: number): number {
+    const value = Number(input);
+    if (!Number.isFinite(value)) return fallback;
+    return Math.min(MAX_CAM_MAX_HEIGHT, Math.max(MIN_CAM_MAX_HEIGHT, Math.round(value)));
+}
+
 export function normalizeCamMode(input: unknown, fallback: CamMode): CamMode {
     return typeof input === "string" && CAM_MODE_SET.has(input) ? (input as CamMode) : fallback;
 }
@@ -101,6 +129,8 @@ export function normalizeSettings(input: unknown, fallback: NuzlockeSettings = D
     const source = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
     return {
         mainWidth: normalizeMainWidth(source.mainWidth, fallback.mainWidth),
+        sideMaxWidth: normalizeSideMaxWidth(source.sideMaxWidth, fallback.sideMaxWidth),
+        camMaxHeight: normalizeCamMaxHeight(source.camMaxHeight, fallback.camMaxHeight),
         mainAspectRatio: normalizeMainAspectRatio(source.mainAspectRatio, fallback.mainAspectRatio),
         camMode: normalizeCamMode(source.camMode, fallback.camMode),
         frameBorderColor: normalizeColor(source.frameBorderColor, fallback.frameBorderColor),
