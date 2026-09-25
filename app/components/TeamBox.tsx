@@ -100,7 +100,7 @@ export function BadgesV({badges, group, className, label, color = "#eab308", tex
                             src={`/badges/${id}.png`}
                             alt={badgeTitle(id)}
                             title={badgeTitle(id)}
-                            className={`h-full w-full object-contain [image-rendering:pixelated] ${earned.has(id) ? "" : "opacity-20 grayscale"}`}
+                            className={`h-full w-full object-contain [image-rendering:pixelated] ${earned.has(id) ? "" : "opacity-40 grayscale"}`}
                         />
                     </div>
                 ))}

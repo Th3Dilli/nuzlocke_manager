@@ -188,7 +188,7 @@ export default function BadgesEditor({apiUrl, field = "badges", badges: remoteBa
                                         <img
                                             src={`/badges/${badge.id}.png`}
                                             alt={badge.name}
-                                            className={`h-10 w-10 object-contain ${isSelected ? "" : "opacity-20 grayscale"}`}
+                                            className={`h-10 w-10 object-contain ${isSelected ? "" : "opacity-40 grayscale"}`}
                                         />
                                         <span className={`w-full truncate text-center text-[11px] ${isSelected ? "text-yellow-200" : "text-gray-500"}`}>
                                             {badge.name}
