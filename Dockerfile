@@ -1,23 +1,17 @@
-# Base image
 FROM node:24-slim
 
-# Create app directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Build tools for native modules (better-sqlite3)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends python3 make g++ \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
+COPY package*.json ./
 RUN npm ci
 
-# Copy project files
 COPY . .
-
-# Build the Next.js application
 RUN npm run build
 
-# Expose the port the app runs on
 EXPOSE 3000
-
-# Start the application
 CMD ["npm", "start"]
